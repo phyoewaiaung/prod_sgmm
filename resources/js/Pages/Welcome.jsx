@@ -8,7 +8,7 @@ export default function Welcome(props) {
                     <div className="flex justify-center">
                         <img src='images/logo.png' width="100" height="70" alt="" />
                     </div>
-                    <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR Testing Par</h1>
+                    <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
                 </header>
                 <main>
                     <div className="flex flex-col justify-center align-middle">
