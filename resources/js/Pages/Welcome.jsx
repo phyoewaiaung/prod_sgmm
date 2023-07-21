@@ -13,7 +13,7 @@ export default function Welcome(props) {
                 <main>
                     <div className="flex flex-col justify-center align-middle">
                         <h2 className="text-blue-700 text-center text-2xl">WELCOME TO SGMYANMAR LOGISTIC SERVICE</h2>
-                        <div className="color ms-[100px] me-[100px] mt-4">
+                        <div className="color ms-[100px] me-[100px] mt-4 dark:text-gray-400">
                             &#10077; Connecting Nations, Delivering Promises.
                             We provide efficient logistics solutions, bridging distances between Myanmar and Singapore,
                             delivering excellence every step of the way. &#10078;
@@ -22,26 +22,26 @@ export default function Welcome(props) {
 
                     <div className="mt-6 flex md:flex-row flex-col place-items-center md:justify-center gap-2">
                         <Link href={route('check-parcel')}>
-                            <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-400 hover:bg-gray-200">
+                            <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-400 ">
                                 <a href="#">
                                     <img className="rounded-t-lg" src="/docs/images/blog/image-1.jpg" alt="" />
                                 </a>
                                 <div className="p-5">
                                     <a href="#">
-                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">Track The Parcel</h5>
+                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">Track The Parcel</h5>
                                     </a>
                                     <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">Welcome to our parcel tracking service. To check the status and location of your parcel</div>
                                 </div>
                             </div>
                         </Link>
                         <Link href={route('logistic-price-list')}>
-                            <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-400 hover:bg-gray-200">
+                            <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-400 ">
                                 <a href="#">
                                     <img className="rounded-t-lg" src="/docs/images/blog/image-1.jpg" alt="" />
                                 </a>
                                 <div className="p-5">
                                     <a href="#">
-                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">Logistic Price List</h5>
+                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">Logistic Price List</h5>
                                     </a>
                                     <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">Thank you for considering our logistic services. Please check our price list for shipping services to various destinations.</div>
                                 </div>
@@ -51,26 +51,26 @@ export default function Welcome(props) {
 
                     <div className="mt-6 flex md:flex-row flex-col place-items-center md:justify-center gap-2">
                         <Link href={route('sg-to-mm')}>
-                            <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-400 hover:bg-gray-200">
+                            <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-400 ">
                                 <a href="#">
                                     <img className="rounded-t-lg" src="/docs/images/blog/image-1.jpg" alt="" />
                                 </a>
                                 <div className="p-5">
                                     <a href="#">
-                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">SG To MM Logistic Form</h5>
+                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">SG To MM Logistic Form</h5>
                                     </a>
                                     <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">Welcome to our logistics services for shipping from <span className="text-purple-700 font-bold">Singapore</span> to <span className="text-pink-700 font-bold">Myanmar</span>.</div>
                                 </div>
                             </div>
                         </Link>
                         <Link href={route('mm-to-sg')}>
-                            <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-gray-200">
+                            <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 ">
                                 <a href="#">
                                     <img className="rounded-t-lg" src="/docs/images/blog/image-1.jpg" alt="" />
                                 </a>
                                 <div className="p-5">
                                     <a href="#">
-                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">MM to SG Logistic Form</h5>
+                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">MM to SG Logistic Form</h5>
                                     </a>
                                     <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">Welcome to our logistics services for shipping from <span className="text-pink-700 font-bold">Myanmar</span> to <span className="text-purple-700 font-bold">Singapore</span>.</div>
                                 </div>
@@ -79,10 +79,10 @@ export default function Welcome(props) {
                     </div>
 
 
-                    <section className="bg-gray-100 py-16">
-                        <div className="container mx-auto px-4">
+                    <section className="bg-gray-100 py-16 dark:bg-gray-900 ">
+                        <div className="container mx-auto px-4 ">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ms-8 me-8">
-                                <div className="bg-white rounded-lg shadow-md p-6">
+                                <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 dark:text-gray-400">
                                     <h2 className="text-2xl text-blue-700 font-bold mb-4">Singapore Branch</h2>
                                     <div className="mb-4"><span className="font-bold">Address: </span>
                                         Peninsula Plaza, 111 North Bridge Road, #02-02A
@@ -92,7 +92,7 @@ export default function Welcome(props) {
                                     </div>
                                     <div className="mb-4"><span className="font-bold">Phone:</span> +65 9325 0329 / +65 8129 0955</div>
                                 </div>
-                                <div className="bg-white rounded-lg shadow-md p-6">
+                                <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 dark:text-gray-400">
                                     <h2 className="text-2xl text-blue-700 font-bold mb-4">Myanmar Branches</h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x-2 divide-x-0">
                                         <div className="pr-2">
@@ -113,7 +113,7 @@ export default function Welcome(props) {
                         </div>
                     </section>
                 </main>
-                <footer className="text-center font-medium ms-8 me-8">
+                <footer className="text-center font-medium ms-8 me-8 dark:text-gray-400">
                     © 2023 by SGMyanmar - Myanmar Online Store - Food Delivery - Logistic Service
                 </footer>
             </div>
