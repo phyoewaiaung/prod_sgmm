@@ -1,0 +1,338 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Carbon\Carbon;
+use Inertia\Inertia;
+use App\Models\Customer;
+use App\Models\MmToSgItem;
+use App\Models\SGtoMMItem;
+use Illuminate\Http\Request;
+use App\Models\MmCategoryItem;
+use App\Models\SgCategoryItem;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+
+class LogisticController extends Controller
+{
+    public function index()
+    {
+        return Inertia::render('Logistic/Index');
+    }
+
+    public function toSgMm()
+    {
+        return 'SG TO MM';
+    }
+
+    public function saveSGtoMM(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "sender_email" => "required|email",
+            "sender_name" => "required",
+            "sender_phone" => "required",
+            "sg_home_pickup" => "required",
+            "sg_address" => "required",
+            "shipment_method" => "required",
+            "how_in_ygn" => "required|in:1,2,3,4",
+            "payment_type" => "required|in:1,2",
+            "receiver_name" => "required",
+            "receiver_address" => "required",
+            "receiver_phone" => "required",
+            "note" => "",
+            "items"  => "required|Array"
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'    =>  'NG',
+                'message'   =>  $validator->errors()->all(),
+            ], 422);
+        }
+
+        $custData['name'] = $request->sender_name;
+        $custData['email'] = $request->sender_email;
+        $custData['phone'] = $request->sender_phone;
+
+        $receData['name'] = $request->receiver_name;
+        $receData['phone'] = $request->receiver_phone;
+
+        $chkCus = $this->chkCusOrReceiver($custData, 1);
+        $chkRece = $this->chkCusOrReceiver($receData, 2);
+
+        DB::beginTransaction();
+
+        try {
+
+            if (count($request->items) > 0) {
+                if (!$chkCus) {
+                    $newCustomer = Customer::create([
+                        'name' => $request->sender_name,
+                        'email' => $request->sender_email,
+                        'phone' => $request->sender_phone,
+                        'flag' => 1
+                    ]);
+                }
+
+                if (!$chkRece) {
+                    $newReceiver = Customer::create([
+                        'name' => $request->receiver_name,
+                        'phone' => $request->receiver_phone,
+                        'flag' => 2
+                    ]);
+                }
+                $no = $this->getInvoiceNo();
+                $logistic = SGtoMMItem::create([
+                    'sender_email' => $request->sender_email,
+                    'sender_name' => $request->sender_name,
+                    'sender_phone' => $request->sender_phone,
+                    'sg_home_pickup' => $request->sg_home_pickup,
+                    'sg_address' => $request->sg_address,
+                    'shipment_method' => $request->shipment_method,
+                    'invoice_no' => $no,
+                    'how_in_ygn' => $request->how_in_ygn,
+                    'payment_type' => $request->payment_type,
+                    'receiver_name' => $request->receiver_name,
+                    'receiver_address' => $request->receiver_address,
+                    'receiver_phone' => $request->receiver_phone,
+                    'note' => $request->note,
+                ]);
+
+                $items = [];
+                foreach ($request->items as $item) {
+                    $data['sg_to_mm_id']        = $logistic->id;
+                    $data['item_category_id']   = $item;
+                    $data['created_at']         = Carbon::now()->format("Y-m-d H:i:s");
+                    $data['updated_at']         = Carbon::now()->format("Y-m-d H:i:s");
+                    // $data['weight']             = null;
+                    array_push($items, $data);
+                }
+
+                $sgCategoryItem = SgCategoryItem::insert($items);
+            } else {
+                return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
+            }
+
+            DB::commit();
+            return response()->json(['status' => 200, 'message' => 'Successfully Insert']);
+        } catch (\Exception $e) {
+            Log::info($e);
+            DB::rollback();
+            return response()->json(['status' => 500, 'message' => 'Something was Wrong']);
+        }
+    }
+
+    public function getInvoiceNo()
+    {
+        // sample --> SM23-07W3006 
+        $date = today();
+        $default = "SM";
+        $no = '001';
+        $carbonDate = Carbon::parse($date);
+        $month = Carbon::parse($date)->format('m');
+        $year = Carbon::parse($date)->format('y');
+        $weekOfMonth = ceil(($carbonDate->day) / 7);
+
+        $firstDayOfMonth = Carbon::createFromDate(now(), $month, 1)->startOfDay();
+        $lastDayOfMonth = Carbon::createFromDate(now(), $month, 1)->endOfMonth()->endOfDay();
+        // return [$firstDayOfMonth, $lastDayOfMonth];
+        $lastNo = SGtoMMItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
+            ->orderBy('created_at', 'desc')->first();
+
+        if (!empty($lastNo)) {
+            $dbNo = $lastNo->invoice_no;
+            $number = substr($dbNo, -3);
+            $incrementedNumber = (int)$number + 1;
+            $no = str_pad($incrementedNumber, strlen($number), '0', STR_PAD_LEFT);
+        }
+        $invoiceNo = "$default$year-$month" . "W" . "$weekOfMonth$no";
+        return $invoiceNo;
+    }    
+
+    public function toMmSG()
+    {
+        return 'mm to sg yout p';
+    }
+
+    public function saveMMtoSG(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            "sender_email" => "required|email",
+            "sender_name" => "required",
+            "sender_phone" => "required",
+            "sender_address" => "required",
+            "transport" => "required",
+            "storage_type" => "required",
+            "mm_home_pickup" => "required",
+            "how_in_sg" => "required|in:1,2,3,4",
+            "payment_type" => "required|in:1,2",
+            "receiver_postal_code" => "",
+            "receiver_name" => "required",
+            "receiver_address" => "required",
+            "receiver_phone" => "required",
+            "additional_instruction" => "",
+            "items"  => "required|Array"
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'    =>  'NG',
+                'message'   =>  $validator->errors()->all(),
+            ], 422);
+        }
+
+        $custData['name'] = $request->sender_name;
+        $custData['email'] = $request->sender_email;
+        $custData['phone'] = $request->sender_phone;
+
+        $receData['name'] = $request->receiver_name;
+        $receData['phone'] = $request->receiver_phone;
+
+        $chkCus = $this->chkCusOrReceiver($custData, 1);
+        $chkRece = $this->chkCusOrReceiver($receData, 2);
+
+        DB::beginTransaction();
+
+        try {
+            if (count($request->items) > 0) {
+                if (!$chkCus) {
+                    $newCustomer = Customer::create([
+                        'name' => $request->sender_name,
+                        'email' => $request->sender_email,
+                        'phone' => $request->sender_phone,
+                        'flag' => 1
+                    ]);
+                }
+
+                if (!$chkRece) {
+                    $newReceiver = Customer::create([
+                        'name' => $request->receiver_name,
+                        'phone' => $request->receiver_phone,
+                        'flag' => 2
+                    ]);
+                }
+                $no = $this->getInvoiceNo();
+                $logistic = MmToSgItem::create([
+                    'sender_name' => $request->sender_name,
+                    'sender_phone' => $request->sender_phone,
+                    'sender_address' => $request->sender_address,
+                    'transport' => $request->transport,
+                    'storage_type' => $request->storage_type,
+                    'mm_home_pickup' => $request->mm_home_pickup,
+                    'how_in_sg' => $request->how_in_sg,
+                    'invoice_no' => $no,
+                    'payment_type' => $request->payment_type,
+                    'receiver_name' => $request->receiver_name,
+                    'receiver_phone' => $request->receiver_phone,
+                    'receiver_address' => $request->receiver_address,
+                    'receiver_postal_code' => $request->receiver_postal_code,
+                    'additional_instruction' => $request->additional_instruction,
+                ]);
+
+                $items = [];
+                foreach ($request->items as $item) {
+                    $data['mm_to_sg_id']        = $logistic->id;
+                    $data['item_category_id']   = $item;
+                    $data['created_at']         = Carbon::now()->format("Y-m-d H:i:s");
+                    $data['updated_at']         = Carbon::now()->format("Y-m-d H:i:s");
+                    // $data['weight']             = null;
+                    array_push($items, $data);
+                }
+
+                $sgCategoryItem = MmCategoryItem::insert($items);
+            } else {
+                return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
+            }
+
+            DB::commit();
+            return response()->json(['status' => 200, 'message' => 'Successfully Insert']);
+        } catch (\Exception $e) {
+            Log::info($e);
+            DB::rollback();
+            return response()->json(['status' => 500, 'message' => 'Something Was Wrong']);
+        }
+    }
+
+
+    public function chkCusOrReceiver($data, $flag)
+    {
+        return Customer::where($data)
+            ->where('flag', $flag)
+            ->exists();
+    }
+
+    // public function mailSend()
+    // {
+    //     try {
+    //         $tourData = TourInfo::where('id', $id)->whereNull('deleted_at')->first();
+
+    //         $approver = User::where('user_id', $tourData->approver_id)
+    //             ->leftJoin('roles', 'roles.id', 'users.role_id')
+    //             ->select('users.*', 'roles.name')
+    //             ->first();
+    //         $prepareBy = User::where('user_id', $tourData->prepare_user_id)
+    //             ->leftJoin('roles', 'roles.id', 'users.role_id')
+    //             ->select('users.*', 'roles.name')
+    //             ->first();
+
+    //         $onResData = OnlineReservation::join('customers', 'customers.id', 'online_reservations.customer_id')
+    //             ->where('online_reservations.id', $tourData->online_reservation_id)
+    //             ->whereNull('online_reservations.deleted_at')->first();
+
+    //         $bookingTypes = $this->bookingTypesPrepare($tourData->online_reservation_id);
+
+
+    //         $company = Company::where('id', $tourData->company_id)->first();
+    //         $tourName = $tourData->tour_name;
+
+
+    //         $approverMailData = [
+    //             "company_name" => $company->company_name,
+    //             "email" => $approver->email,
+    //             "user_name" => $approver->user_name,
+    //             "title" => "Approver Approve",
+    //             "body" => "You have approved the tour with the title '${tourName}'",
+    //             "quotation_title" => $tourName,
+    //             "customer_name" => $onResData->customer_name,
+    //             "booking_types" => $bookingTypes,
+    //             "tour_date" => $tourData->tour_period_from . ' ~ ' . $tourData->tour_period_to,
+    //             "preparer_name" => $prepareBy->user_name,
+    //             "approver_name" => $approver->user_name,
+    //         ];
+
+    //         $prepareMailData = [
+    //             "company_name" => $company->company_name,
+    //             "email" => $prepareBy->email,
+    //             "user_name" => $prepareBy->user_name,
+    //             "title" => "Approving Tour by Approver",
+    //             "body" =>  "Approver have approved the tour with the title ' ${tourName} ' that you have prepared.",
+    //             "quotation_title" => $tourName,
+    //             "customer_name" => $onResData->customer_name,
+    //             "booking_types" => $bookingTypes,
+    //             "tour_date" => $tourData->tour_period_from . ' ~ ' . $tourData->tour_period_to,
+    //             "preparer_name" => $prepareBy->user_name,
+    //             "approver_name" => $approver->user_name,
+    //         ];
+
+
+    //         Mail::send('mail.approve_tour_by_approver', $approverMailData, function ($message) use ($approverMailData) {
+    //             $message->to($approverMailData["email"])
+    //                 ->subject($approverMailData["title"]);
+    //         });
+
+    //         Mail::send('mail.approve_tour_by_approver', $prepareMailData, function ($message) use ($prepareMailData) {
+    //             $message->to($prepareMailData["email"])
+    //                 ->subject($prepareMailData["title"]);
+    //         });
+
+    //         return true;
+    //     } catch (\Exception $e) {
+    //         Log::debug($e->getMessage() . ' error occur in file ' . __FILE__ . ' at line ' . __LINE__ . ' within the class ' . get_class());
+    //         return false;
+    //     }
+
+    // }
+}
