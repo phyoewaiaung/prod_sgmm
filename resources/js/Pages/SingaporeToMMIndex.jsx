@@ -1,8 +1,14 @@
 import React from 'react'
+import QRCode from 'qrcode.react';
 
-const SingaporeToMMIndex = () => {
+const SingaporeToMMIndex = (props) => {
   return (
-    <div>SingaporeToMMIndex</div>
+    <>
+      <div>SingaporeToMMIndex</div>
+
+      
+      <img src={`/${props.qr}`} />
+    </>
   )
 }
 

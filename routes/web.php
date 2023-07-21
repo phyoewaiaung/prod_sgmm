@@ -27,11 +27,14 @@ Route::get('/', function () {
 });
 
 Route::get('/logistic', [LogisticController::class, 'index'])->name('logistic.index');
-Route::get('/logistic/sg-mm', [LogisticController::class, 'toSgMm'])->name('logistic.toSgMm');
-Route::get('/logistic/sg-mm-save', [LogisticController::class, 'saveSGtoMM'])->name('logistic.sg-save');
+// Route::get('/logistic/sg-mm', [LogisticController::class, 'toSgMm'])->name('logistic.toSgMm');
+Route::post('/logistic/sg-mm-save', [LogisticController::class, 'saveSGtoMM'])->name('logistic.sg-save');
 
-Route::get('/logistic/mm-sg', [LogisticController::class, 'toMmSG'])->name('logistic.toMmSg');
-Route::get('/logistic/mm-sg-save', [LogisticController::class, 'saveMMtoSG'])->name('logistic.mm-save');
+// Route::get('/logistic/mm-sg', [LogisticController::class, 'toMmSG'])->name('logistic.toMmSg');
+Route::post('/logistic/mm-sg-save', [LogisticController::class, 'saveMMtoSG'])->name('logistic.mm-save');
+Route::get('/logistic/search', [LogisticController::class, 'search'])->name('logistic.search');
+
+// Route::
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
