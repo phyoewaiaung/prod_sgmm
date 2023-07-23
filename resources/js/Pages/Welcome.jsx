@@ -6,7 +6,7 @@ export default function Welcome(props) {
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <header>
                     <div className="flex justify-center">
-                        <img src='images/logo.png' width="100" height="70" alt="" />
+                        <img src='images/logo.png' width="100" height="70" alt="sgmyanmar logo" />
                     </div>
                     <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
                 </header>
@@ -19,6 +19,27 @@ export default function Welcome(props) {
                             delivering excellence every step of the way. &#10078;
                         </div>
                     </div>
+                    <div className="flex mt-6 justify-center">
+                        <Link href={route('check-parcel')}>
+                            <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-400 ">
+                                <a href="#">
+                                    <img className="rounded-t-lg" src="/docs/images/blog/image-1.jpg" alt="" />
+                                </a>
+                                <div className="p-5">
+                                    <a href="#">
+                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">Check Invoices</h5>
+                                    </a>
+                                    <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">Click here to access the invoices. Keep track of your invoices and payment status effortlessly.</div>
+                                    <Link href={route('check-invoice')}>
+                                        <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                                            Check Invoices
+                                        </button>
+                                    </Link>
+                                </div>
+                            </div>
+                        </Link>
+                    </div>
+                    <hr className='mt-3 border border-gray-200' />
 
                     <div className="mt-6 flex md:flex-row flex-col place-items-center md:justify-center gap-2">
                         <Link href={route('check-parcel')}>
