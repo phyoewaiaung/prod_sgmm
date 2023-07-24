@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.required:after {
+    content: " *";
+    color: red;
+  }
+ol{
+    list-style-type: decimal;
+}
+ul{
+  list-style-type: disc;
+}

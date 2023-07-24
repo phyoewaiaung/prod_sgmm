@@ -55,11 +55,11 @@ class LogisticController extends Controller
 
         $mailSend = $this->mailSend();
 
-        if($mailSend){
-            return 'send p par p';
-        }
+        // if($mailSend){
+        //     return 'send p par p';
+        // }
 
-        return 'errror';
+        // return 'errror';
         $custData['name'] = $request->sender_name;
         $custData['email'] = $request->sender_email;
         $custData['phone'] = $request->sender_phone;
@@ -290,33 +290,12 @@ class LogisticController extends Controller
     public function mailSend()
     {
         try {
-            // $tourData = TourInfo::where('id', $id)->whereNull('deleted_at')->first();
-
-            // $approver = User::where('user_id', $tourData->approver_id)
-            //     ->leftJoin('roles', 'roles.id', 'users.role_id')
-            //     ->select('users.*', 'roles.name')
-            //     ->first();
-            // $prepareBy = User::where('user_id', $tourData->prepare_user_id)
-            //     ->leftJoin('roles', 'roles.id', 'users.role_id')
-            //     ->select('users.*', 'roles.name')
-            //     ->first();
-
-            // $onResData = OnlineReservation::join('customers', 'customers.id', 'online_reservations.customer_id')
-            //     ->where('online_reservations.id', $tourData->online_reservation_id)
-            //     ->whereNull('online_reservations.deleted_at')->first();
-
-            // $bookingTypes = $this->bookingTypesPrepare($tourData->online_reservation_id);
-
-
-            // $company = Company::where('id', $tourData->company_id)->first();
-            // $tourName = $tourData->tour_name;
-
-
             $approverMailData = [
-                "company_name" => 'Developer',
-                "email" => 'waiyan@yopmail.com',
+                // "email" => 'waiyan@yopmail.com',
+                "email" => 'waiyankyw96@gmail.com',
+                // "email" => 'phyoewaiaung082@gmail.com',
                 "user_name" => 'KG',
-                'title' => 'sam p po kyi tr pr'
+                'title' => 'SGMYANMAR SG to MM Pick up acknowledgement'
             ];
 
             $prepareMailData = [
@@ -325,16 +304,19 @@ class LogisticController extends Controller
                 "user_name" => 'WYK',
             ];
 
+            $files = [
+                public_path('images/logo.png')
+            ];
 
-            Mail::send('mail.testing', $approverMailData, function ($message) use ($approverMailData) {
+
+            Mail::send('mail.testing', $approverMailData, function ($message) use ($approverMailData, $files) {
                 $message->to($approverMailData["email"])
                     ->subject($approverMailData["title"]);
-            });
 
-            // Mail::send('mail.approve_tour_by_approver', $prepareMailData, function ($message) use ($prepareMailData) {
-            //     $message->to($prepareMailData["email"])
-            //         ->subject($prepareMailData["title"]);
-            // });
+                    foreach ($files as $file){
+                        $message->attach($file);
+                    }
+            });
 
             return true;
         } catch (\Exception $e) {
@@ -369,4 +351,6 @@ class LogisticController extends Controller
         }
         
     }
+
+
 }

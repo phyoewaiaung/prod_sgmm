@@ -7,13 +7,20 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>This is Testing mail form SG_MM</h1>
-    <h1>This is Testing mail form SG_MM</h1>
-    <h1>This is Testing mail form SG_MM</h1>
-    <h1>This is Testing mail form SG_MM</h1>
-    <h1>This is Testing mail form SG_MM</h1>
-    <h1>This is Testing mail form SG_MM</h1>
-    <h1>This is Testing mail form SG_MM</h1>
-    <h1>This is Testing mail form SG_MM</h1>
+    <h4>Hello,</h4>
+
+    <p>Please let us know if you are requesting a home pick up.</p>
+    <p>Based on the information, it's questionable.</p>
+
+    <p>Please provide name, phone number, and SG home address so that we can contact you.</p>
+
+    <p>Thank you.</p>
+
+
+
+    <p>Best Regards,</p>
+    <img src="{{ $message->embed('images/SGMYANMAR.png') }}" width="120px">
+
+    {{-- <img src='images/logo.png' alt="">     --}}
 </body>
 </html>
