@@ -5,7 +5,7 @@ const InvoiceIssueIndex = () => {
     return (
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
-                <header className='flex flex-col md:flex-row justify-around items-center gap-10'>
+                <header className='ml-3 mr-3 md:ml-0 md:mr-0 flex flex-col md:flex-row justify-around items-center gap-10'>
                     <div className='md:pl-[100px] md:pr-[100px]'>
                         <Link href='/'>
                             <div className="flex justify-center items-center">
@@ -66,10 +66,10 @@ const InvoiceIssueIndex = () => {
                             <h3 className="font-bold dark:text-gray-400">Sender Contact Number : <span className='font-normal'>092345673</span></h3>
                         </div>
                     </div>
-                    <div className='mt-4'>
+                    <div className='mt-4 ml-3 mr-3 md:ml-0 md:mr-0'>
                         <h3 className='dark:text-red-400 font-bold'>phyoewaiaung082@gmail.com</h3>
                     </div>
-                    <div className="mb-3 invoice-issue-container">
+                    <div className="mb-3 invoice-issue-container md:mr-0 md:ml-0 ml-3 mr-3">
                         <table className='invoice-issue-table text-center'>
                             <thead>
                                 <tr>
@@ -149,9 +149,9 @@ const InvoiceIssueIndex = () => {
                             </tbody>
                         </table>
                     </div>
-                    <h3 className="font-bold text-red-600 mt-1">*Any Loss or Damage, we will refund item price OR refund 3 times of shipping fee (item 1 to 5 only), whichever is lower.</h3>
-                    <h3 className="font-bold text-red-600">**if require full refund, additional 5% of item value have to pay upfront</h3>
-                    <div className="flex md:flex-row flex-col md:justify-between mb-5 items-center">
+                    <h3 className="ml-3 mr-3 md:mr-0 md:ml-0 font-bold text-red-600 mt-1">*Any Loss or Damage, we will refund item price OR refund 3 times of shipping fee (item 1 to 5 only), whichever is lower.</h3>
+                    <h3 className="ml-3 mr-3 md:mr-0 md:ml-0 font-bold text-red-600">*if require full refund, additional 5% of item value have to pay upfront</h3>
+                    <div className="ml-5 mr-5 md:mr-0 md:ml-0 flex md:flex-row flex-col md:justify-between mb-5 items-center">
                         <div className='dark:text-gray-400'>
                             <h4 className="font-bold">Terms & Conditions:</h4>
                             <ol>
@@ -164,7 +164,7 @@ const InvoiceIssueIndex = () => {
                             <div>Filters</div>
                             <div>Special Instruction:</div>
                         </div>
-                        <div className='md:mr-[80px]'>
+                        <div className='md:mr-[80px] md:mt-0 mt-4'>
                             <div>
                                 <button className='invoice-issue-button'>Send Email</button>
                             </div>

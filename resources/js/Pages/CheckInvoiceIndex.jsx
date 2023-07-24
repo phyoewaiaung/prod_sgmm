@@ -47,8 +47,8 @@ const CheckInvoiceIndex = () => {
                             Search
                         </button>
                     </div>
-                    <h3 className="font-bold text-xl mb-3 dark:text-gray-400">Check Invoice List</h3>
-                    <div className='invoice-list-container mb-5'>
+                    <h3 className="ml-3 mr-3 md:ml-0 md:mr-0 font-bold text-xl mb-3 dark:text-gray-400">Check Invoice List</h3>
+                    <div className='md:ml-0 md:mr-0 ml-3 mr-3 invoice-list-container mb-5'>
                         <table className='invoice-list-table text-center'>
                             <thead className='text-white'>
                                 <th width={50}>No</th>

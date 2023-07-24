@@ -99,11 +99,11 @@ const CheckParcelIndex = () => {
                             <div className='mt-3'>
                                 <label htmlFor="">Enter Key:</label>
                             </div>
-                            <div className="flex items-center gap-8">
+                            <div className="flex md:flex-row flex-col md:items-center md:gap-8">
                                 <div>
                                     <input type="text" name="" id="" value={key} onChange={keyChange} />
                                 </div>
-                                <div>
+                                <div className='md:mt-0 mt-3'>
                                     <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
                                         Update
                                     </button>
