@@ -20,7 +20,7 @@ export default function Welcome(props) {
                         </div>
                     </div>
                     <div className="flex mt-6 justify-center">
-                        <Link href={route('check-parcel')}>
+                        <Link href={route('check-invoice')}>
                             <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-400 ">
                                 <a href="#">
                                     <img className="rounded-t-lg" src="/docs/images/blog/image-1.jpg" alt="" />
@@ -39,7 +39,7 @@ export default function Welcome(props) {
                             </div>
                         </Link>
                     </div>
-                    <hr className='mt-3 border border-gray-200' />
+                    <hr className='mt-3 border border-gray-200 dark:border-gray-600' />
 
                     <div className="mt-6 flex md:flex-row flex-col place-items-center md:justify-center gap-2">
                         <Link href={route('check-parcel')}>

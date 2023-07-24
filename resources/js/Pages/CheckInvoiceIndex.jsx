@@ -22,11 +22,11 @@ const CheckInvoiceIndex = () => {
                         </div>
                         <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
                     </header></Link>
-                <main className='w-5/6'>
+                <main className='md:w-5/6 w-full'>
                     <h2 className="ont-extrabold text-transparent bg-clip-text bg-gradient-to-r text-blue-700 text-center text-2xl from-purple-700 mb-3 to-pink-600 ">Check Invoices</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-7 ml-[100px] mr-[100px]">
                         <div>
-                            <div className='mb-3'>
+                            <div className='mb-3 dark:text-gray-400'>
                                 <label htmlFor="">Invoice No:</label>
                             </div>
                             <div>
@@ -34,7 +34,7 @@ const CheckInvoiceIndex = () => {
                             </div>
                         </div>
                         <div>
-                            <div className='mb-3'>
+                            <div className='mb-3 dark:text-gray-400'>
                                 <label htmlFor="">Invoice Status:</label>
                             </div>
                             <div>
@@ -47,7 +47,7 @@ const CheckInvoiceIndex = () => {
                             Search
                         </button>
                     </div>
-                    <h3 className="font-bold text-xl mb-3">Check Invoice List</h3>
+                    <h3 className="font-bold text-xl mb-3 dark:text-gray-400">Check Invoice List</h3>
                     <div className='invoice-list-container mb-5'>
                         <table className='invoice-list-table text-center'>
                             <thead className='text-white'>
@@ -59,7 +59,7 @@ const CheckInvoiceIndex = () => {
                                 <th width={150}>Invoice Status</th>
                                 <th colSpan={4} width={500}>Action</th>
                             </thead>
-                            <tbody>
+                            <tbody className='dark:text-gray-400'>
                                 <tr>
                                     <td width={50}>1</td>
                                     <td width={200}>AS22-04W2W539</td>

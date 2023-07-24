@@ -38,3 +38,30 @@ table tbody td{
 .invoice-color-textarea{
     background-color: #B6E0CC;
 }
+.invoice-issue-table{
+    min-width: 950px;
+    width: 100%;
+}
+.invoice-issue-table td:nth-child(2){
+    text-align: start !important;
+}
+.invoice-issue-table thead {
+    background-color: #FFF2CC;
+}
+.invoice-issue-table {
+    border: 1px solid black;
+}
+.invoice-issue-container{
+    overflow: auto;
+}
+.invoice-issue-table thead th,
+.invoice-issue-table tbody td{
+    padding: 6px;
+    border-bottom: 1px solid black;
+}
+.invoice-issue-button{
+    width: 150px;
+    border: 1px solid lightslategray;
+    background-color: #CFE2F3;
+    padding: 7px;
+}
