@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
+import { checkNullOrBlank } from '@/Common/CommonValidation';
 
 const SingaporeToMMIndex = () => {
     const [pickUpRadio, setPickUpRadio] = useState('');
@@ -93,6 +94,16 @@ const SingaporeToMMIndex = () => {
 
     const sgPickUpAddressChange = (e) => {
         setSgPickUpAddress(e.target.value);
+    }
+
+    const submitClick = () => {
+        let errArr = [];
+        if(checkNullOrBlank(senderEmail)){
+            errArr.push('Please Fill Sender Email!');
+        }
+        if(checkNullOrBlank(senderName)){
+            errArr.push('Please Fill Sender Name!');
+        }
     }
 
     return (
@@ -306,7 +317,7 @@ const SingaporeToMMIndex = () => {
                         </div>
                     </div>
                     <div className="flex justify-center mb-4">
-                        <button type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                        <button onClick={submitClick} type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
                             Submit
                         </button>
                     </div>

@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
+import { checkNullOrBlank } from '@/Common/CommonValidation';
+
 
 const SingaporeToMMIndex = () => {
+    const [error, setError] = useState([]);
+    const [success, setSuccess] = useState([]);
     const [pickUpRadio, setPickUpRadio] = useState('');
     const [senderName, setSenderName] = useState('');
     const [senderEmail, setSenderEmail] = useState('');
@@ -140,6 +144,53 @@ const SingaporeToMMIndex = () => {
         setTransportId(e.target.value);
     }
 
+    const submitClick = () => {
+        let errArr = [];
+        let cargoIds = [];
+        cargoData.forEach(item => {
+            if(item.isChecked == true){
+                cargoIds.push(item.id);
+            }
+        })
+
+        if(checkNullOrBlank(senderEmail)){
+            errArr.push('Please Fill Sender Email!');
+        }
+        if(checkNullOrBlank(senderName)){
+            errArr.push('Please Fill Sender Name!');
+        }
+        if(checkNullOrBlank(senderPhone)){
+            errArr.push('Please Fill Sender Phone!');
+        }
+        if(checkNullOrBlank(transportId)){
+            errArr.push('Please Choose Sea Transport or Air Transport?');
+        }
+        if(cargoIds.length == 0){
+            errArr.push('Please choose at least one Item!');
+        }
+        if(checkNullOrBlank(pickUpRadio)){
+            errArr.push('Please choose Yangon Home Pick Up!');
+        }
+        if(checkNullOrBlank(selfCollectionId)){
+            errArr.push('Please Choose SG Home Delievry/ Self Collection!');
+        }
+        if(checkNullOrBlank(payment)){
+            errArr.push('Please Choose payment!');
+        }
+        if(checkNullOrBlank(recipientName)){
+            errArr.push('Please Fill Recipient Name!');
+        }
+        if(checkNullOrBlank(recipientPhone)){
+            errArr.push('Please Fill Recipient Phone!');
+        }
+        if(errArr.length > 0){
+            setError(errArr);
+            console.log(errArr);
+        }else{
+
+        }
+    }
+
     return (
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
@@ -259,9 +310,9 @@ const SingaporeToMMIndex = () => {
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Choose Yangon Home Pick up at S$3.50?</label>
                                 We will contact you to arrange day and time to pickup.
                                 <div className='mt-3'>
-                                    <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id="radio1" value="1" name="yes" onChange={pickUpChange} checked={pickUpRadio === "1" ? true : false} /> <label className=' dark:text-gray-400 cursor-pointer
-                                    me-3' htmlFor="radio1">Yes</label>
-                                    <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id='radio2' value="2" name="no" onChange={pickUpChange} checked={pickUpRadio === "2" ? true : false} /> <label className='cursor-pointer dark:text-gray-400 cursor-po' htmlFor="radio2">No</label>
+                                    <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id="ygnp1" value="1" name="yes" onChange={pickUpChange} checked={pickUpRadio === "1" ? true : false} /> <label className=' dark:text-gray-400 cursor-pointer
+                                    me-3' htmlFor="ygnp1">Yes</label>
+                                    <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id='ygnp2' value="2" name="no" onChange={pickUpChange} checked={pickUpRadio === "2" ? true : false} /> <label className='cursor-pointer dark:text-gray-400 cursor-po' htmlFor="ygnp2">No</label>
                                 </div>
                             </div>
                             <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded dark:text-gray-400'>
@@ -339,7 +390,7 @@ const SingaporeToMMIndex = () => {
                         </div>
                     </div>
                     <div className="flex justify-center mb-4">
-                        <button type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                        <button onClick={submitClick} type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
                             Submit
                         </button>
                     </div>
