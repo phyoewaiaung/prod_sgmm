@@ -21,7 +21,7 @@ function AppWrapper({ App, props }) {
         <BrowserRouter>
             <img onClick={themeClick} className="z-10 w-[30px] h-[30px] md:w-[40px] md:h-[40px] cursor-pointer absolute top-[15px] right-[21px]" src={isDarkMode ? 'images/night-mode.png' : 'images/day-mode.png'} alt="Theme png" />
             <div className={isDarkMode ? 'dark' : 'light'}>
-                <App {...props} />
+                <App {...props}/>
             </div>
         </BrowserRouter>
     );

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from '@inertiajs/react'
+import QrScanner from './QrScanner';
 
 const CheckParcelIndex = () => {
 
@@ -17,6 +18,10 @@ const CheckParcelIndex = () => {
 
     const keyChange = (e) => {
         setKey(e.target.value);
+    }
+
+    const handelCallBack = (qrResult) => {
+        setReceiptNo((JSON.parse(qrResult)).id);
     }
 
     return (
@@ -41,6 +46,7 @@ const CheckParcelIndex = () => {
                                 Sample: 'AS22-04W2W539' 'MS22-04W2W039' 'ASG-00300'
                             </div>
                         </h4>
+                        <QrScanner qrParentCallBack = {handelCallBack}/>
                         <div className='lg:w-[40%] md:w-[50%] w-[60%] mt-3 relative'>
                             <button className='absolute bg-gray-300 hover:bg-gray-400 p-2 font-bold rounded w-[100px] right-[-113px] top-[23px]'>Track</button>
                             <div className=' dark:text-gray-400'>

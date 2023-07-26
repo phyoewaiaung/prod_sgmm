@@ -19,7 +19,7 @@ table tbody td{
     overflow: auto;
 }
 .invoice-list-table{
-    min-width: 1250px;
+    min-width: 1100px;
     width: 100%;
 }
 .invoice-list-table thead th{
@@ -64,4 +64,11 @@ table tbody td{
     border: 1px solid lightslategray;
     background-color: #CFE2F3;
     padding: 7px;
+}
+.qr-style{
+    width: 40%;
+}
+.qr-style > div{
+    display: flex;
+    justify-content: center;
 }

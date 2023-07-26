@@ -57,7 +57,7 @@ const CheckInvoiceIndex = () => {
                                 <th width={150}>Recipient Name</th>
                                 <th width={100}>Payment</th>
                                 <th width={150}>Invoice Status</th>
-                                <th colSpan={4} width={500}>Action</th>
+                                <th colSpan={4} width={350}>Action</th>
                             </thead>
                             <tbody className='dark:text-gray-400'>
                                 <tr>
@@ -67,16 +67,13 @@ const CheckInvoiceIndex = () => {
                                     <td width={150}>mr wyk</td>
                                     <td width={100}>MM</td>
                                     <td width={150}>register</td>
-                                    <td width={100}>
+                                    <td width={150}>
                                         <Link href={route('invoice-issue')}>
                                             <button className='bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600'>Invoice issue</button>
                                         </Link>
                                     </td>
                                     <td width={100}>
                                         <button className='bg-gradient-to-r from-blue-400 to-blue-500 text-white p-2 rounded hover:from-blue-500 hover:to-blue-600'>Received</button>
-                                    </td>
-                                    <td width={100}>
-                                        <button className='bg-gradient-to-r from-yellow-400 to-yellow-500 text-white p-2 rounded hover:from-yellow-500 hover:to-yellow-600'>Collected</button>
                                     </td>
                                     <td width={100}>
                                         <button className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button>
@@ -94,9 +91,6 @@ const CheckInvoiceIndex = () => {
                                     </td>
                                     <td width={100}>
                                         <button className='bg-gradient-to-r from-blue-400 to-blue-500 text-white p-2 rounded hover:from-blue-500 hover:to-blue-600'>Received</button>
-                                    </td>
-                                    <td width={100}>
-                                        <button className='bg-gradient-to-r from-yellow-400 to-yellow-500 text-white p-2 rounded hover:from-yellow-500 hover:to-yellow-600'>Collected</button>
                                     </td>
                                     <td width={100}>
                                         <button className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button>
