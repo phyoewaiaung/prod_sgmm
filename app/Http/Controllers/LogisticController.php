@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Mpdf\Mpdf;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Models\Customer;
@@ -13,8 +14,10 @@ use App\Models\SgCategoryItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Validator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
 
 class LogisticController extends Controller
 {
@@ -352,5 +355,35 @@ class LogisticController extends Controller
         
     }
 
+    public function createPdf ()
+    {
+        $mpdf = new Mpdf([
+            'tempDir' => storage_path('app/mpdf/custom/temp/dir/path'),
+            'orientation' => 'L',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 15,
+            'margin_header' => 10,
+            'margin_footer' => 10,
+            
+        ]);
+        // $mpdf = LaravelMpdf::loadView('testpdf', ['datas' => 'this is pdf generate'],[
+        //     'auto_language_detection' => true,
+        //     'author'                  => 'WYK',
+        //     'margin_top' => 0
+        // ]);
+        
+        $mpdf->autoScriptToLang = true;
+        $mpdf->autoLangToFont = true;
 
+        $html = View::make('testpdf')
+                ->with('datas', 'this is pdf generate');
+        $html->render();
+        $mpdf->WriteHTML($html);
+        $fileName = "generate-001.pdf";
+
+        // return $mpdf->stream($fileName);
+        return $mpdf->Output($fileName, 'i');
+    }
 }

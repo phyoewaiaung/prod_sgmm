@@ -34,7 +34,7 @@ Route::post('/logistic/sg-mm-save', [LogisticController::class, 'saveSGtoMM'])->
 Route::post('/logistic/mm-sg-save', [LogisticController::class, 'saveMMtoSG'])->name('logistic.mm-save');
 Route::get('/logistic/search', [LogisticController::class, 'search'])->name('logistic.search');
 
-// Route::
+Route::get('/load-pdf', [LogisticController::class, 'createPdf'])->name('loadpdf');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
