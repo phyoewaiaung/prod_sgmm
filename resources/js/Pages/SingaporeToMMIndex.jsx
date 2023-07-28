@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Link } from '@inertiajs/react';
+import { checkNullOrBlank } from '@/Common/CommonValidation';
 
 const SingaporeToMMIndex = () => {
     const [pickUpRadio, setPickUpRadio] = useState('');
@@ -94,15 +96,27 @@ const SingaporeToMMIndex = () => {
         setSgPickUpAddress(e.target.value);
     }
 
+    const submitClick = () => {
+        let errArr = [];
+        if(checkNullOrBlank(senderEmail)){
+            errArr.push('Please Fill Sender Email!');
+        }
+        if(checkNullOrBlank(senderName)){
+            errArr.push('Please Fill Sender Name!');
+        }
+    }
+
     return (
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
-                <header>
-                    <div className="flex justify-center">
-                        <img src='images/logo.png' width="100" height="70" alt="" />
-                    </div>
-                    <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
-                </header>
+                <Link href='/'>
+                    <header>
+                        <div className="flex justify-center">
+                            <img src='images/logo.png' width="100" height="70" alt="" />
+                        </div>
+                        <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
+                    </header>
+                </Link>
                 <main className='md:ml-[200px] md:mr-[200px] mt-0 mb-0'>
                     <div className="flex flex-col justify-center align-middle">
                         <h2 className="text-blue-700 text-center text-2xl"><span className="text-purple-700 font-bold">SINGAPORE</span> TO <span className="text-pink-700 font-bold">MYANMAR</span> LOGISTIC SERVICE</h2>
@@ -129,7 +143,7 @@ const SingaporeToMMIndex = () => {
                                 <img className=' me-2' src="images/information.png" width={25} height={25} alt="" />
                                 All Document = $10.00 (flat fee), pickup ($7.0) and MM delivery charges applies
                             </h4>
-                            <div className='mt-3 bg-slate-200 p-3'>
+                            <div className='mt-3 bg-slate-200 p-3 dark:bg-gray-400'>
                                 <h4 className='flex mb-2 items-center'>
                                     <span className="font-bold">Singapore Office</span> : 111 North Bridge Road, #02-02A, Peninsula Plaza, S179098
                                 </h4>
@@ -143,15 +157,15 @@ const SingaporeToMMIndex = () => {
                     <h3 className='dark:text-gray-400 font-bold mt-7 mb-3 me-4 ms-4'>Please provide the following details to avail of our logistics services:</h3>
                     <div className=' pt-4 pb-4'>
                         <div className='me-4 ms-4'>
-                            <div className='flex border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Email</label>
                                 <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="email" name="" id="" value={senderEmail} onChange={senderEmailChange} />
                             </div>
-                            <div className='flex border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Sender's Name / ပေးပို့သူအမည်</label>
                                 <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderName} onChange={senderNameChange} />
                             </div>
-                            <div className='flex border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Choose SG Home Pick up? </label>
                                 <div className='mt-3'>
                                     <input className='focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id="radio1" value="1" name="yes" onChange={pickUpChange} checked={pickUpRadio === "1" ? true : false} /> <label className=' dark:text-gray-400 cursor-pointer
@@ -165,11 +179,11 @@ const SingaporeToMMIndex = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Singapore Address for SG Home Pick Up</label>
                                 <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={sgPickUpAddress} onChange={sgPickUpAddressChange} />
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Shipment Mode / ကုန်ပစ္စည်း ပို့ဆောင်မှု ပုံစံများ</label>
                                 <div className='mt-3'>
                                     {shipmentMode.map(data => {
@@ -187,7 +201,7 @@ const SingaporeToMMIndex = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>What are you sending? ပေးပို့မည့်ပစ္စည်း အမျိုးအစားများ</label>
                                 <div className='mt-3'>
                                     {cargoData.map(data => {
@@ -205,7 +219,7 @@ const SingaporeToMMIndex = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Choose Yangon Home Delivery / Send to Bus Gate (bus terminal) / Self Collection?
                                 </label>
                                 ရန်ကုန် အိမ်အရောက် ပို့ဆောင်ပေးခြင်း/ ကားဂိတ် တင်ပေးခြင်း/ ကိုယ်တိုင် ဆိုင်သို့လာရောက် ထုတ်ယူခြင်း
@@ -225,7 +239,7 @@ const SingaporeToMMIndex = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Payment in Singapore (SG) or in Myanmar (MM)?</label>
                                 ငွေပေးချေမှု ( SG Pay သို့မဟုတ် MM Pay)
                                 <div className='mt-4'>
@@ -234,21 +248,21 @@ const SingaporeToMMIndex = () => {
                                     <input className='focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id='payment2' value="2" name="MM Pay" onChange={paymentChange} checked={payment === "2" ? true : false} /> <label className='cursor-pointer' htmlFor="payment2">MM Pay</label>
                                 </div>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Name / လက်ခံမည့်သူ၏ နာမည်</label>
                                 <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientName} onChange={recipientNameChange} />
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Address /လက်ခံမည့်သူ၏ နေရပ်လိပ်စာ</label>
                                 Please fill in 'NA' or 'Yangon' if self collection
                                 <input className='w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientAddress} onChange={recipientAddressChange} />
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Contact Number / လက်ခံမည့်သူ၏ ဖုန်းနံပါတ်</label>
                                 you can fill in more than 1 contact number
                                 <input className='w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientPhone} onChange={recipientPhoneChange} />
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label className='font-bold'>
                                     Additional Notes For SG Home Pick Up
                                 </label>
@@ -267,7 +281,7 @@ const SingaporeToMMIndex = () => {
                                 </label>
                                 <input className='w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={additionalNote} onChange={additionNoteChange} />
                             </div>
-                            <div className='flex bg-blue-100 border-blue-200 border p-6 flex-col mb-4 rounded'>
+                            <div className='flex bg-blue-100 dark:bg-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='mb-2'>Terms and Conditions (Please Read)</label>
                                 <ol>
                                     <li className='mb-2'>
@@ -292,7 +306,7 @@ const SingaporeToMMIndex = () => {
                                         We may charge based on volumetric weight  (LxWxH/6000 =kg) OR actual weight, whichever is higher
                                     </li>
                                 </ol>
-                                <div className='bg-white p-6 mt-3'>
+                                <div className='bg-white p-6 mt-3 dark:bg-gray-300'>
                                     <label className='required font-bold' htmlFor="">Aggrement</label>
                                     <div className='flex justify-center items-center mt-3'>
                                         <input className='focus:ring cursor-pointer me-3 focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="checkbox" id='aggre' value={aggrementCheck} onChange={aggrementCheckChange} checked={aggrementCheck} />
@@ -303,7 +317,7 @@ const SingaporeToMMIndex = () => {
                         </div>
                     </div>
                     <div className="flex justify-center mb-4">
-                        <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                        <button onClick={submitClick} type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
                             Submit
                         </button>
                     </div>
