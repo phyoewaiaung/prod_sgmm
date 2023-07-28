@@ -143,7 +143,7 @@ class LogisticController extends Controller
 
     public function getInvoiceNo($data)
     {
-        // sample --> SM23-07W3006 
+        // sample --> SM23-07W3006
         $date = today();
         $default = "";
         $no = '001';
@@ -175,7 +175,7 @@ class LogisticController extends Controller
         }
         $invoiceNo = "$default$year-$month" . "W" . "$weekOfMonth$no";
         return $invoiceNo;
-    }    
+    }
 
     // public function toMmSG()
     // {
@@ -184,7 +184,7 @@ class LogisticController extends Controller
 
     public function saveMMtoSG (Request $request)
     {
-
+        return $request;
         $validator = Validator::make($request->all(), [
             "sender_email" => "required|email",
             "sender_name" => "required",

@@ -63,4 +63,12 @@ Route::get('logistic-price-list', function() {
     return Inertia::render('PriceListIndex');
 })->name('logistic-price-list');
 
+Route::get('check-invoice', function() {
+    return Inertia::render('CheckInvoiceIndex');
+})->name('check-invoice');
+
+Route::get('invoice-issue', function() {
+    return Inertia::render('InvoiceIssueIndex');
+})->name('invoice-issue');
+
 require __DIR__.'/auth.php';
