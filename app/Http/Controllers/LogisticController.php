@@ -56,13 +56,13 @@ class LogisticController extends Controller
             ], 422);
         }
 
-        $mailSend = $this->mailSend();
+        $mailSend = $this->mailSend('(SM....)');
 
-        // if($mailSend){
-        //     return 'send p par p';
-        // }
+        if($mailSend){
+            return 'send p par p';
+        }
 
-        // return 'errror';
+        return 'errror';
         $custData['name'] = $request->sender_name;
         $custData['email'] = $request->sender_email;
         $custData['phone'] = $request->sender_phone;
@@ -124,6 +124,8 @@ class LogisticController extends Controller
                 }
 
                 $sgCategoryItem = SgCategoryItem::insert($items);
+
+                $mailSend = $this->mailSend('(SM....)');
             } else {
                 return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
             }
@@ -290,15 +292,15 @@ class LogisticController extends Controller
             ->exists();
     }
 
-    public function mailSend()
+    public function mailSend($data)
     {
         try {
             $approverMailData = [
                 // "email" => 'waiyan@yopmail.com',
                 "email" => 'waiyankyw96@gmail.com',
-                // "email" => 'phyoewaiaung082@gmail.com',
                 "user_name" => 'KG',
-                'title' => 'SGMYANMAR SG to MM Pick up acknowledgement'
+                'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
+                "logistic" => $data,                
             ];
 
             $prepareMailData = [
@@ -308,9 +310,8 @@ class LogisticController extends Controller
             ];
 
             $files = [
-                public_path('images/logo.png')
+                // public_path('images/logo.png')
             ];
-
 
             Mail::send('mail.testing', $approverMailData, function ($message) use ($approverMailData, $files) {
                 $message->to($approverMailData["email"])
@@ -357,9 +358,11 @@ class LogisticController extends Controller
 
     public function createPdf ()
     {
+        $invoiceNo = 'SM23-07W4032';
         $mpdf = new Mpdf([
             'tempDir' => storage_path('app/mpdf/custom/temp/dir/path'),
-            'orientation' => 'L',
+            'format'  => 'A4',
+            // 'orientation' => 'L',
             'margin_left' => 10,
             'margin_right' => 10,
             'margin_top' => 10,
@@ -368,6 +371,12 @@ class LogisticController extends Controller
             'margin_footer' => 10,
             
         ]);
+
+        $title = "Main Title";
+        $subtitle = "Subtitle";
+        
+        $leftBoxContent = "Left Box Content";
+        $rightBoxContent = "Right Box Content";
         // $mpdf = LaravelMpdf::loadView('testpdf', ['datas' => 'this is pdf generate'],[
         //     'auto_language_detection' => true,
         //     'author'                  => 'WYK',
@@ -378,7 +387,12 @@ class LogisticController extends Controller
         $mpdf->autoLangToFont = true;
 
         $html = View::make('testpdf')
-                ->with('datas', 'this is pdf generate');
+                ->with('datas', 'this is pdf generate')
+                ->with('title', $title)
+                ->with('subtitle', $subtitle)
+                ->with('leftBoxContent', $leftBoxContent)
+                ->with('rightBoxContent', $rightBoxContent)
+                ->with('invoiceNo', $invoiceNo);
         $html->render();
         $mpdf->WriteHTML($html);
         $fileName = "generate-001.pdf";
