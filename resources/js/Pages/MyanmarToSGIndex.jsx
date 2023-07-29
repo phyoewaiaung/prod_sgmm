@@ -195,14 +195,11 @@ const SingaporeToMMIndex = () => {
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href="/">
-                    <header>
-                        <div className="flex justify-center">
-                            <img src='images/logo.png' width="100" height="70" alt="" />
-                        </div>
-                        <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
+                <header className="flex justify-center">
+                        <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
                     </header>
                 </Link>
-                <main className='md:ml-[200px] md:mr-[200px] mt-0 mb-0'>
+                <main className='md:ml-[200px] mt-[-35px] md:mr-[200px] mb-0'>
                     <div className="flex flex-col justify-center align-middle">
                         <h2 className="text-blue-700 text-center text-2xl"> <span className="text-pink-700 font-bold">MYANMAR </span>TO <span className="text-purple-700 font-bold">SINGAPORE</span> LOGISTIC SERVICE</h2>
                         <div className='mt-5 me-4 ms-4'>

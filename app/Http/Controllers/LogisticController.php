@@ -34,6 +34,7 @@ class LogisticController extends Controller
 
     public function saveSGtoMM(Request $request)
     {
+        Log::info($request);
         $validator = Validator::make($request->all(), [
             "sender_email" => "required|email",
             "sender_name" => "required",
@@ -128,7 +129,7 @@ class LogisticController extends Controller
                 $sgCategoryItem = SgCategoryItem::insert($items);
 
                 $getParcelTagFile = $this->createPdf($logistic);
-                
+
                 if($getParcelTagFile['status'] == "OK"){
                     $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
                     if(!$mailSend){
@@ -165,7 +166,7 @@ class LogisticController extends Controller
 
         $firstDayOfMonth = Carbon::createFromDate($Y, $month, 1)->startOfDay();
         $lastDayOfMonth = Carbon::createFromDate($Y, $month, 1)->endOfMonth()->endOfDay();
-        
+
         if($data['name'] === 'SGMM'){
             $lastNo = SGtoMMItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
                 ->orderBy('created_at', 'desc')->first();
@@ -176,7 +177,7 @@ class LogisticController extends Controller
                 ->orderBy('created_at', 'desc')->first();
             $default = "MS";
         }
-        
+
         if (!empty($lastNo)) {
             $dbNo = $lastNo->invoice_no;
             $number = substr($dbNo, -3);
@@ -286,7 +287,7 @@ class LogisticController extends Controller
             DB::commit();
             return response()->json(['status' => 200, 'message' => 'Successfully Insert']);
         } catch (\Exception $e) {
-            Log::info(' ========================== saveMMtoSG Error Log ============================== ');            
+            Log::info(' ========================== saveMMtoSG Error Log ============================== ');
             Log::info($e);
             Log::info(' ========================== saveMMtoSG Error Log ============================== ');
             DB::rollback();
@@ -309,7 +310,7 @@ class LogisticController extends Controller
                 "email" => $data->sender_email,
                 "user_name" => $data->sender_name,
                 'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
-                "logistic" => '(SM...)',                
+                "logistic" => '(SM...)',
             ];
 
             $files = [
@@ -336,7 +337,7 @@ class LogisticController extends Controller
 
     public function search (Request $request)
     {
-        
+
         $SGMM = SGtoMMItem::where('invoice_no', $request->invoice_no)->first();
         $MMSG = MmToSgItem::where('invoice_no', $request->invoice_no)->first();
 
@@ -346,7 +347,7 @@ class LogisticController extends Controller
             }else if(!empty($SGMM)){
                 $data = $SGMM;
             };
-            
+
             $fileName = "$data->invoice_no.svg";
             $qrCodeData  = QrCode::size(250)->generate($data, "qr_codes/$fileName");
 
@@ -356,7 +357,7 @@ class LogisticController extends Controller
         }else {
             return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
         }
-        
+
     }
 
     public function createPdf ($data)
@@ -364,7 +365,7 @@ class LogisticController extends Controller
         // $data = SGtoMMItem::first();
         $invoiceNo = $data->invoice_no;
         // return $data;
-        
+
         $mpdf = new Mpdf([
             'tempDir' => storage_path('app/mpdf/custom/temp/dir/path'),
             'format'  => 'A4',
@@ -375,14 +376,14 @@ class LogisticController extends Controller
             'margin_bottom' => 15,
             'margin_header' => 10,
             'margin_footer' => 10,
-            
+
         ]);
         // $mpdf = LaravelMpdf::loadView('testpdf', ['datas' => 'this is pdf generate'],[
         //     'auto_language_detection' => true,
         //     'author'                  => 'WYK',
         //     'margin_top' => 0
         // ]);
-        
+
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;
 
@@ -396,7 +397,7 @@ class LogisticController extends Controller
         // return $mpdf->stream($fileName);
         // return $mpdf->Output($fileName, 'i');
 
-        $fileName = "$invoiceNo.pdf";          
+        $fileName = "$invoiceNo.pdf";
         Storage::disk('public')->put('parcel-tag-file/' . $fileName, $mpdf->Output($fileName, "S"));
         return [
             'status' => 'OK',

@@ -5,13 +5,11 @@ const PriceListIndex = () => {
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href='/'>
-                    <header>
-                        <div className="flex justify-center">
-                            <img src='images/logo.png' width="100" height="70" alt="sgmyanmar logo" />
-                        </div>
-                        <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
-                    </header></Link>
-                <main className='w-5/6'>
+                    <header className="flex justify-center">
+                        <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
+                    </header>
+                </Link>
+                <main className='w-5/6 mt-[-35px]'>
                     <div className="flex flex-col justify-center align-middle">
                         <h2 className="ont-extrabold text-transparent bg-clip-text bg-gradient-to-r text-blue-700 text-center text-2xl from-purple-700 to-pink-600 ">LOGISTIC PRICE LIST</h2>
                     </div>

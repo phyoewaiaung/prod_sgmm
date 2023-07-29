@@ -9,12 +9,11 @@ const InvoiceIssueIndex = () => {
                     <div className='md:pl-[100px] md:pr-[100px]'>
                         <Link href='/'>
                             <div className="flex justify-center items-center">
-                                <img src='images/logo.png' width="100" height="70" alt="sgmyanmar logo" />
+                                <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
                             </div>
-                            <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
                         </Link>
                     </div>
-                    <div className='dark:text-gray-400'>
+                    <div className='dark:text-gray-400 mt-[-78px] md:mt-0'>
                         <h3 className='font-bold mb-2'>Singapore Branch</h3>
                         <h4>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</h4>
                         <h4>Contact: +65 9325 0329</h4>

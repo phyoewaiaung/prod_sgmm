@@ -3,13 +3,10 @@ export default function Welcome(props) {
     return (
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker  bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
-                <header>
-                    <div className="flex justify-center">
-                        <img src='images/logo.png' width="100" height="70" alt="sgmyanmar logo" />
-                    </div>
-                    <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
+                <header className="flex justify-center">
+                    <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
                 </header>
-                <main>
+                <main className="mt-[-35px]">
                     <div className="flex flex-col justify-center align-middle">
                         <h2 className="text-blue-700 text-center text-2xl">WELCOME TO SGMYANMAR LOGISTIC SERVICE</h2>
                         <div className="color ms-[100px] me-[100px] mt-4 dark:text-gray-400">

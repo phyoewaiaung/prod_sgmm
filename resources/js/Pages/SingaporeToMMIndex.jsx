@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
-import { checkNullOrBlank } from '@/Common/CommonValidation';
+import { checkNullOrBlank, emailChk } from '@/Common/CommonValidation';
+import Loading from '@/Common/Loading';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SingaporeToMMIndex = () => {
+    const [loading, setLoading] = useState(false);
     const [pickUpRadio, setPickUpRadio] = useState('');
     const [shipModeId, setShipModeId] = useState('');
     const [senderName, setSenderName] = useState('');
@@ -38,22 +42,36 @@ const SingaporeToMMIndex = () => {
         { id: 4, name: "Self Collection" }
     ]
 
-    const pickUpChange = (e) => {
-        setPickUpRadio(e.target.value);
-    }
-
-    const paymentChange = (e) => {
-        setPayment(e.target.value);
-    }
-
     const shipmodeOnChange = (e) => {
         setShipModeId(e.target.value);
+        document.getElementById('error-ship-mode').textContent = "";
+        document.getElementById('ship-mode').style.border = '1px solid #BFDBFE';
     }
 
-    const recipientNameChange = (e) => {
-        setRecipientName(e.target.value);
+    const senderEmailChange = (e) => {
+        setSenderEmail(e.target.value);
+        let error = document.getElementById('error-sender-email');
+        if (!emailChk(e.target.value)) {
+            error.textContent = 'Please Fill The Valid Email!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        } else {
+            error.textContent = '';
+            document.getElementById('senderEmail').style.border = '1px solid #BFDBFE';
+        }
     }
-
+    const senderNameChange = (e) => {
+        setSenderName(e.target.value)
+        if (!checkNullOrBlank(e.target.value)) {
+            document.getElementById('error-sender-name').textContent = "";
+            document.getElementById('senderName').style.border = '1px solid #BFDBFE';
+        }
+    }
+    const pickUpChange = (e) => {
+        setPickUpRadio(e.target.value);
+        document.getElementById('error-sg-home').textContent = "";
+        document.getElementById('sg-home-pick').style.border = '1px solid #BFDBFE';
+    }
     const cargoOnChage = (id) => {
         let data = cargoData.map(data => {
             if (data.id == id) {
@@ -62,30 +80,59 @@ const SingaporeToMMIndex = () => {
             return data;
         })
         setCargoData(data)
+        let cargoArr = [];
+        cargoData.forEach(d => {
+            if (d.isChecked == true) {
+                cargoArr.push(d.id)
+            }
+        })
+        if (cargoArr.length > 0) {
+            document.getElementById('error-what-send').textContent = "";
+            document.getElementById('what-send').style.border = '1px solid #BFDBFE';
+        } else {
+            document.getElementById('what-send').style.border = '1px solid red';
+            let error = document.getElementById('error-what-send');
+            error.textContent = 'Please Choose at least one item!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
     }
-
     const ygnHomeDeliChange = (e) => {
         setYgnDelId(e.target.value);
+        document.getElementById('error-ygn-home').textContent = "";
+        document.getElementById('ygn-home').style.border = '1px solid #BFDBFE';
     }
-
-    const senderNameChange = (e) => {
-        setSenderName(e.target.value)
+    const paymentChange = (e) => {
+        setPayment(e.target.value);
+        document.getElementById('error-payment').textContent = "";
+        document.getElementById('payment').style.border = '1px solid #BFDBFE';
     }
-
-    const senderEmailChange = (e) => {
-        setSenderEmail(e.target.value);
+    const recipientNameChange = (e) => {
+        setRecipientName(e.target.value);
+        if (!checkNullOrBlank(e.target.value)) {
+            document.getElementById('error-rec-name').textContent = "";
+            document.getElementById('rec-name').style.border = '1px solid #BFDBFE';
+        }
     }
-
     const recipientAddressChange = (e) => {
         setRecipientAddress(e.target.value);
+        if (!checkNullOrBlank(e.target.value)) {
+            document.getElementById('error-rec-add').textContent = "";
+            document.getElementById('rec-add').style.border = '1px solid #BFDBFE';
+        }
     }
-
     const recipientPhoneChange = (e) => {
         setRecipientPhone(e.target.value);
+        if (!checkNullOrBlank(e.target.value)) {
+            document.getElementById('error-rec-ph').textContent = "";
+            document.getElementById('rec-ph').style.border = '1px solid #BFDBFE';
+        }
     }
-
     const aggrementCheckChange = (e) => {
         setAggrementCheck(!aggrementCheck);
+        if (e.target.checked) {
+            document.getElementById('aggre-chk').textContent = "";
+        }
     }
 
     const additionNoteChange = (e) => {
@@ -97,27 +144,170 @@ const SingaporeToMMIndex = () => {
     }
 
     const submitClick = () => {
-        let errArr = [];
-        if(checkNullOrBlank(senderEmail)){
-            errArr.push('Please Fill Sender Email!');
+        let cargoArr = [];
+        cargoData.forEach(d => {
+            if (d.isChecked == true) {
+                cargoArr.push(d.id)
+            }
+        })
+        // let errArr = [];
+        if (checkNullOrBlank(senderEmail)) {
+            document.getElementById('senderEmail').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('senderEmail').style.border = '1px solid red';
+            let error = document.getElementById('error-sender-email');
+            error.textContent = 'Please Fill Sender Email!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(checkNullOrBlank(senderName)){
-            errArr.push('Please Fill Sender Name!');
+        else if (checkNullOrBlank(senderName)) {
+            document.getElementById('senderName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('senderName').style.border = '1px solid red';
+            let error = document.getElementById('error-sender-name');
+            error.textContent = 'Please Fill Sender Name!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else if (checkNullOrBlank(pickUpRadio)) {
+            document.getElementById('sg-home-pick').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('sg-home-pick').style.border = '1px solid red';
+            let error = document.getElementById('error-sg-home');
+            error.textContent = 'Please Choose Yes or No!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else if (checkNullOrBlank(shipModeId)) {
+            document.getElementById('ship-mode').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('ship-mode').style.border = '1px solid red';
+            let error = document.getElementById('error-ship-mode');
+            error.textContent = 'Please Choose Shipment Mode!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else if (cargoArr.length == 0) {
+            document.getElementById('what-send').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('what-send').style.border = '1px solid red';
+            let error = document.getElementById('error-what-send');
+            error.textContent = 'Please Choose at least one item!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else if (checkNullOrBlank(ygnDelId)) {
+            document.getElementById('ygn-home').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('ygn-home').style.border = '1px solid red';
+            let error = document.getElementById('error-ygn-home');
+            error.textContent = 'Please Choose Yangon Home Delivery!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else if (checkNullOrBlank(payment)) {
+            document.getElementById('payment').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('payment').style.border = '1px solid red';
+            let error = document.getElementById('error-payment');
+            error.textContent = 'Please Choose Payment!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else if (checkNullOrBlank(recipientName)) {
+            document.getElementById('rec-name').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('rec-name').style.border = '1px solid red';
+            let error = document.getElementById('error-rec-name');
+            error.textContent = 'Please Fill Recipient Name!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else if (checkNullOrBlank(recipientAddress)) {
+            document.getElementById('rec-add').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('rec-add').style.border = '1px solid red';
+            let error = document.getElementById('error-rec-add');
+            error.textContent = 'Please Fill Recipient Address!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else if (checkNullOrBlank(recipientPhone)) {
+            document.getElementById('rec-ph').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('rec-ph').style.border = '1px solid red';
+            let error = document.getElementById('error-rec-ph');
+            error.textContent = 'Please Fill Recipient Contact Number!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else if (!aggrementCheck) {
+            let error = document.getElementById('aggre-chk');
+            error.textContent = 'Please Check The Aggrementx!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else {
+            setLoading(true);
+            let params = {
+                "sender_email": senderEmail,
+                "sender_name": senderName,
+                "sender_phone": "098765432",
+                "sg_home_pickup": pickUpRadio,
+                "sg_address": sgPickUpAddress,
+                "shipment_method": shipModeId,
+                "how_in_ygn": ygnDelId,
+                "payment_type": payment,
+                "receiver_name": recipientName,
+                "receiver_address": recipientAddress,
+                "receiver_phone": recipientPhone,
+                "note": additionalNote,
+                "items": cargoArr
+            }
+            axios.post('/logistic/sg-mm-save', params)
+                .then(data => {
+                    setLoading(false);
+                    console.log('ok', data);
+                    toast.success('Successfully Registered!', {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    });
+                })
+                .catch((e) => {
+                    console.log(e);
+                    setLoading(false);
+                    toast.error('Fail To Register!', {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    });
+                });
         }
     }
 
     return (
         <>
+            <Loading start={loading} />
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href='/'>
-                    <header>
-                        <div className="flex justify-center">
-                            <img src='images/logo.png' width="100" height="70" alt="" />
-                        </div>
-                        <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
+                <header className="flex justify-center">
+                        <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
                     </header>
                 </Link>
-                <main className='md:ml-[200px] md:mr-[200px] mt-0 mb-0'>
+                <main className='md:ml-[200px] mt-[-35px] md:mr-[200px] mb-0'>
                     <div className="flex flex-col justify-center align-middle">
                         <h2 className="text-blue-700 text-center text-2xl"><span className="text-purple-700 font-bold">SINGAPORE</span> TO <span className="text-pink-700 font-bold">MYANMAR</span> LOGISTIC SERVICE</h2>
                         <div className='mt-5 me-4 ms-4'>
@@ -154,18 +344,20 @@ const SingaporeToMMIndex = () => {
                         </div>
                     </div>
 
-                    <h3 className='dark:text-gray-400 font-bold mt-7 mb-3 me-4 ms-4'>Please provide the following details to avail of our logistics services:</h3>
+                    <h3 id="" className='dark:text-gray-400 font-bold mt-7 mb-3 me-4 ms-4'>Please provide the following details to avail of our logistics services:</h3>
                     <div className=' pt-4 pb-4'>
                         <div className='me-4 ms-4'>
-                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='senderEmail' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Email</label>
                                 <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="email" name="" id="" value={senderEmail} onChange={senderEmailChange} />
+                                <span id='error-sender-email'></span>
                             </div>
-                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='senderName' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Sender's Name / ပေးပို့သူအမည်</label>
                                 <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderName} onChange={senderNameChange} />
+                                <span id="error-sender-name"></span>
                             </div>
-                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='sg-home-pick' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Choose SG Home Pick up? </label>
                                 <div className='mt-3'>
                                     <input className='focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id="radio1" value="1" name="yes" onChange={pickUpChange} checked={pickUpRadio === "1" ? true : false} /> <label className=' dark:text-gray-400 cursor-pointer
@@ -178,19 +370,20 @@ const SingaporeToMMIndex = () => {
                                         NO pickup on Thursdays and Sundays, please indicate under "Additional notes" if you have odd shape items or your items weigh more than 50kg.
                                     </div>
                                 </div>
+                                <span id="error-sg-home"></span>
                             </div>
                             <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
-                                <label htmlFor="" className='required mb-2'>Singapore Address for SG Home Pick Up</label>
+                                <label htmlFor="" className='mb-2'>Singapore Address for SG Home Pick Up</label>
                                 <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={sgPickUpAddress} onChange={sgPickUpAddressChange} />
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='ship-mode' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Shipment Mode / ကုန်ပစ္စည်း ပို့ဆောင်မှု ပုံစံများ</label>
                                 <div className='mt-3'>
                                     {shipmentMode.map(data => {
                                         return (
                                             <div className='mb-2' key={data.id}>
-                                                <input className='focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id={data.id} value={data.id} onChange={shipmodeOnChange} checked={shipModeId == data.id ? true : false} />
-                                                <label htmlFor="" className='ms-2'>{data.name}</label>
+                                                <input className='focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none cursor-pointer' type="radio" id={data.id + 'ship'} value={data.id} onChange={shipmodeOnChange} checked={shipModeId == data.id ? true : false} />
+                                                <label htmlFor={data.id + 'ship'} className='ms-2 cursor-pointer'>{data.name}</label>
                                             </div>
                                         )
                                     })}
@@ -200,8 +393,9 @@ const SingaporeToMMIndex = () => {
                                         Last day for Land cargo is Thursday / Last day for Land express & Air Cargo is Sunday / Last day for Sea Cargo is Sunday
                                     </div>
                                 </div>
+                                <span id="error-ship-mode"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='what-send' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>What are you sending? ပေးပို့မည့်ပစ္စည်း အမျိုးအစားများ</label>
                                 <div className='mt-3'>
                                     {cargoData.map(data => {
@@ -218,8 +412,9 @@ const SingaporeToMMIndex = () => {
                                         Last day for Land cargo is Thursday / Last day for Land express & Air Cargo is Sunday / Last day for Sea Cargo is Sunday
                                     </div>
                                 </div>
+                                <span id="error-what-send"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='ygn-home' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Choose Yangon Home Delivery / Send to Bus Gate (bus terminal) / Self Collection?
                                 </label>
                                 ရန်ကုန် အိမ်အရောက် ပို့ဆောင်ပေးခြင်း/ ကားဂိတ် တင်ပေးခြင်း/ ကိုယ်တိုင် ဆိုင်သို့လာရောက် ထုတ်ယူခြင်း
@@ -227,8 +422,8 @@ const SingaporeToMMIndex = () => {
                                     {ygnHomeDeli.map(data => {
                                         return (
                                             <div className='mb-2' key={data.id}>
-                                                <input className='focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id={data.id} value={data.id} onChange={ygnHomeDeliChange} checked={ygnDelId == data.id ? true : false} />
-                                                <label htmlFor="" className='ms-2'>{data.name}</label>
+                                                <input className='cursor-pointer focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id={data.id + 'ygn-home'} value={data.id} onChange={ygnHomeDeliChange} checked={ygnDelId == data.id ? true : false} />
+                                                <label htmlFor={data.id + 'ygn-home'} className='ms-2 cursor-pointer'>{data.name}</label>
                                             </div>
                                         )
                                     })}
@@ -238,8 +433,9 @@ const SingaporeToMMIndex = () => {
                                         Last day for Land cargo is Thursday / Last day for Land express & Air Cargo is Sunday / Last day for Sea Cargo is Sunday
                                     </div>
                                 </div>
+                                <span id="error-ygn-home"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='payment' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Payment in Singapore (SG) or in Myanmar (MM)?</label>
                                 ငွေပေးချေမှု ( SG Pay သို့မဟုတ် MM Pay)
                                 <div className='mt-4'>
@@ -247,20 +443,24 @@ const SingaporeToMMIndex = () => {
                                     me-3' htmlFor="payment1">SG Pay</label>
                                     <input className='focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id='payment2' value="2" name="MM Pay" onChange={paymentChange} checked={payment === "2" ? true : false} /> <label className='cursor-pointer' htmlFor="payment2">MM Pay</label>
                                 </div>
+                                <span id="error-payment"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='rec-name' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Name / လက်ခံမည့်သူ၏ နာမည်</label>
                                 <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientName} onChange={recipientNameChange} />
+                                <span id="error-rec-name"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='rec-add' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Address /လက်ခံမည့်သူ၏ နေရပ်လိပ်စာ</label>
                                 Please fill in 'NA' or 'Yangon' if self collection
                                 <input className='w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientAddress} onChange={recipientAddressChange} />
+                                <span id="error-rec-add"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='rec-ph' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Contact Number / လက်ခံမည့်သူ၏ ဖုန်းနံပါတ်</label>
                                 you can fill in more than 1 contact number
                                 <input className='w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientPhone} onChange={recipientPhoneChange} />
+                                <span id="error-rec-ph"></span>
                             </div>
                             <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label className='font-bold'>
@@ -312,6 +512,7 @@ const SingaporeToMMIndex = () => {
                                         <input className='focus:ring cursor-pointer me-3 focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="checkbox" id='aggre' value={aggrementCheck} onChange={aggrementCheckChange} checked={aggrementCheck} />
                                         <label htmlFor='aggre' className='ms-2 cursor-pointer'>I have READ and AGREE with the Terms and Conditions above and that cargo may be charged based on  volumetric weight  (LxWxH/6000 =kg) OR actual weight, whichever is higher</label>
                                     </div>
+                                    <span id="aggre-chk"></span>
                                 </div>
                             </div>
                         </div>

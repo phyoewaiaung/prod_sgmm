@@ -28,13 +28,11 @@ const CheckParcelIndex = () => {
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href='/'>
-                    <header>
-                        <div className="flex justify-center">
-                            <img src='images/logo.png' width="100" height="70" alt="sgmyanmar logo" />
-                        </div>
-                        <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
-                    </header></Link>
-                <main className='md:w-5/6 ms-3 me-3'>
+                    <header className="flex justify-center">
+                        <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
+                    </header>
+                </Link>
+                <main className='md:w-5/6 ms-3 me-3 mt-[-35px]'>
                     <div className="flex flex-col justify-center align-middle">
                         <h2 className="ont-extrabold text-transparent bg-clip-text bg-gradient-to-r text-blue-700 text-center text-2xl from-purple-700 to-pink-600 ">TRACK THE PARCEL ( ပစ္စည်းရောက်ရှိမှု စုံစမ်းရန် )</h2>
                     </div>
@@ -46,7 +44,7 @@ const CheckParcelIndex = () => {
                                 Sample: 'AS22-04W2W539' 'MS22-04W2W039' 'ASG-00300'
                             </div>
                         </h4>
-                        <QrScanner qrParentCallBack = {handelCallBack}/>
+                        <QrScanner qrParentCallBack={handelCallBack} />
                         <div className='lg:w-[40%] md:w-[50%] w-[60%] mt-3 relative'>
                             <button className='absolute bg-gray-300 hover:bg-gray-400 p-2 font-bold rounded w-[100px] right-[-113px] top-[23px]'>Track</button>
                             <div className=' dark:text-gray-400'>
