@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Mpdf\Mpdf;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Models\Customer;
@@ -13,7 +14,11 @@ use App\Models\SgCategoryItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
 
 class LogisticController extends Controller
 {
@@ -22,10 +27,10 @@ class LogisticController extends Controller
         return Inertia::render('Logistic/Index');
     }
 
-    public function toSgMm()
-    {
-        return 'SG TO MM';
-    }
+    // public function toSgMm()
+    // {
+    //     return 'SG TO MM';
+    // }
 
     public function saveSGtoMM(Request $request)
     {
@@ -51,6 +56,14 @@ class LogisticController extends Controller
                 'message'   =>  $validator->errors()->all(),
             ], 422);
         }
+        // return $request;
+        // $data = SGtoMMItem::first();
+        // $mailSend = $this->mailSend($data, 'parcel-tag-file/SM23-07W5001.pdf');
+        // // return $mailSend;
+        // if($mailSend){
+        //     return 'send p par p';
+        // }
+        // return 'errror';
 
         $custData['name'] = $request->sender_name;
         $custData['email'] = $request->sender_email;
@@ -61,7 +74,7 @@ class LogisticController extends Controller
 
         $chkCus = $this->chkCusOrReceiver($custData, 1);
         $chkRece = $this->chkCusOrReceiver($receData, 2);
-
+        $message = 'Successfully Insert';
         DB::beginTransaction();
 
         try {
@@ -83,7 +96,9 @@ class LogisticController extends Controller
                         'flag' => 2
                     ]);
                 }
-                $no = $this->getInvoiceNo();
+
+                $no = $this->getInvoiceNo(['name'=>'SGMM']);
+
                 $logistic = SGtoMMItem::create([
                     'sender_email' => $request->sender_email,
                     'sender_name' => $request->sender_name,
@@ -111,36 +126,57 @@ class LogisticController extends Controller
                 }
 
                 $sgCategoryItem = SgCategoryItem::insert($items);
+
+                $getParcelTagFile = $this->createPdf($logistic);
+                
+                if($getParcelTagFile['status'] == "OK"){
+                    $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
+                    if(!$mailSend){
+                        $message = "$message but Send Mail Error";
+                    }
+                }
+
             } else {
                 return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
             }
 
             DB::commit();
-            return response()->json(['status' => 200, 'message' => 'Successfully Insert']);
+            return response()->json(['status' => 200, 'message' => $message ]);
         } catch (\Exception $e) {
+            Log::info(' ========================== saveSGtoMM Error Log ============================== ');
             Log::info($e);
+            Log::info(' ========================== saveSGtoMM Error Log ============================== ');
             DB::rollback();
             return response()->json(['status' => 500, 'message' => 'Something was Wrong']);
         }
     }
 
-    public function getInvoiceNo()
+    public function getInvoiceNo($data)
     {
         // sample --> SM23-07W3006
         $date = today();
-        $default = "SM";
+        $default = "";
         $no = '001';
         $carbonDate = Carbon::parse($date);
         $month = Carbon::parse($date)->format('m');
         $year = Carbon::parse($date)->format('y');
+        $Y = Carbon::parse($date)->format('Y');
         $weekOfMonth = ceil(($carbonDate->day) / 7);
 
-        $firstDayOfMonth = Carbon::createFromDate(now(), $month, 1)->startOfDay();
-        $lastDayOfMonth = Carbon::createFromDate(now(), $month, 1)->endOfMonth()->endOfDay();
-        // return [$firstDayOfMonth, $lastDayOfMonth];
-        $lastNo = SGtoMMItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
-            ->orderBy('created_at', 'desc')->first();
+        $firstDayOfMonth = Carbon::createFromDate($Y, $month, 1)->startOfDay();
+        $lastDayOfMonth = Carbon::createFromDate($Y, $month, 1)->endOfMonth()->endOfDay();
+        
+        if($data['name'] === 'SGMM'){
+            $lastNo = SGtoMMItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
+                ->orderBy('created_at', 'desc')->first();
 
+            $default = "SM";
+        }else if($data['name'] === 'MMSG'){
+            $lastNo = MmToSgItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
+                ->orderBy('created_at', 'desc')->first();
+            $default = "MS";
+        }
+        
         if (!empty($lastNo)) {
             $dbNo = $lastNo->invoice_no;
             $number = substr($dbNo, -3);
@@ -151,12 +187,12 @@ class LogisticController extends Controller
         return $invoiceNo;
     }
 
-    public function toMmSG()
-    {
-        return 'mm to sg yout p';
-    }
+    // public function toMmSG()
+    // {
+    //     return 'mm to sg yout p';
+    // }
 
-    public function saveMMtoSG(Request $request)
+    public function saveMMtoSG (Request $request)
     {
         return $request;
         $validator = Validator::make($request->all(), [
@@ -214,7 +250,7 @@ class LogisticController extends Controller
                         'flag' => 2
                     ]);
                 }
-                $no = $this->getInvoiceNo();
+                $no = $this->getInvoiceNo(['name'=>'MMSG']);
                 $logistic = MmToSgItem::create([
                     'sender_name' => $request->sender_name,
                     'sender_phone' => $request->sender_phone,
@@ -250,7 +286,9 @@ class LogisticController extends Controller
             DB::commit();
             return response()->json(['status' => 200, 'message' => 'Successfully Insert']);
         } catch (\Exception $e) {
+            Log::info(' ========================== saveMMtoSG Error Log ============================== ');            
             Log::info($e);
+            Log::info(' ========================== saveMMtoSG Error Log ============================== ');
             DB::rollback();
             return response()->json(['status' => 500, 'message' => 'Something Was Wrong']);
         }
@@ -264,75 +302,107 @@ class LogisticController extends Controller
             ->exists();
     }
 
-    // public function mailSend()
-    // {
-    //     try {
-    //         $tourData = TourInfo::where('id', $id)->whereNull('deleted_at')->first();
+    public function mailSend($data, $file)
+    {
+        try {
+            $approverMailData = [
+                "email" => $data->sender_email,
+                "user_name" => $data->sender_name,
+                'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
+                "logistic" => '(SM...)',                
+            ];
 
-    //         $approver = User::where('user_id', $tourData->approver_id)
-    //             ->leftJoin('roles', 'roles.id', 'users.role_id')
-    //             ->select('users.*', 'roles.name')
-    //             ->first();
-    //         $prepareBy = User::where('user_id', $tourData->prepare_user_id)
-    //             ->leftJoin('roles', 'roles.id', 'users.role_id')
-    //             ->select('users.*', 'roles.name')
-    //             ->first();
+            $files = [
+                public_path("storage/$file")
+            ];
+            // return $files;
+            Mail::send('mail.sg_mm_save', $approverMailData, function ($message) use ($approverMailData, $files) {
+                $message->to($approverMailData["email"])
+                    ->subject($approverMailData["title"]);
 
-    //         $onResData = OnlineReservation::join('customers', 'customers.id', 'online_reservations.customer_id')
-    //             ->where('online_reservations.id', $tourData->online_reservation_id)
-    //             ->whereNull('online_reservations.deleted_at')->first();
+                    foreach ($files as $file){
+                        $message->attach($file);
+                    }
+            });
 
-    //         $bookingTypes = $this->bookingTypesPrepare($tourData->online_reservation_id);
+            return true;
+        } catch (\Exception $e) {
+            Log::info($e);
+            // Log::debug($e->getMessage() . ' error occur in file ' . __FILE__ . ' at line ' . __LINE__ . ' within the class ' . get_class());
+            return false;
+        }
 
+    }
 
-    //         $company = Company::where('id', $tourData->company_id)->first();
-    //         $tourName = $tourData->tour_name;
+    public function search (Request $request)
+    {
+        
+        $SGMM = SGtoMMItem::where('invoice_no', $request->invoice_no)->first();
+        $MMSG = MmToSgItem::where('invoice_no', $request->invoice_no)->first();
 
+        if(!empty($MMSG) || !empty($SGMM)){
+            if(!empty($MMSG)){
+                $data = $MMSG;
+            }else if(!empty($SGMM)){
+                $data = $SGMM;
+            };
+            
+            $fileName = "$data->invoice_no.svg";
+            $qrCodeData  = QrCode::size(250)->generate($data, "qr_codes/$fileName");
 
-    //         $approverMailData = [
-    //             "company_name" => $company->company_name,
-    //             "email" => $approver->email,
-    //             "user_name" => $approver->user_name,
-    //             "title" => "Approver Approve",
-    //             "body" => "You have approved the tour with the title '${tourName}'",
-    //             "quotation_title" => $tourName,
-    //             "customer_name" => $onResData->customer_name,
-    //             "booking_types" => $bookingTypes,
-    //             "tour_date" => $tourData->tour_period_from . ' ~ ' . $tourData->tour_period_to,
-    //             "preparer_name" => $prepareBy->user_name,
-    //             "approver_name" => $approver->user_name,
-    //         ];
+            return Inertia::render('SingaporeToMMIndex', [
+                'qr' => "qr_codes/$fileName"
+            ]);
+        }else {
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
+        }
+        
+    }
 
-    //         $prepareMailData = [
-    //             "company_name" => $company->company_name,
-    //             "email" => $prepareBy->email,
-    //             "user_name" => $prepareBy->user_name,
-    //             "title" => "Approving Tour by Approver",
-    //             "body" =>  "Approver have approved the tour with the title ' ${tourName} ' that you have prepared.",
-    //             "quotation_title" => $tourName,
-    //             "customer_name" => $onResData->customer_name,
-    //             "booking_types" => $bookingTypes,
-    //             "tour_date" => $tourData->tour_period_from . ' ~ ' . $tourData->tour_period_to,
-    //             "preparer_name" => $prepareBy->user_name,
-    //             "approver_name" => $approver->user_name,
-    //         ];
+    public function createPdf ($data)
+    {
+        // $data = SGtoMMItem::first();
+        $invoiceNo = $data->invoice_no;
+        // return $data;
+        
+        $mpdf = new Mpdf([
+            'tempDir' => storage_path('app/mpdf/custom/temp/dir/path'),
+            'format'  => 'A4',
+            // 'orientation' => 'L',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 15,
+            'margin_header' => 10,
+            'margin_footer' => 10,
+            
+        ]);
+        // $mpdf = LaravelMpdf::loadView('testpdf', ['datas' => 'this is pdf generate'],[
+        //     'auto_language_detection' => true,
+        //     'author'                  => 'WYK',
+        //     'margin_top' => 0
+        // ]);
+        
+        $mpdf->autoScriptToLang = true;
+        $mpdf->autoLangToFont = true;
 
+        $html = View::make('parcel_tag')
+                ->with('datas', 'this is pdf generate')
+                ->with('data', $data);
+        $html->render();
+        $mpdf->WriteHTML($html);
+        $fileName = "generate-001.pdf";
 
-    //         Mail::send('mail.approve_tour_by_approver', $approverMailData, function ($message) use ($approverMailData) {
-    //             $message->to($approverMailData["email"])
-    //                 ->subject($approverMailData["title"]);
-    //         });
+        // return $mpdf->stream($fileName);
+        // return $mpdf->Output($fileName, 'i');
 
-    //         Mail::send('mail.approve_tour_by_approver', $prepareMailData, function ($message) use ($prepareMailData) {
-    //             $message->to($prepareMailData["email"])
-    //                 ->subject($prepareMailData["title"]);
-    //         });
+        $fileName = "$invoiceNo.pdf";          
+        Storage::disk('public')->put('parcel-tag-file/' . $fileName, $mpdf->Output($fileName, "S"));
+        return [
+            'status' => 'OK',
+            'invoice_no' => $invoiceNo,
+            'fileName' =>  "parcel-tag-file/$fileName"
+        ];
 
-    //         return true;
-    //     } catch (\Exception $e) {
-    //         Log::debug($e->getMessage() . ' error occur in file ' . __FILE__ . ' at line ' . __LINE__ . ' within the class ' . get_class());
-    //         return false;
-    //     }
-
-    // }
+    }
 }
