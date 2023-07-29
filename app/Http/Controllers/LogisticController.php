@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
@@ -55,14 +56,15 @@ class LogisticController extends Controller
                 'message'   =>  $validator->errors()->all(),
             ], 422);
         }
+        // return $request;
+        // $data = SGtoMMItem::first();
+        // $mailSend = $this->mailSend($data, 'parcel-tag-file/SM23-07W5001.pdf');
+        // // return $mailSend;
+        // if($mailSend){
+        //     return 'send p par p';
+        // }
+        // return 'errror';
 
-        $mailSend = $this->mailSend('(SM....)');
-
-        if($mailSend){
-            return 'send p par p';
-        }
-
-        return 'errror';
         $custData['name'] = $request->sender_name;
         $custData['email'] = $request->sender_email;
         $custData['phone'] = $request->sender_phone;
@@ -72,7 +74,7 @@ class LogisticController extends Controller
 
         $chkCus = $this->chkCusOrReceiver($custData, 1);
         $chkRece = $this->chkCusOrReceiver($receData, 2);
-
+        $message = 'Successfully Insert';
         DB::beginTransaction();
 
         try {
@@ -125,13 +127,21 @@ class LogisticController extends Controller
 
                 $sgCategoryItem = SgCategoryItem::insert($items);
 
-                $mailSend = $this->mailSend('(SM....)');
+                $getParcelTagFile = $this->createPdf($logistic);
+                
+                if($getParcelTagFile['status'] == "OK"){
+                    $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
+                    if(!$mailSend){
+                        $message = "$message but Send Mail Error";
+                    }
+                }
+
             } else {
                 return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
             }
 
             DB::commit();
-            return response()->json(['status' => 200, 'message' => 'Successfully Insert']);
+            return response()->json(['status' => 200, 'message' => $message ]);
         } catch (\Exception $e) {
             Log::info(' ========================== saveSGtoMM Error Log ============================== ');
             Log::info($e);
@@ -292,28 +302,21 @@ class LogisticController extends Controller
             ->exists();
     }
 
-    public function mailSend($data)
+    public function mailSend($data, $file)
     {
         try {
             $approverMailData = [
-                // "email" => 'waiyan@yopmail.com',
-                "email" => 'waiyankyw96@gmail.com',
-                "user_name" => 'KG',
+                "email" => $data->sender_email,
+                "user_name" => $data->sender_name,
                 'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
-                "logistic" => $data,                
-            ];
-
-            $prepareMailData = [
-                "company_name" => 'SG_MM',
-                "email" => 'waiyan@yopmail.com',
-                "user_name" => 'WYK',
+                "logistic" => '(SM...)',                
             ];
 
             $files = [
-                // public_path('images/logo.png')
+                public_path("storage/$file")
             ];
-
-            Mail::send('mail.testing', $approverMailData, function ($message) use ($approverMailData, $files) {
+            // return $files;
+            Mail::send('mail.sg_mm_save', $approverMailData, function ($message) use ($approverMailData, $files) {
                 $message->to($approverMailData["email"])
                     ->subject($approverMailData["title"]);
 
@@ -356,9 +359,12 @@ class LogisticController extends Controller
         
     }
 
-    public function createPdf ()
+    public function createPdf ($data)
     {
-        $invoiceNo = 'SM23-07W4032';
+        // $data = SGtoMMItem::first();
+        $invoiceNo = $data->invoice_no;
+        // return $data;
+        
         $mpdf = new Mpdf([
             'tempDir' => storage_path('app/mpdf/custom/temp/dir/path'),
             'format'  => 'A4',
@@ -371,12 +377,6 @@ class LogisticController extends Controller
             'margin_footer' => 10,
             
         ]);
-
-        $title = "Main Title";
-        $subtitle = "Subtitle";
-        
-        $leftBoxContent = "Left Box Content";
-        $rightBoxContent = "Right Box Content";
         // $mpdf = LaravelMpdf::loadView('testpdf', ['datas' => 'this is pdf generate'],[
         //     'auto_language_detection' => true,
         //     'author'                  => 'WYK',
@@ -386,18 +386,23 @@ class LogisticController extends Controller
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;
 
-        $html = View::make('testpdf')
+        $html = View::make('parcel_tag')
                 ->with('datas', 'this is pdf generate')
-                ->with('title', $title)
-                ->with('subtitle', $subtitle)
-                ->with('leftBoxContent', $leftBoxContent)
-                ->with('rightBoxContent', $rightBoxContent)
-                ->with('invoiceNo', $invoiceNo);
+                ->with('data', $data);
         $html->render();
         $mpdf->WriteHTML($html);
         $fileName = "generate-001.pdf";
 
         // return $mpdf->stream($fileName);
-        return $mpdf->Output($fileName, 'i');
+        // return $mpdf->Output($fileName, 'i');
+
+        $fileName = "$invoiceNo.pdf";          
+        Storage::disk('public')->put('parcel-tag-file/' . $fileName, $mpdf->Output($fileName, "S"));
+        return [
+            'status' => 'OK',
+            'invoice_no' => $invoiceNo,
+            'fileName' =>  "parcel-tag-file/$fileName"
+        ];
+
     }
 }
