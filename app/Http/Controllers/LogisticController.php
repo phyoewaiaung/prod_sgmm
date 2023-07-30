@@ -1,16 +1,16 @@
 <?php
 
-namespace app\Http\Controllers;
+namespace App\Http\Controllers;
 
 use Mpdf\Mpdf;
 use Carbon\Carbon;
 use Inertia\Inertia;
-use app\Models\Customer;
-use app\Models\MmToSgItem;
-use app\Models\SGtoMMItem;
+use App\Models\Customer;
+use App\Models\MmToSgItem;
+use App\Models\SGtoMMItem;
 use Illuminate\Http\Request;
-use app\Models\MmCategoryItem;
-use app\Models\SgCategoryItem;
+use App\Models\MmCategoryItem;
+use App\Models\SgCategoryItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
