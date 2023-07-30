@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SgToMmItem extends Model
+class SGtoMMItem extends Model
 {
     use HasFactory;
     protected $guarded = [];
