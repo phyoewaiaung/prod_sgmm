@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Models\Customer;
 use App\Models\MmToSgItem;
-use App\Models\SGtoMMItem;
+use App\Models\SgToMmItem;
 use Illuminate\Http\Request;
 use App\Models\MmCategoryItem;
 use App\Models\SgCategoryItem;
@@ -58,7 +58,7 @@ class LogisticController extends Controller
             ], 422);
         }
         // return $request;
-        // $data = SGtoMMItem::first();
+        // $data = SgToMmItem::first();
         // $mailSend = $this->mailSend($data, 'parcel-tag-file/SM23-07W5001.pdf');
         // // return $mailSend;
         // if($mailSend){
@@ -100,7 +100,7 @@ class LogisticController extends Controller
 
                 $no = $this->getInvoiceNo(['name'=>'SGMM']);
 
-                $logistic = SGtoMMItem::create([
+                $logistic = SgToMmItem::create([
                     'sender_email' => $request->sender_email,
                     'sender_name' => $request->sender_name,
                     'sender_phone' => $request->sender_phone,
@@ -168,7 +168,7 @@ class LogisticController extends Controller
         $lastDayOfMonth = Carbon::createFromDate($Y, $month, 1)->endOfMonth()->endOfDay();
 
         if($data['name'] === 'SGMM'){
-            $lastNo = SGtoMMItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
+            $lastNo = SgToMmItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
                 ->orderBy('created_at', 'desc')->first();
 
             $default = "SM";
@@ -338,7 +338,7 @@ class LogisticController extends Controller
     public function search (Request $request)
     {
 
-        $SGMM = SGtoMMItem::where('invoice_no', $request->invoice_no)->first();
+        $SGMM = SgToMmItem::where('invoice_no', $request->invoice_no)->first();
         $MMSG = MmToSgItem::where('invoice_no', $request->invoice_no)->first();
 
         if(!empty($MMSG) || !empty($SGMM)){
@@ -362,7 +362,7 @@ class LogisticController extends Controller
 
     public function createPdf ($data)
     {
-        // $data = SGtoMMItem::first();
+        // $data = SgToMmItem::first();
         $invoiceNo = $data->invoice_no;
         // return $data;
 
