@@ -15,8 +15,9 @@ return new class extends Migration
     {
         Schema::create('mm_to_sg_items', function (Blueprint $table) {
             $table->id();
+            $table->string('sender_email');
             $table->string('sender_name');
-            $table->bigInteger('sender_phone');
+            $table->string('sender_phone');
             $table->string('sender_address');
             $table->tinyInteger('transport')->comment('1: Sea Cargo 2: Air Cargo');
             $table->tinyInteger('storage_type')->comment('1: Room Temperature 2: In Normal Fridge 3: In Freezer');
@@ -25,9 +26,10 @@ return new class extends Migration
             $table->string('invoice_no');
             $table->tinyInteger('payment_type')->comment('1: SG Pay 2: MM Pay');
             $table->string('receiver_name');
-            $table->bigInteger('receiver_phone');
+            $table->string('receiver_phone');
             $table->string('receiver_address');
             $table->string('receiver_postal_code')->nullable();
+            $table->string('payment_status')->default(1)->comment('1 : pending 2 : received');
             $table->longText('additional_instruction')->nullable();
             $table->timestamps();
         });

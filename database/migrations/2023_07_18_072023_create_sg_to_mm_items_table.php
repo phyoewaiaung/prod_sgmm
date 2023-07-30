@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('sender_email');
             $table->string('sender_name');
-            $table->bigInteger('sender_phone');
+            $table->string('sender_phone');
             $table->tinyInteger('sg_home_pickup')->comment('1: true 2: false');
             $table->string('sg_address');
             $table->tinyInteger('shipment_method')->comment('1:Land(2week) 2:Land Express(7-10 days) 3:Sea Cargo(3-4 week) 4:Air Cargo(3-5 days)');
@@ -26,7 +26,8 @@ return new class extends Migration
             $table->tinyInteger('payment_type')->comment('1:SG Pay 2:MM Pay');
             $table->string('receiver_name');
             $table->string('receiver_address');
-            $table->bigInteger('receiver_phone');
+            $table->string('receiver_phone');
+            $table->string('payment_status')->default(1)->comment('1 : pending 2 : received');
             $table->longText('note')->nullable();
             $table->timestamps();
         });
