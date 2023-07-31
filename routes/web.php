@@ -33,8 +33,8 @@ Route::post('/logistic/sg-mm-save', [LogisticController::class, 'saveSGtoMM'])->
 // Route::get('/logistic/mm-sg', [LogisticController::class, 'toMmSG'])->name('logistic.toMmSg');
 Route::post('/logistic/mm-sg-save', [LogisticController::class, 'saveMMtoSG'])->name('logistic.mm-save');
 Route::get('/logistic/search', [LogisticController::class, 'search'])->name('logistic.search');
-
 Route::get('/load-pdf', [LogisticController::class, 'createPdf'])->name('loadpdf');
+Route::post('/save-issue', [LogisticController::class, 'saveIssue'])->name('save-issue');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -61,14 +61,12 @@ Route::get('/sg-to-mm', function() {
 
 Route::get('logistic-price-list', function() {
     return Inertia::render('PriceListIndex');
-})->name('logistic-price-list');
+})->middleware(['auth', 'verified'])->name('logistic-price-list');
 
 Route::get('check-invoice', function() {
     return Inertia::render('CheckInvoiceIndex');
-})->name('check-invoice');
+})->middleware(['auth', 'verified'])->name('check-invoice');
 
-Route::get('invoice-issue', function() {
-    return Inertia::render('InvoiceIssueIndex');
-})->name('invoice-issue');
+Route::get('invoice-issue', [LogisticController::class, 'invoiceIssue'])->name('invoice-issue');
 
 require __DIR__.'/auth.php';

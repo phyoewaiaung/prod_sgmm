@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('receiver_phone');
             $table->string('receiver_address');
             $table->string('receiver_postal_code')->nullable();
+            $table->integer('handling_fee')->default(2);
             $table->string('payment_status')->default(1)->comment('1 : pending 2 : received');
             $table->longText('additional_instruction')->nullable();
             $table->timestamps();
