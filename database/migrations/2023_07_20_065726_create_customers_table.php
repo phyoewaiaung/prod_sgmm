@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->nullable();
-            $table->bigInteger('phone');
+            $table->string('phone');
             $table->tinyInteger('flag')->comment('1: customer 2: receiver');
             $table->timestamps();
         });
