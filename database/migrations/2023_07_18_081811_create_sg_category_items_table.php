@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('sg_to_mm_id');
             $table->integer('item_category_id');
             $table->string('weight')->nullable();
+            $table->string('unit_price')->nullable();
+            $table->string('total_price')->nullable();
             $table->timestamps();
         });
     }

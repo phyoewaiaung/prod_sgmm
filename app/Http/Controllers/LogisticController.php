@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Models\Customer;
 use App\Models\MmToSgItem;
-use App\Models\SgToMmItem;
+use App\Models\SgtoMmItem;
 use Illuminate\Http\Request;
 use App\Models\MmCategoryItem;
 use App\Models\SgCategoryItem;
@@ -57,14 +57,6 @@ class LogisticController extends Controller
                 'message'   =>  $validator->errors()->all(),
             ], 422);
         }
-        // return $request;
-        // $data = SgToMmItem::first();
-        // $mailSend = $this->mailSend($data, 'parcel-tag-file/SM23-07W5001.pdf');
-        // // return $mailSend;
-        // if($mailSend){
-        //     return 'send p par p';
-        // }
-        // return 'errror';
 
         $custData['name'] = $request->sender_name;
         $custData['email'] = $request->sender_email;
@@ -100,7 +92,7 @@ class LogisticController extends Controller
 
                 $no = $this->getInvoiceNo(['name'=>'SGMM']);
 
-                $logistic = SgToMmItem::create([
+                $logistic = SgtoMmItem::create([
                     'sender_email' => $request->sender_email,
                     'sender_name' => $request->sender_name,
                     'sender_phone' => $request->sender_phone,
@@ -168,7 +160,7 @@ class LogisticController extends Controller
         $lastDayOfMonth = Carbon::createFromDate($Y, $month, 1)->endOfMonth()->endOfDay();
 
         if($data['name'] === 'SGMM'){
-            $lastNo = SgToMmItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
+            $lastNo = SgtoMmItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
                 ->orderBy('created_at', 'desc')->first();
 
             $default = "SM";
@@ -195,7 +187,6 @@ class LogisticController extends Controller
 
     public function saveMMtoSG (Request $request)
     {
-        return $request;
         $validator = Validator::make($request->all(), [
             "sender_email" => "required|email",
             "sender_name" => "required",
@@ -230,7 +221,7 @@ class LogisticController extends Controller
 
         $chkCus = $this->chkCusOrReceiver($custData, 1);
         $chkRece = $this->chkCusOrReceiver($receData, 2);
-
+        $message = 'Successfully Insert';
         DB::beginTransaction();
 
         try {
@@ -253,6 +244,7 @@ class LogisticController extends Controller
                 }
                 $no = $this->getInvoiceNo(['name'=>'MMSG']);
                 $logistic = MmToSgItem::create([
+                    'sender_email' => $request->sender_email,
                     'sender_name' => $request->sender_name,
                     'sender_phone' => $request->sender_phone,
                     'sender_address' => $request->sender_address,
@@ -280,12 +272,21 @@ class LogisticController extends Controller
                 }
 
                 $sgCategoryItem = MmCategoryItem::insert($items);
+
+                $getParcelTagFile = $this->createPdf($logistic, 2);
+
+                if($getParcelTagFile['status'] == "OK"){
+                    $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
+                    if(!$mailSend){
+                        $message = "$message but Send Mail Error";
+                    }
+                }
             } else {
                 return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
             }
 
             DB::commit();
-            return response()->json(['status' => 200, 'message' => 'Successfully Insert']);
+            return response()->json(['status' => 200, 'message' => $message ]);
         } catch (\Exception $e) {
             Log::info(' ========================== saveMMtoSG Error Log ============================== ');
             Log::info($e);
@@ -337,32 +338,49 @@ class LogisticController extends Controller
 
     public function search (Request $request)
     {
+        $searchData = [];
+        if(!empty($request->invoice_no) || !is_null($request->invoice_no)){
+            $searchData[] = ['invoice_no', $request->invoice_no];
+        }
 
-        $SGMM = SgToMmItem::where('invoice_no', $request->invoice_no)->first();
-        $MMSG = MmToSgItem::where('invoice_no', $request->invoice_no)->first();
+        if(!empty($request->status) || !is_null($request->status)){
+            $searchData[] = ['payment_status', $request->status];
+        }
+
+        $returndData = [];
+        $SGMM = SgtoMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status')->orderBy('created_at', 'desc')->get();
+        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status')->orderBy('created_at', 'desc')->get();
 
         if(!empty($MMSG) || !empty($SGMM)){
             if(!empty($MMSG)){
-                $data = $MMSG;
-            }else if(!empty($SGMM)){
-                $data = $SGMM;
+                foreach($MMSG as $data){
+                    array_push($returndData, $data);
+                }
+            }
+            if(!empty($SGMM)){
+                foreach($SGMM as $data){
+                    array_push($returndData, $data);
+                }
             };
+            return response()->json(['status' => 200, 'data' => $returndData]);
+            // $fileName = "$data->invoice_no.svg";
+            // $qrCodeData  = QrCode::size(250)->generate($data, "qr_codes/$fileName");
 
-            $fileName = "$data->invoice_no.svg";
-            $qrCodeData  = QrCode::size(250)->generate($data, "qr_codes/$fileName");
-
-            return Inertia::render('SingaporeToMMIndex', [
-                'qr' => "qr_codes/$fileName"
-            ]);
+            // return Inertia::render('SingaporeToMMIndex', [
+            //     'qr' => "qr_codes/$fileName"
+            // ]);
         }else {
             return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
         }
 
     }
 
-    public function createPdf ($data)
+    public function createPdf ($data, $flag = 1)
+    // public function createPdf ()
     {
-        // $data = SgToMmItem::first();
+        // $data = SgtoMmItem::first();
+        // $data = MmToSgItem::first();
+        // $flag = 2;
         $invoiceNo = $data->invoice_no;
         // return $data;
 
@@ -388,22 +406,187 @@ class LogisticController extends Controller
         $mpdf->autoLangToFont = true;
 
         $html = View::make('parcel_tag')
-                ->with('datas', 'this is pdf generate')
-                ->with('data', $data);
+                ->with('data', $data)
+                ->with('flag', $flag);
         $html->render();
         $mpdf->WriteHTML($html);
-        $fileName = "generate-001.pdf";
+        $fileName = "$invoiceNo.pdf";
+        $storagePath = "parcel-tag-file/$flag/";
 
+        // return "$storagePath$fileName";
         // return $mpdf->stream($fileName);
         // return $mpdf->Output($fileName, 'i');
 
-        $fileName = "$invoiceNo.pdf";
-        Storage::disk('public')->put('parcel-tag-file/' . $fileName, $mpdf->Output($fileName, "S"));
+        Storage::disk('public')->put($storagePath . $fileName, $mpdf->Output($fileName, "S"));
         return [
             'status' => 'OK',
             'invoice_no' => $invoiceNo,
-            'fileName' =>  "parcel-tag-file/$fileName"
+            'fileName' =>  "$storagePath$fileName"
         ];
 
+    }
+
+    public function invoiceIssue (Request $request)
+    {
+        $SGMM = SgtoMmItem::where('invoice_no', $request->invoice_no)
+                        // ->join('sg_category_items', 'sg_category_items.sg_to_mm_id', 'sg_to_mm_items.id')
+                        ->with('category', 'category.categoryName:id,name')
+                        ->first();
+        $MMSG = MmToSgItem::where('invoice_no', $request->invoice_no)
+                        ->with('category', 'category.categoryName:id,name')
+                        // ->join('mm_category_items', 'mm_category_items.mm_to_sg_id', 'mm_to_sg_items.id')
+                        ->first();
+
+        $returndData = [];
+        if(!empty($MMSG) || !empty($SGMM)){
+            if(!empty($MMSG)){
+                array_push($returndData, $MMSG);
+            }
+            if(!empty($SGMM)){
+                array_push($returndData, $SGMM);
+            };
+            // return response()->json(['status' => 200, 'data' => $returndData]);
+            // $fileName = "$data->invoice_no.svg";
+            // $qrCodeData  = QrCode::size(250)->generate($data, "qr_codes/$fileName");
+
+            // return Inertia::render('SingaporeToMMIndex', [
+            //     'qr' => "qr_codes/$fileName"
+            // ]);
+        }
+        // return $returndData;
+
+        return Inertia::render('InvoiceIssueIndex', ['data' => $returndData]);
+    }
+
+    public function saveIssue (Request $request)
+    {
+        $SGMM = SgtoMmItem::where('invoice_no', $request->invoice_no)
+                        // ->join('sg_category_items', 'sg_category_items.sg_to_mm_id', 'sg_to_mm_items.id')
+                        // ->join('item_categories', 'item_categories.id', 'sg_category_items.item_category_id')
+                        // ->select('sg_to_mm_items.*', 'item_categories.name', 'sg_category_items.weight')
+                        ->with('category:*', 'category.categoryName')
+                        ->first();
+
+        $MMSG = MmToSgItem::where('invoice_no', $request->invoice_no)
+                        // ->join('mm_category_items', 'mm_category_items.mm_to_sg_id', 'mm_to_sg_items.id')
+                        // ->join('item_categories', 'item_categories.id', 'mm_category_items.item_category_id')
+                        // ->select('mm_to_sg_items.*', 'item_categories.name', 'mm_category_items.weight')
+                        ->with('category:*', 'category.categoryName')
+                        ->first();
+
+        if(!empty($MMSG) || !empty($SGMM)){
+            DB::beginTransaction();
+            try {
+                if(!empty($MMSG)){
+                    $data = $MMSG;
+
+                    $dbCategoryData =  $data->category->pluck('item_category_id')->sort()->values();
+                    $requestCategoryData = collect($request->category_data)->pluck('id')->sort()->values();
+
+                    if($dbCategoryData != $requestCategoryData){
+                        return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !']);
+                    }
+                    foreach($request->category_data as $updateCat) {
+                        $updateData = MmCategoryItem::where('mm_to_sg_id', $data->id)
+                                            ->where('item_category_id', $updateCat)
+                                            ->first();
+
+                        $updateData->weight = $updateCat['weight'];
+                        $updateData->unit_price = $updateCat['unit_price'];
+                        $updateData->total_price = $updateCat['total_price'];
+                        // $updateData->update();
+                    }
+                    if($request->handling_fee){
+                        $data->handling_fee = 1;
+                    }else{
+                        $data->handling_fee = 2;
+                    }
+                    // $data->update();
+                    $generateData = MmToSgItem::where('invoice_no', $request->invoice_no)
+                                            ->with('category:*', 'category.categoryName')
+                                            ->first();
+                }else if(!empty($SGMM)){
+                    $data = $SGMM;
+
+                    $dbCategoryData =  $data->category->pluck('item_category_id')->sort()->values();
+                    $requestCategoryData = collect($request->category_data)->pluck('id')->sort()->values();
+
+                    if($dbCategoryData != $requestCategoryData){
+                        return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !']);
+                    }
+                    foreach($request->category_data as $updateCat) {
+                        $updateData = SgCategoryItem::where('sg_to_mm_id', $data->id)
+                                            ->where('item_category_id', $updateCat)
+                                            ->first();
+
+                        $updateData->weight = $updateCat['weight'];
+                        $updateData->unit_price = $updateCat['unit_price'];
+                        $updateData->total_price = $updateCat['total_price'];
+                        // $updateData->update();
+                        $generateData = SgtoMmItem::where('invoice_no', $request->invoice_no)
+                                    ->with('category:*', 'category.categoryName')
+                                    ->first();
+
+                    }
+                    if($request->handling_fee){
+                        $data->handling_fee = 1;
+                    }else{
+                        $data->handling_fee = 2;
+                    }
+                    // $data->update();
+
+                };
+
+
+                // DB::commit();
+                return $generateData;
+                return response()->json(['status' => 200, 'message' => "Update Success" ]);
+
+            } catch (\Exception $e) {
+                Log::info(' ========================== Save Issue Error Log ============================== ');
+                Log::info($e);
+                Log::info(' ========================== Save Issue Error Log ============================== ');
+                DB::rollback();
+                return response()->json(['status' => 500, 'message' => 'Something Was Wrong']);
+            }
+
+        }else{
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
+        }
+    }
+
+    public function issuceFileCreate ()
+    {
+        $mpdf = new Mpdf([
+            'tempDir' => storage_path('app/mpdf/custom/temp/dir/path'),
+            'format'  => 'A4',
+            // 'orientation' => 'L',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 15,
+            'margin_header' => 10,
+            'margin_footer' => 10,
+
+        ]);
+        // $mpdf = LaravelMpdf::loadView('testpdf', ['datas' => 'this is pdf generate'],[
+        //     'auto_language_detection' => true,
+        //     'author'                  => 'WYK',
+        //     'margin_top' => 0
+        // ]);
+
+        $mpdf->autoScriptToLang = true;
+        $mpdf->autoLangToFont = true;
+
+        $html = View::make('pdf.invoice_issue');
+                // ->with('data', $generateData);
+        $html->render();
+        $mpdf->WriteHTML($html);
+        $fileName = "inovice_issue.pdf";
+        $storagePath = "parcel-tag-file/issue/";
+
+        // return "$storagePath$fileName";
+        // return $mpdf->stream($fileName);
+        return $mpdf->Output($fileName, 'i');
     }
 }
