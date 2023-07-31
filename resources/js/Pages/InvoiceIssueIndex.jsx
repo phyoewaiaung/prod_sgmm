@@ -1,7 +1,50 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from '@inertiajs/react'
+import { numberChk } from '@/Common/CommonValidation';
 
 const InvoiceIssueIndex = () => {
+    const [foodWeight, setFoodWeight] = useState(0);
+    const [shoeWeight, setShoeWeight] = useState(0);
+    const [cosmeticWeight, setCosmeticWeight] = useState(0);
+    const [electronicWeight, setElectronicWeight] = useState(0);
+    const [othersWeight, setOthersWeight] = useState(0);
+
+
+    const foodWeightChange = (e) => {
+        if (numberChk(e.target.value)) {
+            setFoodWeight(e.target.value);
+        } else {
+            setFoodWeight('');
+        }
+    }
+    const shoeWeightChange = (e) => {
+        if (numberChk(e.target.value)) {
+            setShoeWeight(e.target.value);
+        } else {
+            setShoeWeight('');
+        }
+    }
+    const cosmeticWeightChange = (e) => {
+        if (numberChk(e.target.value)) {
+            setCosmeticWeight(e.target.value);
+        } else {
+            setCosmeticWeight('');
+        }
+    }
+    const electronicWeightChange = (e) => {
+        if (numberChk(e.target.value)) {
+            setElectronicWeight(e.target.value);
+        } else {
+            setElectronicWeight('');
+        }
+    }
+    const othersWeightChange = (e) => {
+        if (numberChk(e.target.value)) {
+            setOthersWeight(e.target.value);
+        } else {
+            setOthersWeight('');
+        }
+    }
     return (
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
@@ -83,42 +126,54 @@ const InvoiceIssueIndex = () => {
                                 <tr>
                                     <td>1</td>
                                     <td>Food and Clothes</td>
-                                    <td>3.00</td>
+                                    <td>
+                                        <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={foodWeight === 0 ? '' : foodWeight} onChange={foodWeightChange} />
+                                    </td>
                                     <td>3</td>
                                     <td> $9.00</td>
                                 </tr>
                                 <tr>
                                     <td>2</td>
                                     <td>Shoes / Bag</td>
-                                    <td>3.00</td>
+                                    <td>
+                                        <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={shoeWeight === 0 ? '' : shoeWeight} onChange={shoeWeightChange} />
+                                    </td>
                                     <td>5</td>
                                     <td>$16.00</td>
                                 </tr>
                                 <tr>
                                     <td>3</td>
                                     <td>Cosmetics / Medicine/ Supplements</td>
-                                    <td>3.00</td>
+                                    <td>
+                                        <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={cosmeticWeight === 0 ? '' : cosmeticWeight} onChange={cosmeticWeightChange} />
+                                    </td>
                                     <td>5</td>
                                     <td>$16.00</td>
                                 </tr>
                                 <tr>
                                     <td>4</td>
                                     <td>Electronic Item</td>
-                                    <td>3.00</td>
+                                    <td>
+                                        <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={electronicWeight === 0 ? '' : electronicWeight} onChange={electronicWeightChange} />
+                                    </td>
                                     <td>5</td>
                                     <td>$16.00</td>
                                 </tr>
                                 <tr>
                                     <td>5</td>
                                     <td>Others - Voltage regulator</td>
-                                    <td>3.00</td>
+                                    <td>
+                                        <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={othersWeight === 0 ? '' : othersWeight} onChange={othersWeightChange} />
+                                    </td>
                                     <td>10%</td>
                                     <td>$16.00</td>
                                 </tr>
                                 <tr>
                                     <td></td>
                                     <td>Total Weight</td>
-                                    <td>7.00</td>
+                                    <td>
+                                        {(parseFloat(foodWeight) + parseFloat(shoeWeight) + parseFloat(cosmeticWeight) + parseFloat(electronicWeight) + parseFloat(othersWeight)) === 0 ? '' : (parseFloat(foodWeight) + parseFloat(shoeWeight) + parseFloat(cosmeticWeight) + parseFloat(electronicWeight) + parseFloat(othersWeight))}
+                                    </td>
                                     <td>handling fee 3 kg</td>
                                     <td>-</td>
                                 </tr>

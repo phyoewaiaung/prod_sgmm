@@ -5,7 +5,7 @@ import Loading from '@/Common/Loading';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const SingaporeToMMIndex = () => {
+const SingaporeToMMIndex = (props) => {
     const [loading, setLoading] = useState(false);
     const [pickUpRadio, setPickUpRadio] = useState('');
     const [shipModeId, setShipModeId] = useState('');

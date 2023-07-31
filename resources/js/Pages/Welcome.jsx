@@ -60,10 +60,20 @@ export default function Welcome(props) {
                                 </div>
                             </div>
                         </Link>
-                        <Link href={route('mm-to-sg')}>
+                        <Link href={route('mm-to-sg-okkala')}>
                             <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 ">
                                 <div className="p-5">
-                                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">MM to SG Logistic Form</h5>
+                                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">MM to SG Logistic Form <span>(Okkala)</span></h5>
+                                    <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">Welcome to our logistics services for shipping from <span className="text-pink-700 font-bold">Myanmar</span> to <span className="text-purple-700 font-bold">Singapore</span>.</div>
+                                </div>
+                            </div>
+                        </Link>
+                    </div>
+                    <div className="mt-6 flex md:flex-row flex-col place-items-center md:justify-center gap-2">
+                        <Link href={route('mm-to-sg-alon')}>
+                            <div className=" min-h-[165px] ms-4 me-4 max-w-sm cursor-pointer border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 transition ease-in-out hover:-translate-y-1 hover:scale-110 ">
+                                <div className="p-5">
+                                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ont-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-600 hover:from-pink-600 hover:to-blue-700">MM to SG Logistic Form <span>(Alon)</span></h5>
                                     <div className="mb-3 font-normal text-gray-700 dark:text-gray-400">Welcome to our logistics services for shipping from <span className="text-pink-700 font-bold">Myanmar</span> to <span className="text-purple-700 font-bold">Singapore</span>.</div>
                                 </div>
                             </div>
