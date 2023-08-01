@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
-import { checkNullOrBlank } from '@/Common/CommonValidation';
+import { checkNullOrBlank, emailChk } from '@/Common/CommonValidation';
+import Loading from '@/Common/Loading';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
-const SingaporeToMMIndex = () => {
-    const [error, setError] = useState([]);
-    const [success, setSuccess] = useState([]);
+const MyanmarToSgAlon = () => {
+    const [loading, setLoading] = useState(false);
     const [pickUpRadio, setPickUpRadio] = useState('');
     const [senderName, setSenderName] = useState('');
     const [senderEmail, setSenderEmail] = useState('');
@@ -13,7 +15,6 @@ const SingaporeToMMIndex = () => {
     const [recipientName, setRecipientName] = useState('');
     const [recipientAddress, setRecipientAddress] = useState('');
     const [recipientPhone, setRecipientPhone] = useState('');
-    const [aggrementCheck, setAggrementCheck] = useState(false);
     const [senderPhone, setSenderPhone] = useState('');
     const [senderAddress, setSenderAddress] = useState('');
     const [transportId, setTransportId] = useState('');
@@ -26,6 +27,7 @@ const SingaporeToMMIndex = () => {
     const [weightCos, setWeightCos] = useState('');
     const [weightFrozen, setWeightFrozen] = useState('');
     const [weightOther, setWeightOther] = useState('');
+    const [storageTypeId, setStorageTypeId] = useState('');
 
     const [cargoData, setCargoData] = useState([
         { id: 1, name: "Food", isChecked: false },
@@ -50,10 +52,6 @@ const SingaporeToMMIndex = () => {
 
     const cargoDetailChange = (e) => {
         setCartgoDetail(e.target.value);
-    }
-
-    const selfCollectionChange = (id) => {
-        setSelfCollectionid(id);
     }
 
     const recipientPostalCodeChange = (e) => {
@@ -84,16 +82,43 @@ const SingaporeToMMIndex = () => {
         setWeightOther(e.target.value);
     }
 
-    const pickUpChange = (e) => {
-        setPickUpRadio(e.target.value);
+    const senderEmailChange = (e) => {
+        setSenderEmail(e.target.value);
+        let error = document.getElementById('error-sender-email');
+        if (!emailChk(e.target.value)) {
+            error.textContent = 'Please Fill The Valid Email!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        } else {
+            error.textContent = '';
+            document.getElementById('senderEmail').style.border = '1px solid #BFDBFE';
+        }
     }
 
-    const paymentChange = (e) => {
-        setPayment(e.target.value);
+    const senderNameChange = (e) => {
+        setSenderName(e.target.value);
+        if (!checkNullOrBlank(e.target.value)) {
+            document.getElementById('error-sender-name').textContent = "";
+            document.getElementById('senderName').style.border = '1px solid #BFDBFE';
+        }
     }
 
-    const recipientNameChange = (e) => {
-        setRecipientName(e.target.value);
+    const senderPhoneChange = (e) => {
+        setSenderPhone(e.target.value);
+        if (!checkNullOrBlank(e.target.value)) {
+            document.getElementById('error-sender-phone').textContent = "";
+            document.getElementById('senderPhone').style.border = '1px solid #BFDBFE';
+        }
+    }
+
+    const senderAddressChange = (e) => {
+        setSenderAddress(e.target.value);
+    }
+
+    const transportChange = (e) => {
+        setTransportId(e.target.value);
+        document.getElementById('error-transport').textContent = "";
+        document.getElementById('transportId').style.border = '1px solid #BFDBFE';
     }
 
     const cargoOnChage = (id) => {
@@ -104,107 +129,238 @@ const SingaporeToMMIndex = () => {
             return data;
         })
         setCargoData(data)
+        let cargoArr = [];
+        cargoData.forEach(d => {
+            if (d.isChecked == true) {
+                cargoArr.push(d.id)
+            }
+        })
+        if (cargoArr.length > 0) {
+            document.getElementById('error-what-send').textContent = "";
+            document.getElementById('what-send').style.border = '1px solid #BFDBFE';
+        } else {
+            document.getElementById('what-send').style.border = '1px solid red';
+            let error = document.getElementById('error-what-send');
+            error.textContent = 'Please Choose at least one item!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
     }
 
     const storageTypeChange = (id) => {
-        let data = storageType.map(data => {
-            if (data.id == id) {
-                data.isChecked = !data.isChecked;
-            }
-            return data;
-        })
-        setStorageType(data)
+        setStorageTypeId(id);
+        document.getElementById('error-storage').textContent = "";
+        document.getElementById('storage').style.border = '1px solid #BFDBFE';
     }
 
-    const senderNameChange = (e) => {
-        setSenderName(e.target.value)
+    const pickUpChange = (e) => {
+        setPickUpRadio(e.target.value);
+        document.getElementById('error-ygn-pickup').textContent = "";
+        document.getElementById('yangon-pickup').style.border = '1px solid #BFDBFE';
     }
 
-    const senderEmailChange = (e) => {
-        setSenderEmail(e.target.value);
+    const selfCollectionChange = (id) => {
+        setSelfCollectionid(id);
+        document.getElementById('error-sg-home').textContent = "";
+        document.getElementById('sg-home').style.border = '1px solid #BFDBFE';
+    }
+
+    const paymentChange = (e) => {
+        setPayment(e.target.value);
+        document.getElementById('error-payment').textContent = "";
+        document.getElementById('payment').style.border = '1px solid #BFDBFE';
+    }
+
+    const recipientNameChange = (e) => {
+        setRecipientName(e.target.value);
+        if (!checkNullOrBlank(e.target.value)) {
+            document.getElementById('error-rec-name').textContent = "";
+            document.getElementById('rec-name').style.border = '1px solid #BFDBFE';
+        }
+    }
+
+    const recipientPhoneChange = (e) => {
+        setRecipientPhone(e.target.value);
+        if (!checkNullOrBlank(e.target.value)) {
+            document.getElementById('error-rec-phone').textContent = "";
+            document.getElementById('rec-phone').style.border = '1px solid #BFDBFE';
+        }
     }
 
     const recipientAddressChange = (e) => {
         setRecipientAddress(e.target.value);
     }
 
-    const recipientPhoneChange = (e) => {
-        setRecipientPhone(e.target.value);
-    }
-
-    const senderPhoneChange = (e) => {
-        setSenderPhone(e.target.value);
-    }
-
-    const senderAddressChange = (e) => {
-        setSenderAddress(e.target.value);
-    }
-
-    const transportChange = (e) => {
-        setTransportId(e.target.value);
-    }
-
     const submitClick = () => {
-        let errArr = [];
-        let cargoIds = [];
-        cargoData.forEach(item => {
-            if(item.isChecked == true){
-                cargoIds.push(item.id);
+        let cargoArr = [];
+        cargoData.forEach(d => {
+            if (d.isChecked == true) {
+                cargoArr.push(d.id)
             }
         })
 
-        if(checkNullOrBlank(senderEmail)){
-            errArr.push('Please Fill Sender Email!');
+        if (checkNullOrBlank(senderEmail)) {
+            document.getElementById('senderEmail').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('senderEmail').style.border = '1px solid red';
+            let error = document.getElementById('error-sender-email');
+            error.textContent = 'Please Fill Sender Email!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(checkNullOrBlank(senderName)){
-            errArr.push('Please Fill Sender Name!');
+        else if (checkNullOrBlank(senderName)) {
+            document.getElementById('senderName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('senderName').style.border = '1px solid red';
+            let error = document.getElementById('error-sender-name');
+            error.textContent = 'Please Fill Sender Name!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(checkNullOrBlank(senderPhone)){
-            errArr.push('Please Fill Sender Phone!');
+        else if (checkNullOrBlank(senderPhone)) {
+            document.getElementById('senderPhone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('senderPhone').style.border = '1px solid red';
+            let error = document.getElementById('error-sender-phone');
+            error.textContent = 'Please Fill Sender Phone Number!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(checkNullOrBlank(transportId)){
-            errArr.push('Please Choose Sea Transport or Air Transport?');
+        else if (checkNullOrBlank(transportId)) {
+            document.getElementById('transportId').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('transportId').style.border = '1px solid red';
+            let error = document.getElementById('error-transport');
+            error.textContent = 'Please Choose Transport!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(cargoIds.length == 0){
-            errArr.push('Please choose at least one Item!');
+        else if (cargoArr.length == 0) {
+            document.getElementById('what-send').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('what-send').style.border = '1px solid red';
+            let error = document.getElementById('error-what-send');
+            error.textContent = 'Please Choose at least one item!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(checkNullOrBlank(pickUpRadio)){
-            errArr.push('Please choose Yangon Home Pick Up!');
+        else if (checkNullOrBlank(storageTypeId)) {
+            document.getElementById('storage').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('storage').style.border = '1px solid red';
+            let error = document.getElementById('error-storage');
+            error.textContent = 'Please Choose Storage Type!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(checkNullOrBlank(selfCollectionId)){
-            errArr.push('Please Choose SG Home Delievry/ Self Collection!');
+        else if (checkNullOrBlank(pickUpRadio)) {
+            document.getElementById('yangon-pickup').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('yangon-pickup').style.border = '1px solid red';
+            let error = document.getElementById('error-ygn-pickup');
+            error.textContent = 'Please Choose Yes or No!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(checkNullOrBlank(payment)){
-            errArr.push('Please Choose payment!');
+        else if (checkNullOrBlank(selfCollectionId)) {
+            document.getElementById('sg-home').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('sg-home').style.border = '1px solid red';
+            let error = document.getElementById('error-sg-home');
+            error.textContent = 'Please Choose SG Home Delivery!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(checkNullOrBlank(recipientName)){
-            errArr.push('Please Fill Recipient Name!');
+        else if (checkNullOrBlank(payment)) {
+            document.getElementById('payment').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('payment').style.border = '1px solid red';
+            let error = document.getElementById('error-payment');
+            error.textContent = 'Please Choose at least one item!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(checkNullOrBlank(recipientPhone)){
-            errArr.push('Please Fill Recipient Phone!');
+        else if (checkNullOrBlank(recipientName)) {
+            document.getElementById('rec-name').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('rec-name').style.border = '1px solid red';
+            let error = document.getElementById('error-rec-name');
+            error.textContent = 'Please Fill Recipient Name!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
         }
-        if(errArr.length > 0){
-            setError(errArr);
-            console.log(errArr);
-        }else{
-
+        else if (checkNullOrBlank(recipientPhone)) {
+            document.getElementById('rec-phone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('rec-phone').style.border = '1px solid red';
+            let error = document.getElementById('error-rec-phone');
+            error.textContent = 'Please Fill Recipient Phone Number!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else {
+            setLoading(true);
+            let params = {
+                "sender_email": senderEmail,
+                "sender_name": senderName,
+                "sender_phone": senderPhone,
+                "sender_address": senderAddress,
+                "transport": transportId,
+                "storage_type": storageTypeId,
+                "mm_home_pickup": pickUpRadio,
+                "how_in_sg": selfCollectionId,
+                "payment_type": payment,
+                "receiver_postal_code": recipientPostalCode,
+                "receiver_name": recipientName,
+                "receiver_address": recipientAddress,
+                "receiver_phone": recipientPhone,
+                "additional_instruction": additionalOpt,
+                "items": cargoArr
+            }
+            axios.post('/logistic/mm-sg-save', params)
+                .then(data => {
+                    setLoading(false);
+                    toast.success('Successfully Registered!', {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    });
+                })
+                .catch((e) => {
+                    setLoading(false);
+                    toast.error('Fail To Register!', {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    });
+                });
         }
     }
 
     return (
         <>
+            <Loading start={loading} />
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href="/">
-                    <header>
-                        <div className="flex justify-center">
-                            <img src='images/logo.png' width="100" height="70" alt="" />
-                        </div>
-                        <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
+                    <header className="flex justify-center mt-10">
+                        <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
                     </header>
                 </Link>
-                <main className='md:ml-[200px] md:mr-[200px] mt-0 mb-0'>
+                <main className='md:ml-[200px] mt-[-35px] md:mr-[200px] mb-0'>
                     <div className="flex flex-col justify-center align-middle">
                         <h2 className="text-blue-700 text-center text-2xl"> <span className="text-pink-700 font-bold">MYANMAR </span>TO <span className="text-purple-700 font-bold">SINGAPORE</span> LOGISTIC SERVICE</h2>
+                        <h3 className='text-blue-700 font-bold text-center text-xl'>( Alone Branch )</h3>
                         <div className='mt-5 me-4 ms-4'>
                             <h2 className='mb-4 font-bold text-blue-600 text-[20px]' htmlFor="">MM to SG rates:</h2>
                             <div className='mb-3 dark:text-gray-400'>
@@ -251,31 +407,35 @@ const SingaporeToMMIndex = () => {
                     <h3 className='dark:text-gray-400 font-bold mt-7 mb-3 me-4 ms-4'>Please provide the following details to avail of our logistics services:</h3>
                     <div className=' pt-4 pb-4'>
                         <div className='me-4 ms-4'>
-                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='senderEmail' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Email</label>
                                 <input className=' dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="email" name="" id="" value={senderEmail} onChange={senderEmailChange} />
+                                <span id="error-sender-email"></span>
                             </div>
-                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='senderName' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Sender's Name / ပေးပို့သူအမည်</label>
                                 <input className=' dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderName} onChange={senderNameChange} />
+                                <span id="error-sender-name"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='senderPhone' className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Sender's Contact Number / ပေးပို့သူ၏ ဖုန်းနံပါတ်</label>
                                 <input className=' dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderPhone} onChange={senderPhoneChange} />
+                                <span id="error-sender-phone"></span>
                             </div>
                             <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='mb-2'>Sender's Address /ပေးပို့သူ၏ နေရပ်လိပ်စာ (optional)</label>
                                 <input className=' dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderAddress} onChange={senderAddressChange} />
                             </div>
-                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='transportId' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Sea Transport or Air Transport?</label>
                                 <div className='mt-3'>
                                     <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id="radio1" value="1" onChange={transportChange} checked={transportId === "1" ? true : false} /> <label className=' dark:text-gray-400 cursor-pointer
                                     me-3' htmlFor="radio1">Sea</label>
-                                    <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id='radio2' value="2" onChange={transportChange} checked={transportId === "2" ? true : false} /> <label className='cursor-pointer dark:text-gray-400 cursor-po' htmlFor="radio2">Air</label>
+                                    <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id='radio2' value="2" onChange={transportChange} checked={transportId === "2" ? true : false} /> <label className='cursor-pointer dark:text-gray-400' htmlFor="radio2">Air</label>
                                 </div>
+                                <span id="error-transport"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='what-send' className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>What are you sending? (you can select more than 1)</label>
                                 ALL FROZEN FOOD must be given to office in frozen state, cannot pack with dried foods
                                 <div className='mt-3'>
@@ -288,34 +448,37 @@ const SingaporeToMMIndex = () => {
                                         )
                                     })}
                                 </div>
+                                <span id="error-what-send"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='storage' className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Storage Type</label>
                                 <div className='mt-3'>
                                     {storageType.map(data => {
                                         return (
                                             <div className='mb-2' key={data.id}>
-                                                <input className=' dark:bg-gray-400 focus:ring cursor-pointer focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="checkbox" id={data.name} value={data.id} onChange={function () { storageTypeChange(data.id) }} checked={data.isChecked} />
+                                                <input className=' dark:bg-gray-400 focus:ring cursor-pointer focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id={data.name} value={data.id} onChange={function () { storageTypeChange(data.id) }} checked={data.id == storageTypeId ? true : false} />
                                                 <label htmlFor={data.name} className='ms-2 cursor-pointer'>{data.name}</label>
                                             </div>
                                         )
                                     })}
                                 </div>
+                                <span id="error-storage"></span>
                             </div>
                             <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 mb-2'>Please provide details for your cargo. (optional)</label>
                                 <input className=' dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="email" name="" id="" value={cargoDetail} onChange={cargoDetailChange} />
                             </div>
-                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded dark:text-gray-400'>
+                            <div id='yangon-pickup' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded dark:text-gray-400'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Choose Yangon Home Pick up at S$3.50?</label>
                                 We will contact you to arrange day and time to pickup.
                                 <div className='mt-3'>
                                     <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id="ygnp1" value="1" name="yes" onChange={pickUpChange} checked={pickUpRadio === "1" ? true : false} /> <label className=' dark:text-gray-400 cursor-pointer
                                     me-3' htmlFor="ygnp1">Yes</label>
-                                    <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id='ygnp2' value="2" name="no" onChange={pickUpChange} checked={pickUpRadio === "2" ? true : false} /> <label className='cursor-pointer dark:text-gray-400 cursor-po' htmlFor="ygnp2">No</label>
+                                    <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id='ygnp2' value="2" name="no" onChange={pickUpChange} checked={pickUpRadio === "2" ? true : false} /> <label className='cursor-pointer dark:text-gray-400' htmlFor="ygnp2">No</label>
                                 </div>
+                                <span id="error-ygn-pickup"></span>
                             </div>
-                            <div className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded dark:text-gray-400'>
+                            <div id='sg-home' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded dark:text-gray-400'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Choose SG Home Delivery / Self Collection?</label>
                                 SG Home Delivery is based on driver's schedule, we appreciate your patience
                                 <div className='mt-3'>
@@ -328,8 +491,9 @@ const SingaporeToMMIndex = () => {
                                         )
                                     })}
                                 </div>
+                                <span id="error-sg-home"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='payment' className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Payment in Singapore (SG) or in Myanmar (MM)?</label>
                                 ငွေပေးချေမှု ( SG Pay သို့မဟုတ် MM Pay)
                                 <div className='mt-4'>
@@ -337,14 +501,17 @@ const SingaporeToMMIndex = () => {
                                     me-3' htmlFor="payment1">SG Pay</label>
                                     <input className=' dark:bg-gray-400 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="radio" id='payment2' value="2" name="MM Pay" onChange={paymentChange} checked={payment === "2" ? true : false} /> <label className='cursor-pointer' htmlFor="payment2">MM Pay</label>
                                 </div>
+                                <span id="error-payment"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='rec-name' className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Name / လက်ခံမည့်သူ၏ နာမည်</label>
                                 <input className=' dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientName} onChange={recipientNameChange} />
+                                <span id="error-rec-name"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                            <div id='rec-phone' className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Contact Number / လက်ခံမည့်သူ၏ ဖုန်းနံပါတ်</label>
                                 <input className=' dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientPhone} onChange={recipientPhoneChange} />
+                                <span id="error-rec-phone"></span>
                             </div>
                             <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='mb-2'>Recipient's Postal Code</label>
@@ -410,4 +577,4 @@ const SingaporeToMMIndex = () => {
     );
 }
 
-export default SingaporeToMMIndex
+export default MyanmarToSgAlon

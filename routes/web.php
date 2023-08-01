@@ -51,9 +51,13 @@ Route::get('/check-parcel', function() {
     return Inertia::render('CheckParcelIndex');
 })->name('check-parcel');
 
-Route::get('/mm-to-sg', function() {
-    return Inertia::render('MyanmarToSGIndex');
-})->name('mm-to-sg');
+Route::get('/mm-to-sg-okkala', function() {
+    return Inertia::render('MyanmarToSgOkkala');
+})->name('mm-to-sg-okkala');
+
+Route::get('/mm-to-sg-alon', function() {
+    return Inertia::render('MyanmarToSgAlon');
+})->name('mm-to-sg-alon');
 
 Route::get('/sg-to-mm', function() {
     return Inertia::render('SingaporeToMMIndex');

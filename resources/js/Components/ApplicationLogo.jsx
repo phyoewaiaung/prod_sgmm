@@ -1,5 +1,5 @@
 export default function ApplicationLogo(props) {
     return (
-        <img src='images/logo.png' width="100" height="70" alt="sgmyanmar logo" />
+        <img className="mt-[-65px] mb-[-50px]" src='images/SGMYANMAR.png' width="300" alt="sgmyanmar logo" />
     );
 }

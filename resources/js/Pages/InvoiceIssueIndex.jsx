@@ -1,20 +1,150 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from '@inertiajs/react'
+import { isdigit } from '@/Common/CommonValidation';
+import axios from 'axios';
 
-const InvoiceIssueIndex = () => {
+const InvoiceIssueIndex = (props) => {
+    console.log(props.data)
+    const [foodWeight, setFoodWeight] = useState(0);
+    const [shoeWeight, setShoeWeight] = useState(0);
+    const [cosmeticWeight, setCosmeticWeight] = useState(0);
+    const [electronicWeight, setElectronicWeight] = useState(0);
+    const [othersWeight, setOthersWeight] = useState(0);
+    const [handlingFee, setHandlingFee] = useState(false);
+    const categories = props.data[0].category;
+
+    const foodUnit = props.data[0].shipment_method ?
+        props.data[0].shipment_method == "1" ?
+            "6.00" :
+            props.data[0].shipment_method == "2" ?
+                "8.00" :
+                props.data[0].shipment_method == "3" ?
+                    "3.00" : "10" : "4.5"
+
+    const shoeUnit = props.data[0].shipment_method ?
+        props.data[0].shipment_method == "1" ?
+            "8.00" :
+            props.data[0].shipment_method == "2" ?
+                "10.00" :
+                props.data[0].shipment_method == "3" ?
+                    "4.00" : "12" : "4.5"
+
+
+    const cosmeticUnit = props.data[0].shipment_method ?
+        props.data[0].shipment_method == "1" ?
+            "9.00" :
+            props.data[0].shipment_method == "2" ?
+                "12.00" :
+                props.data[0].shipment_method == "3" ?
+                    "5.00" : "14" : "4.5"
+
+    const electronicUnit = props.data[0].shipment_method ?
+        props.data[0].shipment_method == "1" ?
+            "10.00" :
+            props.data[0].shipment_method == "2" ?
+                "12.00" :
+                props.data[0].shipment_method == "3" ?
+                    "5.00" : "15" : "4.5"
+
+    const totalFood = (parseFloat(foodUnit) * ((foodWeight == "") ? 0.0 : parseFloat(foodWeight))) == "0" ? "-" : (parseFloat(foodUnit) * ((foodWeight == "") ? 0.0 : parseFloat(foodWeight))).toFixed(2);
+
+    const totalShoe = (parseFloat(shoeUnit) * ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight))) == "0" ? "-" : (parseFloat(shoeUnit) * ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight))).toFixed(2);
+
+    const totalCosmetic = (parseFloat(cosmeticUnit) * ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight))) == "0" ? "-" : (parseFloat(cosmeticUnit) * ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight))).toFixed(2);
+
+    const totalElectronic = (parseFloat(electronicUnit) * ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight))) == "0" ? "-" : (parseFloat(electronicUnit) * ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight))).toFixed(2);
+
+    useEffect(() => {
+        props.data.length == "0" ?
+            to_route('check-invoice') : ''
+    }, [])
+
+    const foodWeightChange = (e) => {
+        if (!e.target.value) {
+            setFoodWeight("");
+        } else if (isdigit(e.target.value)) {
+            setFoodWeight(e.target.value);
+        }
+    }
+    const shoeWeightChange = (e) => {
+        if (!e.target.value) {
+            setShoeWeight("");
+        } else if (isdigit(e.target.value)) {
+            setShoeWeight(e.target.value);
+        }
+    }
+    const cosmeticWeightChange = (e) => {
+        if (!e.target.value) {
+            setCosmeticWeight("");
+        } else if (isdigit(e.target.value)) {
+            setCosmeticWeight(e.target.value);
+        }
+    }
+    const electronicWeightChange = (e) => {
+        if (!e.target.value) {
+            setElectronicWeight("");
+        } else if (isdigit(e.target.value)) {
+            setElectronicWeight(e.target.value);
+        }
+    }
+    const othersWeightChange = (e) => {
+        if (!e.target.value) {
+            setOthersWeight("");
+        } else if (isdigit(e.target.value)) {
+            setOthersWeight(e.target.value);
+        }
+    }
+    const checkboxChange = () => {
+        setHandlingFee(!handlingFee);
+    }
+
+    const updateClick = () => {
+        let data = categories.map(d => {
+            if (d.item_category_id == "1" || d.item_category_id == "2") {
+                d.weight = foodWeight
+            }
+            if (d.item_category_id == "3") {
+                d.weight = shoeWeight
+            }
+            if (d.item_category_id == "4") {
+                d.weight = cosmeticWeight
+            }
+            if (d.item_category_id == "5") {
+                d.weight = electronicWeight
+            }
+            if (d.item_category_id == "6") {
+                d.weight = othersWeight
+            }
+            return d;
+        })
+
+        let params = {
+            id: props.data[0].id,
+            invoice_no: props.data[0].invoice_no,
+            categroy_data: data,
+            handling_fee : handlingFee? true:false
+        }
+        axios.post('/save-issue', params)
+            .then(data => console.log(data))
+            .catch(e => console.log(e))
+    }
+
+    const sendEmailClick = () => {
+
+    }
+
     return (
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
-                <header className='ml-3 mr-3 md:ml-0 md:mr-0 flex flex-col md:flex-row justify-around items-center gap-10'>
+                <header className='mt-10 ml-3 mr-3 md:ml-0 md:mr-0 flex flex-col md:flex-row justify-around items-center gap-10'>
                     <div className='md:pl-[100px] md:pr-[100px]'>
                         <Link href='/'>
                             <div className="flex justify-center items-center">
-                                <img src='images/logo.png' width="100" height="70" alt="sgmyanmar logo" />
+                                <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
                             </div>
-                            <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
                         </Link>
                     </div>
-                    <div className='dark:text-gray-400'>
+                    <div className='dark:text-gray-400 mt-[-78px] md:mt-0'>
                         <h3 className='font-bold mb-2'>Singapore Branch</h3>
                         <h4>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</h4>
                         <h4>Contact: +65 9325 0329</h4>
@@ -36,7 +166,7 @@ const InvoiceIssueIndex = () => {
                                 <h2 className='font-bold text-xl mt-3'>Invoice</h2>
                             </div>
                             <div>
-                                <h2 className='font-bold text-xl mt-3'>VR- SM23-07W3006</h2>
+                                <h2 className='font-bold text-xl mt-3'>VR- {props.data[0].invoice_no}</h2>
                             </div>
                         </div>
                     </div>
@@ -46,28 +176,37 @@ const InvoiceIssueIndex = () => {
                     <div className="flex md:flex-row flex-col md:justify-evenly mt-3">
                         <div className='text-center'>
                             <h3 className="font-bold dark:text-gray-400">Date & Time :<span className='text-red-600 font-normal'>17/07/2023 17:35:30 </span></h3>
-                            <h3 className='font-bold dark:text-gray-400'>Name :<span className='font-normal'>PHYOE WAI AUNG</span></h3>
+                            <h3 className='font-bold dark:text-gray-400'>Name :<span className='font-normal'>{props.data[0].sender_name}</span></h3>
                         </div>
                         <div>
-                            <h3 className='font-bold text-center dark:text-gray-400'>Delievery Mode : <span className='font-normal'>Sea Cargo (3-4 weeks from shipment)</span></h3>
+                            <h3 className='font-bold text-center dark:text-gray-400'>Delievery Mode : <span className='font-normal'>{
+                                props.data[0].transport ? (props.data[0].transport == "1" ? "Air" : "Sea") :
+                                    props.data[0].shipment_method == "1" ?
+                                        "Land (2 weeks from shipment)" :
+                                        props.data[0].shipment_method == "2" ?
+                                            "Land Express (7-10 days from shipment)" :
+                                            props.data[0].shipment_method == "3" ?
+                                                "Sea Cargo (3-4 weeks from shipment)" :
+                                                "Air Cargo (3-5 days from shipment)"
+                            }</span></h3>
                         </div>
                     </div>
                     <div className="flex md:flex-row flex-col md:justify-evenly mt-3">
                         <div className='md:w-1/2 w-full text-center'>
                             <h3 className="font-bold text-center md:text-start ml-11 dark:text-blue-500">Shipping Information</h3>
-                            <textarea className='invoice-color-textarea w-5/6' value='No. 21,Block C,Thiri Yadanar Retail and Wholesale Market, Thudhamma Road, North Okkalapa Tsp.Yangon' readOnly />
-                            <h3 className="font-bold dark:text-gray-400">Recipient Name : <span className="font-normal">phyoe wai aung</span></h3>
-                            <h3 className="font-bold dark:text-gray-400">Recipient Contact Number : <span className='font-normal'>092345673</span></h3>
+                            <textarea className='invoice-color-textarea w-5/6' value={props.data[0].receiver_address} readOnly />
+                            <h3 className="font-bold dark:text-gray-400">Recipient Name : <span className="font-normal">{props.data[0].receiver_name}</span></h3>
+                            <h3 className="font-bold dark:text-gray-400">Recipient Contact Number : <span className='font-normal'>{props.data[0].receiver_phone}</span></h3>
                         </div>
                         <div className='md:w-1/2 w-full text-center'>
                             <h3 className="font-bold text-center md:text-start ml-11 dark:text-blue-500">Billing Information</h3>
-                            <textarea className='invoice-color-textarea w-5/6' value='No. 21,Block C,Thiri Yadanar Retail and Wholesale Market, Thudhamma Road, North Okkalapa Tsp.Yangon' readOnly />
-                            <h3 className="font-bold dark:text-gray-400">Sender Name : <span className="font-normal">phyoe wai aung</span></h3>
-                            <h3 className="font-bold dark:text-gray-400">Sender Contact Number : <span className='font-normal'>092345673</span></h3>
+                            <textarea className='invoice-color-textarea w-5/6' value={props.data[0].sender_address} readOnly />
+                            <h3 className="font-bold dark:text-gray-400">Sender Name : <span className="font-normal">{props.data[0].sender_name}</span></h3>
+                            <h3 className="font-bold dark:text-gray-400">Sender Contact Number : <span className='font-normal'>{props.data[0].sender_phone}</span></h3>
                         </div>
                     </div>
                     <div className='mt-4 ml-3 mr-3 md:ml-0 md:mr-0'>
-                        <h3 className='dark:text-red-400 font-bold'>phyoewaiaung082@gmail.com</h3>
+                        <h3 className='dark:text-red-400 font-bold'>{props.data[0].sender_email}</h3>
                     </div>
                     <div className="mb-3 invoice-issue-container md:mr-0 md:ml-0 ml-3 mr-3">
                         <table className='invoice-issue-table text-center'>
@@ -81,70 +220,120 @@ const InvoiceIssueIndex = () => {
                                 </tr>
                             </thead>
                             <tbody className="dark:text-gray-400">
-                                <tr>
-                                    <td>1</td>
-                                    <td>Food and Clothes</td>
-                                    <td>3.00</td>
-                                    <td>3</td>
-                                    <td> $9.00</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Shoes / Bag</td>
-                                    <td>3.00</td>
-                                    <td>5</td>
-                                    <td>$16.00</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Cosmetics / Medicine/ Supplements</td>
-                                    <td>3.00</td>
-                                    <td>5</td>
-                                    <td>$16.00</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>Electronic Item</td>
-                                    <td>3.00</td>
-                                    <td>5</td>
-                                    <td>$16.00</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>Others - Voltage regulator</td>
-                                    <td>3.00</td>
-                                    <td>10%</td>
-                                    <td>$16.00</td>
-                                </tr>
+                                {categories.length > 0 &&
+                                    categories.map((data, index) => {
+                                        return (
+                                            <React.Fragment key={index}>
+                                                {data.item_category_id == "1" &&
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>Food and Clothes</td>
+                                                        <td>
+                                                            <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={foodWeight === 0 ? '' : foodWeight} onChange={foodWeightChange} />
+                                                        </td>
+                                                        <td>{foodUnit}</td>
+                                                        <td>{totalFood}</td>
+                                                    </tr>
+                                                }
+
+                                                {data.item_category_id == "3" &&
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td>Shoes / Bag</td>
+                                                        <td>
+                                                            <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={shoeWeight === 0 ? '' : shoeWeight} onChange={shoeWeightChange} />
+                                                        </td>
+                                                        <td>{shoeUnit}</td>
+                                                        <td>{totalShoe}</td>
+                                                    </tr>
+                                                }
+                                                {data.item_category_id == "4" &&
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td>Cosmetics / Medicine/ Supplements</td>
+                                                        <td>
+                                                            <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={cosmeticWeight === 0 ? '' : cosmeticWeight} onChange={cosmeticWeightChange} />
+                                                        </td>
+                                                        <td>{cosmeticUnit}</td>
+                                                        <td>{totalCosmetic}</td>
+                                                    </tr>
+                                                }
+                                                {data.item_category_id == "5" &&
+                                                    <tr>
+                                                        <td>4</td>
+                                                        <td>Electronic Item</td>
+                                                        <td>
+                                                            <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={electronicWeight === 0 ? '' : electronicWeight} onChange={electronicWeightChange} />
+                                                        </td>
+                                                        <td>{electronicUnit}</td>
+                                                        <td>{totalElectronic}</td>
+                                                    </tr>
+                                                }
+                                                {data.item_category_id == "6" &&
+                                                    <tr>
+                                                        <td>5</td>
+                                                        <td>Others - Voltage regulator</td>
+                                                        <td>
+                                                            <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={othersWeight === 0 ? '' : othersWeight} onChange={othersWeightChange} />
+                                                        </td>
+                                                        <td>10%</td>
+                                                        <td>$16.00</td>
+                                                    </tr>
+                                                }
+                                            </React.Fragment>
+                                        )
+                                    })
+                                }
                                 <tr>
                                     <td></td>
                                     <td>Total Weight</td>
-                                    <td>7.00</td>
-                                    <td>handling fee 3 kg</td>
+                                    <td>
+                                        {
+                                            ((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                                            ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                                            ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                                            ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                                            ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))
+                                        }
+                                    </td>
+                                    <td>
+                                        <input className='cursor-pointer focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="checkbox" value={handlingFee} onChange={checkboxChange} checked={handlingFee} />
+                                        <span className='ms-2'>handling fee 3 kg</span>
+                                    </td>
                                     <td>-</td>
                                 </tr>
                                 <tr>
                                     <td></td>
                                     <td>SG Home PickUp:</td>
-                                    <td className='text-start' colSpan={2}>Yes</td>
+                                    <td className='text-start' colSpan={2}>{props.data[0].sg_home_pickup == "1" ? "Yes" : "No"}</td>
                                     <td>-</td>
                                 </tr>
                                 <tr>
                                     <td></td>
                                     <td>Home/ Bus Station deliver:</td>
-                                    <td className='text-start' colSpan={2}>Yangon Home Delivery Downtown ($3.5)</td>
+                                    <td className='text-start' colSpan={2}>
+                                        {props.data[0].how_in_ygn == "1" ? "Yangon Home Delivery Downtown ($3.5)" :
+                                            props.data[0].how_in_ygn == "2" ? "Yangon Home Deliver outside ($5.0)" :
+                                                props.data[0].how_in_ygn == "3" ? "Bus Gate ($3.5)" : "Self Collection"
+                                        }
+                                    </td>
                                     <td>-</td>
                                 </tr>
                                 <tr>
                                     <td colSpan={2}></td>
-                                    <td className='text-start'>MM Pay</td>
+                                    <td className='text-start'>{props.data[0].payment_type == "1" ? "SG PAY" : "MM PAY"}</td>
                                     <td colSpan={2}></td>
                                 </tr>
                                 <tr>
                                     <td></td>
                                     <td colSpan={2} className='font-bold'>PayNow to mobile 93250329 or UEN number 53413642K </td>
                                     <td>TOTAL</td>
-                                    <td>$45.40</td>
+                                    <td>{
+                                        (parseFloat((totalFood == "-" ? 0 : totalFood)) +
+                                            parseFloat((totalShoe == "-" ? 0 : totalShoe)) +
+                                            parseFloat((totalCosmetic == "-" ? 0 : totalCosmetic)) +
+                                            parseFloat((totalElectronic == "-" ? 0 : totalElectronic))).toFixed(2)
+                                    }</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -166,10 +355,10 @@ const InvoiceIssueIndex = () => {
                         </div>
                         <div className='md:mr-[80px] md:mt-0 mt-4'>
                             <div>
-                                <button className='invoice-issue-button'>Send Email</button>
+                                <button onClick={sendEmailClick} className='invoice-issue-button'>Send Email</button>
                             </div>
                             <div className='mt-3'>
-                                <button className='invoice-issue-button'>Update</button>
+                                <button onClick={updateClick} className='invoice-issue-button'>Update</button>
                             </div>
                         </div>
                     </div>

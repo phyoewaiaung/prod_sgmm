@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from '@inertiajs/react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import Loading from '@/Common/Loading';
 
 const CheckInvoiceIndex = () => {
+    const [loading, setLoading] = useState(false);
     const [invoiceNo, setInvoiceNo] = useState('');
     const [invoiceSts, setInvoiceSts] = useState('');
+    const [invoiceList, setInvoiceList] = useState([]);
 
     const invoiceNoChange = (e) => {
         setInvoiceNo(e.target.value);
@@ -12,18 +17,66 @@ const CheckInvoiceIndex = () => {
     const invoiceStsChange = (e) => {
         setInvoiceSts(e.target.value);
     }
+    useEffect(() => {
+        setLoading(true);
+        axios.get('/logistic/search')
+            .then(res => {
+                setLoading(false);
+                setInvoiceList(res.data.data)
+            })
+            .catch(e => {
+                setLoading(false);
+                toast.error('Fail To Load Invoice Data!', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                })
+            }
+            )
+    }, [])
+
+    const searchClick = () => {
+        setLoading(true);
+        let params = {
+            invoice_no:invoiceNo,
+            status: invoiceSts
+        }
+        axios.post('/logistic/search',params)
+        .then(res => {
+            setLoading(false);
+            setInvoiceList(res.data.data)
+        })
+        .catch(e => {
+            setLoading(false);
+            toast.error('Fail To Load Invoice Data!', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            })
+        }
+        )
+    }
     return (
         <>
+            <Loading start={loading} />
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href='/'>
-                    <header>
-                        <div className="flex justify-center">
-                            <img src='images/logo.png' width="100" height="70" alt="sgmyanmar logo" />
-                        </div>
-                        <h1 className="text-4xl font-bold text-center text-blue-700 py-4">SGMYANMAR</h1>
-                    </header></Link>
-                <main className='md:w-5/6 w-full'>
-                    <h2 className="ont-extrabold text-transparent bg-clip-text bg-gradient-to-r text-blue-700 text-center text-2xl from-purple-700 mb-3 to-pink-600 ">Check Invoices</h2>
+                    <header className="flex justify-center mt-10">
+                        <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
+                    </header>
+                </Link>
+                <main className='md:w-5/6 w-full mt-[-70px]'>
+                    <h2 className="ont-extrabold text-transparent bg-clip-text bg-gradient-to-r text-blue-700 text-center text-2xl from-purple-700 mb-3 mt-4 to-pink-600 ">Check Invoices</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-7 ml-[100px] mr-[100px]">
                         <div>
                             <div className='mb-3 dark:text-gray-400'>
@@ -43,59 +96,46 @@ const CheckInvoiceIndex = () => {
                         </div>
                     </div>
                     <div className='text-center mt-3 mb-3'>
-                        <button type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
+                        <button onClick={searchClick} type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
                             Search
                         </button>
                     </div>
                     <h3 className="ml-3 mr-3 md:ml-0 md:mr-0 font-bold text-xl mb-3 dark:text-gray-400">Check Invoice List</h3>
                     <div className='md:ml-0 md:mr-0 ml-3 mr-3 invoice-list-container mb-5'>
-                        <table className='invoice-list-table text-center'>
+                        <table className='invoice-list-table text-center break-all'>
                             <thead className='text-white'>
                                 <th width={50}>No</th>
-                                <th width={150}>Invoice ID</th>
-                                <th width={150}>Sender Name</th>
-                                <th width={150}>Recipient Name</th>
+                                <th width={120}>Invoice ID</th>
+                                <th width={160}>Sender Name</th>
+                                <th width={160}>Recipient Name</th>
                                 <th width={100}>Payment</th>
                                 <th width={150}>Invoice Status</th>
-                                <th colSpan={4} width={350}>Action</th>
+                                <th colSpan={2} width={210}>Action</th>
                             </thead>
                             <tbody className='dark:text-gray-400'>
-                                <tr>
-                                    <td width={50}>1</td>
-                                    <td width={200}>AS22-04W2W539</td>
-                                    <td width={150}>phyoe wai aung</td>
-                                    <td width={150}>mr wyk</td>
-                                    <td width={100}>MM</td>
-                                    <td width={150}>register</td>
-                                    <td width={150}>
-                                        <Link href={route('invoice-issue')}>
-                                            <button className='bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600'>Invoice issue</button>
-                                        </Link>
-                                    </td>
-                                    <td width={100}>
-                                        <button className='bg-gradient-to-r from-blue-400 to-blue-500 text-white p-2 rounded hover:from-blue-500 hover:to-blue-600'>Received</button>
-                                    </td>
-                                    <td width={100}>
-                                        <button className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width={50}>1</td>
-                                    <td width={200}>AS22-04W2W539</td>
-                                    <td width={150}>phyoe wai aung</td>
-                                    <td width={150}>mr wyk</td>
-                                    <td width={100}>MM</td>
-                                    <td width={150}>register</td>
-                                    <td width={100}>
-                                        <button className='bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600'>Invoice issue</button>
-                                    </td>
-                                    <td width={100}>
-                                        <button className='bg-gradient-to-r from-blue-400 to-blue-500 text-white p-2 rounded hover:from-blue-500 hover:to-blue-600'>Received</button>
-                                    </td>
-                                    <td width={100}>
-                                        <button className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button>
-                                    </td>
-                                </tr>
+                                {invoiceList.length > 0 &&
+                                    invoiceList.map((data, index) => {
+                                        return (
+                                            <tr>
+                                                <td width={50}>{index + 1}</td>
+                                                <td width={120}>{data.invoice_no}</td>
+                                                <td width={160}>{data.sender_name}</td>
+                                                <td width={160}>{data.receiver_name}</td>
+                                                <td width={100}>{data.payment_type == "1" ? "SG" : "MM"}</td>
+                                                <td width={150}>register</td>
+                                                <td width={120}>
+                                                    <Link href={route('invoice-issue')} method='post' data={{ invoice_no: data.invoice_no }}
+                                                        preserveState={true}>
+                                                        <button className='bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600'>Invoice issue</button>
+                                                    </Link>
+                                                </td>
+                                                <td width={90}>
+                                                    <button className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })
+                                }
                             </tbody>
                         </table>
                     </div>

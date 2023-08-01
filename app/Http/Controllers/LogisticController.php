@@ -34,6 +34,7 @@ class LogisticController extends Controller
 
     public function saveSGtoMM(Request $request)
     {
+        Log::info($request);
         $validator = Validator::make($request->all(), [
             "sender_email" => "required|email",
             "sender_name" => "required",
@@ -120,13 +121,13 @@ class LogisticController extends Controller
                 $sgCategoryItem = SgCategoryItem::insert($items);
 
                 $getParcelTagFile = $this->createPdf($logistic);
-                
-                if($getParcelTagFile['status'] == "OK"){
-                    $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
-                    if(!$mailSend){
-                        $message = "$message but Send Mail Error";
-                    }
-                }
+
+                // if($getParcelTagFile['status'] == "OK"){
+                //     $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
+                //     if(!$mailSend){
+                //         $message = "$message but Send Mail Error";
+                //     }
+                // }
 
             } else {
                 return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
@@ -157,7 +158,7 @@ class LogisticController extends Controller
 
         $firstDayOfMonth = Carbon::createFromDate($Y, $month, 1)->startOfDay();
         $lastDayOfMonth = Carbon::createFromDate($Y, $month, 1)->endOfMonth()->endOfDay();
-        
+
         if($data['name'] === 'SGMM'){
             $lastNo = SgtoMmItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
                 ->orderBy('created_at', 'desc')->first();
@@ -168,7 +169,7 @@ class LogisticController extends Controller
                 ->orderBy('created_at', 'desc')->first();
             $default = "MS";
         }
-        
+
         if (!empty($lastNo)) {
             $dbNo = $lastNo->invoice_no;
             $number = substr($dbNo, -3);
@@ -273,13 +274,13 @@ class LogisticController extends Controller
                 $sgCategoryItem = MmCategoryItem::insert($items);
 
                 $getParcelTagFile = $this->createPdf($logistic, 2);
-                
-                if($getParcelTagFile['status'] == "OK"){
-                    $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
-                    if(!$mailSend){
-                        $message = "$message but Send Mail Error";
-                    }
-                }
+
+                // if($getParcelTagFile['status'] == "OK"){
+                //     $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
+                //     if(!$mailSend){
+                //         $message = "$message but Send Mail Error";
+                //     }
+                // }
             } else {
                 return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
             }
@@ -287,7 +288,7 @@ class LogisticController extends Controller
             DB::commit();
             return response()->json(['status' => 200, 'message' => $message ]);
         } catch (\Exception $e) {
-            Log::info(' ========================== saveMMtoSG Error Log ============================== ');            
+            Log::info(' ========================== saveMMtoSG Error Log ============================== ');
             Log::info($e);
             Log::info(' ========================== saveMMtoSG Error Log ============================== ');
             DB::rollback();
@@ -310,7 +311,7 @@ class LogisticController extends Controller
                 "email" => $data->sender_email,
                 "user_name" => $data->sender_name,
                 'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
-                "logistic" => '(SM...)',                
+                "logistic" => '(SM...)',
             ];
 
             $files = [
@@ -371,7 +372,7 @@ class LogisticController extends Controller
         }else {
             return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
         }
-        
+
     }
 
     public function createPdf ($data, $flag = 1)
@@ -382,7 +383,7 @@ class LogisticController extends Controller
         // $flag = 2;
         $invoiceNo = $data->invoice_no;
         // return $data;
-        
+
         $mpdf = new Mpdf([
             'tempDir' => storage_path('app/mpdf/custom/temp/dir/path'),
             'format'  => 'A4',
@@ -393,14 +394,14 @@ class LogisticController extends Controller
             'margin_bottom' => 15,
             'margin_header' => 10,
             'margin_footer' => 10,
-            
+
         ]);
         // $mpdf = LaravelMpdf::loadView('testpdf', ['datas' => 'this is pdf generate'],[
         //     'auto_language_detection' => true,
         //     'author'                  => 'WYK',
         //     'margin_top' => 0
         // ]);
-        
+
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;
 
@@ -410,7 +411,7 @@ class LogisticController extends Controller
         $html->render();
         $mpdf->WriteHTML($html);
         $fileName = "$invoiceNo.pdf";
-        $storagePath = "parcel-tag-file/$flag/";  
+        $storagePath = "parcel-tag-file/$flag/";
 
         // return "$storagePath$fileName";
         // return $mpdf->stream($fileName);
@@ -465,7 +466,7 @@ class LogisticController extends Controller
                         // ->select('sg_to_mm_items.*', 'item_categories.name', 'sg_category_items.weight')
                         ->with('category:*', 'category.categoryName')
                         ->first();
-                        
+
         $MMSG = MmToSgItem::where('invoice_no', $request->invoice_no)
                         // ->join('mm_category_items', 'mm_category_items.mm_to_sg_id', 'mm_to_sg_items.id')
                         // ->join('item_categories', 'item_categories.id', 'mm_category_items.item_category_id')
@@ -478,10 +479,10 @@ class LogisticController extends Controller
             try {
                 if(!empty($MMSG)){
                     $data = $MMSG;
-                    
+
                     $dbCategoryData =  $data->category->pluck('item_category_id')->sort()->values();
                     $requestCategoryData = collect($request->category_data)->pluck('id')->sort()->values();
-    
+
                     if($dbCategoryData != $requestCategoryData){
                         return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !']);
                     }
@@ -489,7 +490,7 @@ class LogisticController extends Controller
                         $updateData = MmCategoryItem::where('mm_to_sg_id', $data->id)
                                             ->where('item_category_id', $updateCat)
                                             ->first();
-    
+
                         $updateData->weight = $updateCat['weight'];
                         $updateData->unit_price = $updateCat['unit_price'];
                         $updateData->total_price = $updateCat['total_price'];
@@ -506,10 +507,10 @@ class LogisticController extends Controller
                                             ->first();
                 }else if(!empty($SGMM)){
                     $data = $SGMM;
-    
+
                     $dbCategoryData =  $data->category->pluck('item_category_id')->sort()->values();
                     $requestCategoryData = collect($request->category_data)->pluck('id')->sort()->values();
-        
+
                     if($dbCategoryData != $requestCategoryData){
                         return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !']);
                     }
@@ -517,7 +518,7 @@ class LogisticController extends Controller
                         $updateData = SgCategoryItem::where('sg_to_mm_id', $data->id)
                                             ->where('item_category_id', $updateCat)
                                             ->first();
-    
+
                         $updateData->weight = $updateCat['weight'];
                         $updateData->unit_price = $updateCat['unit_price'];
                         $updateData->total_price = $updateCat['total_price'];
@@ -525,7 +526,7 @@ class LogisticController extends Controller
                         $generateData = SgtoMmItem::where('invoice_no', $request->invoice_no)
                                     ->with('category:*', 'category.categoryName')
                                     ->first();
-                        
+
                     }
                     if($request->handling_fee){
                         $data->handling_fee = 1;
@@ -533,22 +534,22 @@ class LogisticController extends Controller
                         $data->handling_fee = 2;
                     }
                     // $data->update();
-                    
+
                 };
 
-                
+
                 // DB::commit();
                 return $generateData;
                 return response()->json(['status' => 200, 'message' => "Update Success" ]);
 
             } catch (\Exception $e) {
-                Log::info(' ========================== Save Issue Error Log ============================== ');            
+                Log::info(' ========================== Save Issue Error Log ============================== ');
                 Log::info($e);
                 Log::info(' ========================== Save Issue Error Log ============================== ');
                 DB::rollback();
                 return response()->json(['status' => 500, 'message' => 'Something Was Wrong']);
             }
-            
+
         }else{
             return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
         }
@@ -574,7 +575,7 @@ class LogisticController extends Controller
         //     'author'                  => 'WYK',
         //     'margin_top' => 0
         // ]);
-        
+
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;
 
@@ -583,7 +584,7 @@ class LogisticController extends Controller
         $html->render();
         $mpdf->WriteHTML($html);
         $fileName = "inovice_issue.pdf";
-        $storagePath = "parcel-tag-file/issue/";  
+        $storagePath = "parcel-tag-file/issue/";
 
         // return "$storagePath$fileName";
         // return $mpdf->stream($fileName);
