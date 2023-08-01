@@ -1,5 +1,6 @@
 import { Link } from "@inertiajs/react";
 export default function Welcome(props) {
+    console.log(props);
     return (
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker  bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
