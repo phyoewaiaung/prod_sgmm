@@ -19,7 +19,7 @@ table tbody td {
     overflow: auto;
 }
 .invoice-list-table {
-    min-width: 1000px;
+    min-width: 950px;
     width: 100%;
 }
 .invoice-list-table thead th {

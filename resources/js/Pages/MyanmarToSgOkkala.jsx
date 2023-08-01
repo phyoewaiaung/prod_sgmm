@@ -289,51 +289,50 @@ const MyanmarToSgOkkala = () => {
         }
         else {
             setLoading(true);
-            toast('hi');
-            // let params = {
-            //     "sender_email": senderEmail,
-            //     "sender_name": senderName,
-            //     "sender_phone": "098765432",
-            //     "sg_home_pickup": pickUpRadio,
-            //     "sg_address": sgPickUpAddress,
-            //     "shipment_method": shipModeId,
-            //     "how_in_ygn": ygnDelId,
-            //     "payment_type": payment,
-            //     "receiver_name": recipientName,
-            //     "receiver_address": recipientAddress,
-            //     "receiver_phone": recipientPhone,
-            //     "note": additionalNote,
-            //     "items": cargoArr
-            // }
-            // axios.post('/logistic/sg-mm-save', params)
-            //     .then(data => {
-            //         setLoading(false);
-            //         console.log('ok', data);
-            //         toast.success('Successfully Registered!', {
-            //             position: "top-right",
-            //             autoClose: 3000,
-            //             hideProgressBar: false,
-            //             closeOnClick: true,
-            //             pauseOnHover: true,
-            //             draggable: true,
-            //             progress: undefined,
-            //             theme: "dark",
-            //         });
-            //     })
-            //     .catch((e) => {
-            //         console.log(e);
-            //         setLoading(false);
-            //         toast.error('Fail To Register!', {
-            //             position: "top-right",
-            //             autoClose: 3000,
-            //             hideProgressBar: false,
-            //             closeOnClick: true,
-            //             pauseOnHover: true,
-            //             draggable: true,
-            //             progress: undefined,
-            //             theme: "dark",
-            //         });
-            //     });
+            let params = {
+                "sender_email": senderEmail,
+                "sender_name": senderName,
+                "sender_phone": senderPhone,
+                "sender_address": senderAddress,
+                "transport": transportId,
+                "storage_type": storageTypeId,
+                "mm_home_pickup": pickUpRadio,
+                "how_in_sg": selfCollectionId,
+                "payment_type": payment,
+                "receiver_postal_code": recipientPostalCode,
+                "receiver_name": recipientName,
+                "receiver_address": recipientAddress,
+                "receiver_phone": recipientPhone,
+                "additional_instruction": additionalOpt,
+                "items": cargoArr
+            }
+            axios.post('/logistic/mm-sg-save', params)
+                .then(data => {
+                    setLoading(false);
+                    toast.success('Successfully Registered!', {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    });
+                })
+                .catch((e) => {
+                    setLoading(false);
+                    toast.error('Fail To Register!', {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    });
+                });
         }
     }
 
@@ -354,7 +353,7 @@ const MyanmarToSgOkkala = () => {
             />
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href="/">
-                    <header className="flex justify-center">
+                    <header className="flex justify-center mt-10">
                         <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
                     </header>
                 </Link>

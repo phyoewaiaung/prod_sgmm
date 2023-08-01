@@ -122,12 +122,12 @@ class LogisticController extends Controller
 
                 $getParcelTagFile = $this->createPdf($logistic);
 
-                if($getParcelTagFile['status'] == "OK"){
-                    $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
-                    if(!$mailSend){
-                        $message = "$message but Send Mail Error";
-                    }
-                }
+                // if($getParcelTagFile['status'] == "OK"){
+                //     $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
+                //     if(!$mailSend){
+                //         $message = "$message but Send Mail Error";
+                //     }
+                // }
 
             } else {
                 return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
@@ -275,12 +275,12 @@ class LogisticController extends Controller
 
                 $getParcelTagFile = $this->createPdf($logistic, 2);
 
-                if($getParcelTagFile['status'] == "OK"){
-                    $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
-                    if(!$mailSend){
-                        $message = "$message but Send Mail Error";
-                    }
-                }
+                // if($getParcelTagFile['status'] == "OK"){
+                //     $mailSend = $this->mailSend($logistic, $getParcelTagFile['fileName']);
+                //     if(!$mailSend){
+                //         $message = "$message but Send Mail Error";
+                //     }
+                // }
             } else {
                 return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
             }

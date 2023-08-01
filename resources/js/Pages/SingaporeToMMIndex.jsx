@@ -257,7 +257,6 @@ const SingaporeToMMIndex = (props) => {
             axios.post('/logistic/sg-mm-save', params)
                 .then(data => {
                     setLoading(false);
-                    console.log('ok', data);
                     toast.success('Successfully Registered!', {
                         position: "top-right",
                         autoClose: 3000,
@@ -270,7 +269,6 @@ const SingaporeToMMIndex = (props) => {
                     });
                 })
                 .catch((e) => {
-                    console.log(e);
                     setLoading(false);
                     toast.error('Fail To Register!', {
                         position: "top-right",
@@ -303,7 +301,7 @@ const SingaporeToMMIndex = (props) => {
             />
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href='/'>
-                <header className="flex justify-center">
+                <header className="flex justify-center mt-10">
                         <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
                     </header>
                 </Link>
