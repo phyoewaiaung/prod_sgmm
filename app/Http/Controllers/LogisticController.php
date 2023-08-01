@@ -567,7 +567,8 @@ class LogisticController extends Controller
             'margin_bottom' => 15,
             'margin_header' => 10,
             'margin_footer' => 10,
-
+            'default_font_size' => '9',
+            
         ]);
         // $mpdf = LaravelMpdf::loadView('testpdf', ['datas' => 'this is pdf generate'],[
         //     'auto_language_detection' => true,
