@@ -47,30 +47,30 @@ Route::middleware('auth')->group(function () {
 });
 
 /**** Pages */
-Route::get('/check-parcel', function() {
+Route::get('/check-parcel', function () {
     return Inertia::render('CheckParcelIndex');
 })->name('check-parcel');
 
-Route::get('/mm-to-sg-okkala', function() {
+Route::get('/mm-to-sg-okkala', function () {
     return Inertia::render('MyanmarToSgOkkala');
 })->name('mm-to-sg-okkala');
 
-Route::get('/mm-to-sg-alon', function() {
+Route::get('/mm-to-sg-alon', function () {
     return Inertia::render('MyanmarToSgAlon');
 })->name('mm-to-sg-alon');
 
-Route::get('/sg-to-mm', function() {
+Route::get('/sg-to-mm', function () {
     return Inertia::render('SingaporeToMMIndex');
 })->name('sg-to-mm');
 
-Route::get('logistic-price-list', function() {
+Route::get('logistic-price-list', function () {
     return Inertia::render('PriceListIndex');
 })->middleware(['auth', 'verified'])->name('logistic-price-list');
 
-Route::get('check-invoice', function() {
+Route::get('check-invoice', function () {
     return Inertia::render('CheckInvoiceIndex');
 })->middleware(['auth', 'verified'])->name('check-invoice');
 
-Route::get('invoice-issue', [LogisticController::class, 'invoiceIssue'])->name('invoice-issue');
+Route::post('invoice-issue', [LogisticController::class, 'invoiceIssue'])->name('invoice-issue');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
