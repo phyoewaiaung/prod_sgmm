@@ -83,7 +83,7 @@
 
             <div>
                 <div align="left" style="width: 48%; float: left; text-align: center">
-                    <p><strong>Date & Time :</strong><span style='color: red'>{{ $data['created_at'] }} </span></p>
+                    <p><strong>Date & Time :</strong><span style='color: red'>{{ \Carbon\Carbon::parse($data['created_at'])->format('d-m-Y H:i:s')  }} </span></p>
                     <p class='font-bold dark:text-gray-400'>
                         <strong>Name :</strong>
                         <span>{{ $data['sender_name'] }}</span>
@@ -141,7 +141,7 @@
                             style='background-color: #B6E0CC; padding: 5px 10px; text-align: start; border: 1px solid black'>
                             {{-- No. 21,Block C,Thiri Yadanar Retail and Wholesale Market, Thudhamma Road, North Okkalapa
                             Tsp.Yangon --}}
-                            {{ $data['sender_address'] }}
+                            {{ $data['form'] == 1 ? $data['sg_address'] : $data['sender_address'] }}
                         </p>
                         <p><strong>Sender Name :</strong> <span class="font-normal">{{ $data['sender_name'] }}</span>
                         </p>
@@ -173,41 +173,7 @@
                                 <td style="border-bottom: 1px solid black;"> $ {{ $cat['total_price'] }}</td>
                             </tr>
                         @endforeach
-                        {{-- <tr>
-                            <td style="border-bottom: 1px solid black;">1</td>
-                            <td style="border-bottom: 1px solid black;">Food and Clothes</td>
-                            <td style="border-bottom: 1px solid black;">3.00</td>
-                            <td style="border-bottom: 1px solid black;">3</td>
-                            <td style="border-bottom: 1px solid black;"> $9.00</td>
-                        </tr>
-                        <tr>
-                            <td style="border-bottom: 1px solid black;">2</td>
-                            <td style="border-bottom: 1px solid black;">Shoes / Bag</td>
-                            <td style="border-bottom: 1px solid black;">3.00</td>
-                            <td style="border-bottom: 1px solid black;">5</td>
-                            <td style="border-bottom: 1px solid black;">$16.00</td>
-                        </tr>
-                        <tr>
-                            <td style="border-bottom: 1px solid black;">3</td>
-                            <td style="border-bottom: 1px solid black;">Cosmetics / Medicine/ Supplements</td>
-                            <td style="border-bottom: 1px solid black;">3.00</td>
-                            <td style="border-bottom: 1px solid black;">5</td>
-                            <td style="border-bottom: 1px solid black;">$16.00</td>
-                        </tr>
-                        <tr>
-                            <td style="border-bottom: 1px solid black;">4</td>
-                            <td style="border-bottom: 1px solid black;">Electronic Item</td>
-                            <td style="border-bottom: 1px solid black;">3.00</td>
-                            <td style="border-bottom: 1px solid black;">5</td>
-                            <td style="border-bottom: 1px solid black;">$16.00</td>
-                        </tr>
-                        <tr>
-                            <td style="border-bottom: 1px solid black;">5</td>
-                            <td style="border-bottom: 1px solid black;">Others - Voltage regulator</td>
-                            <td style="border-bottom: 1px solid black;">3.00</td>
-                            <td style="border-bottom: 1px solid black;">10%</td>
-                            <td style="border-bottom: 1px solid black;">$16.00</td>
-                        </tr> --}}
+                        
                         <tr>
                             <td style="border-bottom: 1px solid black;"></td>
                             <td style="border-bottom: 1px solid black;">Total Weight</td>

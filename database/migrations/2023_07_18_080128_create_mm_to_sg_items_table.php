@@ -33,6 +33,7 @@ return new class extends Migration
             $table->integer('form');
             $table->string('estimated_arrival')->nullable();
             $table->string('shelf_no')->nullable();
+            $table->string('total_price')->nullable();
             $table->string('payment_status')->default(1)->comment('1 : pending 2 : received');
             $table->longText('additional_instruction')->nullable();
             $table->timestamps();
