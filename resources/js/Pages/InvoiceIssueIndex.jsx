@@ -168,22 +168,31 @@ const InvoiceIssueIndex = (props) => {
     const updateClick = () => {
         let data = categories.map(d => {
             if (d.item_category_id == "1") {
-                d.weight = foodWeight
+                d.weight = foodWeight;
+                d.unit_price = foodUnit;
             }
             if (d.item_category_id == "2") {
-                d.weight = clothWeight
+                d.weight = clothWeight;
+                d.unit_price = foodUnit;
             }
             if (d.item_category_id == "3") {
-                d.weight = cosmeticWeight
+                d.weight = cosmeticWeight;
+                d.unit_price = cosmeticUnit;
             }
             if (d.item_category_id == "4") {
-                d.weight = shoeWeight
+                d.weight = shoeWeight;
+                d.unit_price = shoeUnit;
             }
             if (d.item_category_id == "5") {
-                d.weight = electronicWeight
+                d.weight = electronicWeight;
+                d.unit_price = electronicUnit;
+            }
+            if (d.item_category_id == "6") {
+                d.weight = frozenWeight;
+                d.unit_price = frozenUnit;
             }
             if (d.item_category_id == "7") {
-                d.weight = othersWeight
+                d.weight = othersWeight;
             }
             return d;
         })
@@ -195,37 +204,8 @@ const InvoiceIssueIndex = (props) => {
             handling_fee: handlingFee ? true : false,
             pickup: sgPickup,
 
-            pickupAmt: (
-                sgPickup == "1" &&
-                (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
-                    ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
-                    ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
-                    ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
-                    ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
-                    ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
-            ) ? 4.90 : 7.00,
-
-            collection_type: howInYgn == "1" ? "Yangon Home Delivery Downtown ($3.5)" :
-                howInYgn == "2" ? "Yangon Home Deliver outside ($5.0)" :
-                    howInYgn == "3" ? "Bus Gate ($3.5)" : "Self Collection",
-
-            collection_amount: howInYgn == "1" ? "3.50" :
-                howInYgn == "2" ? "5.00" :
-                    howInYgn == "3" ? "3.50" : "-",
-
-            total_weight: ((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
-                ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
-                ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
-                ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
-                ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
-                ((othersWeight == "") ? 0.0 : parseFloat(othersWeight)),
-
-            total_amount: (parseFloat((totalFood == "-" ? 0 : totalFood)) +
-                parseFloat((totalCloth == "-" ? 0 : totalCloth)) +
-                parseFloat((totalShoe == "-" ? 0 : totalShoe)) +
-                parseFloat((totalCosmetic == "-" ? 0 : totalCosmetic)) +
-                parseFloat((totalElectronic == "-" ? 0 : totalElectronic)) +
-                ((
+            pickupAmt: (howInSg == undefined ?
+                (
                     sgPickup == "1" &&
                     (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
                         ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
@@ -233,10 +213,87 @@ const InvoiceIssueIndex = (props) => {
                         ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
                         ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
                         ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
-                ) ? 4.90 : 7.00) + (handlingFee ? 0.90 : 0) +
-                (howInYgn == "1" ? 3.50 :
-                    howInYgn == "2" ? 5.00 :
-                        howInYgn == "3" ? 3.50 : 0)
+                ) ? 4.90 : 7.00 : "3.5"
+            ),
+
+            collection_type: (howInSg == undefined ?
+                howInYgn == "1" ? "Yangon Home Delivery Downtown ($3.5)" :
+                    howInYgn == "2" ? "Yangon Home Deliver outside ($5.0)" :
+                        howInYgn == "3" ? "Bus Gate ($3.5)" : "Self Collection" :
+                howInSg == "1" ? "SG Home Delivery (S$5.90 within two days)" :
+                    howInSg == "2" ? "SG Home Delivery (S$10.0 within one day)" :
+                        "Self Collection"
+            ),
+
+            collection_amount: (howInSg == undefined ?
+                howInYgn == "1" ? "3.50" :
+                    howInYgn == "2" ? "5.00" :
+                        howInYgn == "3" ? "3.50" : "-" :
+                (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                    ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                    ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
+                    ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                    ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                    ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                    ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) > 20 ? "10.00" :
+                    (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                        ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                        ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
+                        ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                        ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                        ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                        ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) > 15 ? "10.00" : "5.90"
+            ),
+
+            total_weight: ((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
+                ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                ((othersWeight == "") ? 0.0 : parseFloat(othersWeight)),
+
+            total_amount: (parseFloat((totalFood == "-" ? 0 : totalFood)) +
+                parseFloat((totalCloth == "-" ? 0 : totalCloth)) +
+                parseFloat((totalFrozen == "-" ? 0 : totalFrozen)) +
+                parseFloat((totalShoe == "-" ? 0 : totalShoe)) +
+                parseFloat((totalCosmetic == "-" ? 0 : totalCosmetic)) +
+                parseFloat((totalElectronic == "-" ? 0 : totalElectronic)) +
+                (handlingFee ? 0.90 : 0) +
+                (howInSg == undefined ?
+                    ((
+                        sgPickup == "1" &&
+                        (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                            ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                            ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
+                            ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                            ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                            ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                            ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
+                    ) ? 4.90 : 7.00) :
+                    0.00
+                )
+                +
+                (ygnPickup == "1" ? 3.50 : 0.00) +
+                (howInSg == undefined ?
+                    howInYgn == "1" ? 3.50 :
+                        howInYgn == "2" ? 5.00 :
+                            howInYgn == "3" ? 3.50 : 0 :
+                    (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                        ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                        ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
+                        ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                        ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                        ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                        ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) > 20 ? 10.00 :
+                        (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                            ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                            ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
+                            ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                            ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                            ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                            ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) > 15 ? 10.00 : 5.90
+                )
             ).toFixed(2)
         }
         axios.post('/save-issue', params)
@@ -428,6 +485,7 @@ const InvoiceIssueIndex = (props) => {
                                         {
                                             ((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
                                             ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                                            ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
                                             ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
                                             ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
                                             ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
@@ -448,15 +506,22 @@ const InvoiceIssueIndex = (props) => {
                                             sgPickup == "1" ? "Yes" : "No" :
                                             ygnPickup == "1" ? "Yes" : "No"
                                     }</td>
-                                    <td>{(
-                                        sgPickup == "1" &&
-                                        (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
-                                            ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
-                                            ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
-                                            ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
-                                            ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
-                                            ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
-                                    ) ? 4.90 : 7.00}</td>
+                                    <td>
+                                        {
+                                            howInSg == undefined ?
+                                                (
+                                                    sgPickup == "1" &&
+                                                    (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                                                        ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                                                        ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                                                        ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                                                        ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                                                        ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
+                                                ) ? 4.90 : 7.00
+                                                :
+                                                "3.50"
+                                        }
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td></td>
@@ -474,9 +539,26 @@ const InvoiceIssueIndex = (props) => {
                                         }
                                     </td>
                                     <td>
-                                        {howInYgn == "1" ? "3.50" :
-                                            howInYgn == "2" ? "5.00" :
-                                                howInYgn == "3" ? "3.50" : "-"
+                                        {
+                                            howInSg == undefined ?
+                                                howInYgn == "1" ? "3.50" :
+                                                    howInYgn == "2" ? "5.00" :
+                                                        howInYgn == "3" ? "3.50" : "-"
+                                                :
+                                                (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                                                    ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                                                    ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
+                                                    ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                                                    ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                                                    ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                                                    ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) > 20 ? "10.00" :
+                                                    (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                                                        ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                                                        ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
+                                                        ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                                                        ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                                                        ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                                                        ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) > 15 ? "10.00" : "5.90"
                                         }
                                     </td>
                                 </tr>
@@ -492,21 +574,45 @@ const InvoiceIssueIndex = (props) => {
                                     <td>{
                                         (parseFloat((totalFood == "-" ? 0 : totalFood)) +
                                             parseFloat((totalCloth == "-" ? 0 : totalCloth)) +
+                                            parseFloat((totalFrozen == "-" ? 0 : totalFrozen)) +
                                             parseFloat((totalShoe == "-" ? 0 : totalShoe)) +
                                             parseFloat((totalCosmetic == "-" ? 0 : totalCosmetic)) +
                                             parseFloat((totalElectronic == "-" ? 0 : totalElectronic)) +
-                                            ((
-                                                sgPickup == "1" &&
+                                            (handlingFee ? 0.90 : 0) +
+                                            (howInSg == undefined ?
+                                                ((
+                                                    sgPickup == "1" &&
+                                                    (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                                                        ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                                                        ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
+                                                        ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                                                        ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                                                        ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                                                        ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
+                                                ) ? 4.90 : 7.00) :
+                                                0.00
+                                            )
+                                            +
+                                            (ygnPickup == "1" ? 3.50 : 0.00) +
+                                            (howInSg == undefined ?
+                                                howInYgn == "1" ? 3.50 :
+                                                    howInYgn == "2" ? 5.00 :
+                                                        howInYgn == "3" ? 3.50 : 0 :
                                                 (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
                                                     ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                                                    ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
                                                     ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
                                                     ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
                                                     ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
-                                                    ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
-                                            ) ? 4.90 : 7.00) + (handlingFee ? 0.90 : 0) +
-                                            (howInYgn == "1" ? 3.50 :
-                                                howInYgn == "2" ? 5.00 :
-                                                    howInYgn == "3" ? 3.50 : 0)
+                                                    ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) > 20 ? 10.00 :
+                                                    (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                                                        ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                                                        ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
+                                                        ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                                                        ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                                                        ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                                                        ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) > 15 ? 10.00 : 5.90
+                                            )
                                         ).toFixed(2)
                                     }</td>
                                 </tr>
