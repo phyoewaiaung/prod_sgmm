@@ -4,92 +4,159 @@ import { isdigit } from '@/Common/CommonValidation';
 import axios from 'axios';
 
 const InvoiceIssueIndex = (props) => {
-    console.log(props.data)
-    const [foodWeight, setFoodWeight] = useState(0);
-    const [shoeWeight, setShoeWeight] = useState(0);
-    const [cosmeticWeight, setCosmeticWeight] = useState(0);
-    const [electronicWeight, setElectronicWeight] = useState(0);
+    const [foodWeight, setFoodWeight] = useState("");
+    const [clothWeight, setClothWeight] = useState("");
+    const [frozenWeight, setFrozenWeight] = useState("");
+    const [shoeWeight, setShoeWeight] = useState("");
+    const [cosmeticWeight, setCosmeticWeight] = useState("");
+    const [electronicWeight, setElectronicWeight] = useState("");
     const [othersWeight, setOthersWeight] = useState(0);
     const [handlingFee, setHandlingFee] = useState(false);
-    const categories = props.data[0].category;
+    const [categories, setCategories] = useState([]);
+    const [foodUnit, setFoodUnit] = useState();
+    const [shoeUnit, setShoeUnit] = useState();
+    const [frozenUnit, setFronzenUnit] = useState(8.5);
+    const [cosmeticUnit, setCosmeticUnit] = useState();
+    const [electronicUnit, setElectronicUnit] = useState();
+    const [totalFood, setTotalFood] = useState('0');
+    const [totalCloth, setTotalCloth] = useState('0');
+    const [totalFrozen, setTotalFrozen] = useState('0');
+    const [totalShoe, setTotalShoe] = useState('0');
+    const [totalCosmetic, setTotalCosmetic] = useState('0');
+    const [totalElectronic, setTotalElectronic] = useState('0');
+    const [totalOther, setTotalOther] = useState('0');
+    const [id, setId] = useState('');
+    const [invoiceNo, setInvoiceNo] = useState('');
+    const [senderName, setSenderName] = useState('');
+    const [senderPhone, setSenderPhone] = useState('');
+    const [senderAddress, setSenderAddress] = useState('');
+    const [senderEmail, setSenderEmail] = useState('');
+    const [transport, setTransport] = useState('');
+    const [shipMode, setShipMode] = useState('');
+    const [receiverName, setReceiverName] = useState('');
+    const [receiverAddress, setReceiverAddress] = useState('');
+    const [receiverPhone, setReceiverPhone] = useState('');
+    const [sgPickup, setSgPickup] = useState('');
+    const [howInYgn, setHowInYgn] = useState('');
+    const [ygnPickup, setYgnPickup] = useState('');
+    const [howInSg, setHowInSg] = useState('');
+    const [paymentType, setPaymentType] = useState('');
 
-    const foodUnit = props.data[0].shipment_method ?
-        props.data[0].shipment_method == "1" ?
-            "6.00" :
-            props.data[0].shipment_method == "2" ?
-                "8.00" :
-                props.data[0].shipment_method == "3" ?
-                    "3.00" : "10" : "4.5"
-
-    const shoeUnit = props.data[0].shipment_method ?
-        props.data[0].shipment_method == "1" ?
-            "8.00" :
-            props.data[0].shipment_method == "2" ?
-                "10.00" :
-                props.data[0].shipment_method == "3" ?
-                    "4.00" : "12" : "4.5"
-
-
-    const cosmeticUnit = props.data[0].shipment_method ?
-        props.data[0].shipment_method == "1" ?
-            "9.00" :
-            props.data[0].shipment_method == "2" ?
-                "12.00" :
-                props.data[0].shipment_method == "3" ?
-                    "5.00" : "14" : "4.5"
-
-    const electronicUnit = props.data[0].shipment_method ?
-        props.data[0].shipment_method == "1" ?
-            "10.00" :
-            props.data[0].shipment_method == "2" ?
-                "12.00" :
-                props.data[0].shipment_method == "3" ?
-                    "5.00" : "15" : "4.5"
-
-    const totalFood = (parseFloat(foodUnit) * ((foodWeight == "") ? 0.0 : parseFloat(foodWeight))) == "0" ? "-" : (parseFloat(foodUnit) * ((foodWeight == "") ? 0.0 : parseFloat(foodWeight))).toFixed(2);
-
-    const totalShoe = (parseFloat(shoeUnit) * ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight))) == "0" ? "-" : (parseFloat(shoeUnit) * ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight))).toFixed(2);
-
-    const totalCosmetic = (parseFloat(cosmeticUnit) * ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight))) == "0" ? "-" : (parseFloat(cosmeticUnit) * ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight))).toFixed(2);
-
-    const totalElectronic = (parseFloat(electronicUnit) * ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight))) == "0" ? "-" : (parseFloat(electronicUnit) * ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight))).toFixed(2);
 
     useEffect(() => {
-        props.data.length == "0" ?
-            to_route('check-invoice') : ''
+        setCategories(props.data[0].category);
+        const foodUnit = props.data[0].shipment_method ?
+            props.data[0].shipment_method == "1" ?
+                "6.00" :
+                props.data[0].shipment_method == "2" ?
+                    "8.00" :
+                    props.data[0].shipment_method == "3" ?
+                        "3.00" : "8" : props.data[0].transport == "1" ? parseFloat(foodWeight) > 20 ? "4.00" : "4.50" : "8.00";
+
+        const shoeUnit = props.data[0].shipment_method ?
+            props.data[0].shipment_method == "1" ?
+                "8.00" :
+                props.data[0].shipment_method == "2" ?
+                    "10.00" :
+                    props.data[0].shipment_method == "3" ?
+                        "4.00" : "12" : "4.5";
+
+        const cosmeticUnit = props.data[0].shipment_method ?
+            props.data[0].shipment_method == "1" ?
+                "9.00" :
+                props.data[0].shipment_method == "2" ?
+                    "12.00" :
+                    props.data[0].shipment_method == "3" ?
+                        "5.00" : "14" : "4.5";
+
+        const electronicUnit = props.data[0].shipment_method ?
+            props.data[0].shipment_method == "1" ?
+                "10.00" :
+                props.data[0].shipment_method == "2" ?
+                    "12.00" :
+                    props.data[0].shipment_method == "3" ?
+                        "5.00" : "15" : "4.5";
+
+        setFoodUnit(foodUnit);
+        setShoeUnit(shoeUnit);
+        setCosmeticUnit(cosmeticUnit);
+        setElectronicUnit(electronicUnit);
+        setId(props.data[0].id);
+        setInvoiceNo(props.data[0].invoice_no);
+        setSenderName(props.data[0].sender_name);
+        setSenderAddress(props.data[0].sender_address);
+        setSenderPhone(props.data[0].sender_phone);
+        setSenderEmail(props.data[0].sender_email);
+        setTransport(props.data[0].transport);
+        setShipMode(props.data[0].shipment_method);
+        setReceiverName(props.data[0].receiver_name);
+        setReceiverAddress(props.data[0].receiver_address);
+        setReceiverPhone(props.data[0].receiver_phone);
+        setSgPickup(props.data[0].sg_home_pickup);
+        setHowInYgn(props.data[0].how_in_ygn);
+        setYgnPickup(props.data[0].mm_home_pickup);
+        setHowInSg(props.data[0].how_in_sg);
+        setPaymentType(props.data[0].payment_type);
     }, [])
 
     const foodWeightChange = (e) => {
         if (!e.target.value) {
             setFoodWeight("");
+            setTotalFood("-");
         } else if (isdigit(e.target.value)) {
             setFoodWeight(e.target.value);
+            setTotalFood((parseFloat(e.target.value) * foodUnit).toFixed(2));
+        }
+    }
+    const clothWeightChange = (e) => {
+        if (!e.target.value) {
+            setClothWeight("");
+            setTotalCloth("-");
+        } else if (isdigit(e.target.value)) {
+            setClothWeight(e.target.value);
+            setTotalCloth((parseFloat(e.target.value) * foodUnit).toFixed(2));
+        }
+    }
+    const frozenWeightChange = (e) => {
+        if (!e.target.value) {
+            setFrozenWeight("");
+            setTotalFrozen("-");
+        } else if (isdigit(e.target.value)) {
+            setFrozenWeight(e.target.value);
+            setTotalFrozen((parseFloat(e.target.value) * frozenUnit).toFixed(2));
         }
     }
     const shoeWeightChange = (e) => {
         if (!e.target.value) {
             setShoeWeight("");
+            setTotalShoe("-");
         } else if (isdigit(e.target.value)) {
             setShoeWeight(e.target.value);
+            setTotalShoe((parseFloat(e.target.value) * shoeUnit).toFixed(2));
         }
     }
     const cosmeticWeightChange = (e) => {
         if (!e.target.value) {
             setCosmeticWeight("");
+            setTotalCosmetic("-");
         } else if (isdigit(e.target.value)) {
             setCosmeticWeight(e.target.value);
+            setTotalCosmetic((parseFloat(e.target.value) * cosmeticUnit).toFixed(2));
         }
     }
     const electronicWeightChange = (e) => {
         if (!e.target.value) {
             setElectronicWeight("");
+            setTotalElectronic("-");
         } else if (isdigit(e.target.value)) {
             setElectronicWeight(e.target.value);
+            setTotalElectronic((parseFloat(e.target.value) * electronicUnit).toFixed(2));
         }
     }
     const othersWeightChange = (e) => {
         if (!e.target.value) {
             setOthersWeight("");
+            setTotalOther("-");
         } else if (isdigit(e.target.value)) {
             setOthersWeight(e.target.value);
         }
@@ -100,29 +167,77 @@ const InvoiceIssueIndex = (props) => {
 
     const updateClick = () => {
         let data = categories.map(d => {
-            if (d.item_category_id == "1" || d.item_category_id == "2") {
+            if (d.item_category_id == "1") {
                 d.weight = foodWeight
             }
+            if (d.item_category_id == "2") {
+                d.weight = clothWeight
+            }
             if (d.item_category_id == "3") {
-                d.weight = shoeWeight
+                d.weight = cosmeticWeight
             }
             if (d.item_category_id == "4") {
-                d.weight = cosmeticWeight
+                d.weight = shoeWeight
             }
             if (d.item_category_id == "5") {
                 d.weight = electronicWeight
             }
-            if (d.item_category_id == "6") {
+            if (d.item_category_id == "7") {
                 d.weight = othersWeight
             }
             return d;
         })
 
         let params = {
-            id: props.data[0].id,
-            invoice_no: props.data[0].invoice_no,
+            id: id,
+            invoice_no: invoiceNo,
             categroy_data: data,
-            handling_fee : handlingFee? true:false
+            handling_fee: handlingFee ? true : false,
+            pickup: sgPickup,
+
+            pickupAmt: (
+                sgPickup == "1" &&
+                (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                    ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                    ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                    ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                    ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                    ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
+            ) ? 4.90 : 7.00,
+
+            collection_type: howInYgn == "1" ? "Yangon Home Delivery Downtown ($3.5)" :
+                howInYgn == "2" ? "Yangon Home Deliver outside ($5.0)" :
+                    howInYgn == "3" ? "Bus Gate ($3.5)" : "Self Collection",
+
+            collection_amount: howInYgn == "1" ? "3.50" :
+                howInYgn == "2" ? "5.00" :
+                    howInYgn == "3" ? "3.50" : "-",
+
+            total_weight: ((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                ((othersWeight == "") ? 0.0 : parseFloat(othersWeight)),
+
+            total_amount: (parseFloat((totalFood == "-" ? 0 : totalFood)) +
+                parseFloat((totalCloth == "-" ? 0 : totalCloth)) +
+                parseFloat((totalShoe == "-" ? 0 : totalShoe)) +
+                parseFloat((totalCosmetic == "-" ? 0 : totalCosmetic)) +
+                parseFloat((totalElectronic == "-" ? 0 : totalElectronic)) +
+                ((
+                    sgPickup == "1" &&
+                    (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                        ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                        ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                        ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                        ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                        ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
+                ) ? 4.90 : 7.00) + (handlingFee ? 0.90 : 0) +
+                (howInYgn == "1" ? 3.50 :
+                    howInYgn == "2" ? 5.00 :
+                        howInYgn == "3" ? 3.50 : 0)
+            ).toFixed(2)
         }
         axios.post('/save-issue', params)
             .then(data => console.log(data))
@@ -166,7 +281,7 @@ const InvoiceIssueIndex = (props) => {
                                 <h2 className='font-bold text-xl mt-3'>Invoice</h2>
                             </div>
                             <div>
-                                <h2 className='font-bold text-xl mt-3'>VR- {props.data[0].invoice_no}</h2>
+                                <h2 className='font-bold text-xl mt-3'>VR- {invoiceNo}</h2>
                             </div>
                         </div>
                     </div>
@@ -176,16 +291,16 @@ const InvoiceIssueIndex = (props) => {
                     <div className="flex md:flex-row flex-col md:justify-evenly mt-3">
                         <div className='text-center'>
                             <h3 className="font-bold dark:text-gray-400">Date & Time :<span className='text-red-600 font-normal'>17/07/2023 17:35:30 </span></h3>
-                            <h3 className='font-bold dark:text-gray-400'>Name :<span className='font-normal'>{props.data[0].sender_name}</span></h3>
+                            <h3 className='font-bold dark:text-gray-400'>Name :<span className='font-normal'>{senderName}</span></h3>
                         </div>
                         <div>
                             <h3 className='font-bold text-center dark:text-gray-400'>Delievery Mode : <span className='font-normal'>{
-                                props.data[0].transport ? (props.data[0].transport == "1" ? "Air" : "Sea") :
-                                    props.data[0].shipment_method == "1" ?
+                                transport ? (transport == "1" ? "Air" : "Sea") :
+                                    shipMode == "1" ?
                                         "Land (2 weeks from shipment)" :
-                                        props.data[0].shipment_method == "2" ?
+                                        shipMode == "2" ?
                                             "Land Express (7-10 days from shipment)" :
-                                            props.data[0].shipment_method == "3" ?
+                                            shipMode == "3" ?
                                                 "Sea Cargo (3-4 weeks from shipment)" :
                                                 "Air Cargo (3-5 days from shipment)"
                             }</span></h3>
@@ -194,19 +309,19 @@ const InvoiceIssueIndex = (props) => {
                     <div className="flex md:flex-row flex-col md:justify-evenly mt-3">
                         <div className='md:w-1/2 w-full text-center'>
                             <h3 className="font-bold text-center md:text-start ml-11 dark:text-blue-500">Shipping Information</h3>
-                            <textarea className='invoice-color-textarea w-5/6' value={props.data[0].receiver_address} readOnly />
-                            <h3 className="font-bold dark:text-gray-400">Recipient Name : <span className="font-normal">{props.data[0].receiver_name}</span></h3>
-                            <h3 className="font-bold dark:text-gray-400">Recipient Contact Number : <span className='font-normal'>{props.data[0].receiver_phone}</span></h3>
+                            <textarea className='invoice-color-textarea w-5/6' value={receiverAddress} readOnly />
+                            <h3 className="font-bold dark:text-gray-400">Recipient Name : <span className="font-normal">{receiverName}</span></h3>
+                            <h3 className="font-bold dark:text-gray-400">Recipient Contact Number : <span className='font-normal'>{receiverPhone}</span></h3>
                         </div>
                         <div className='md:w-1/2 w-full text-center'>
                             <h3 className="font-bold text-center md:text-start ml-11 dark:text-blue-500">Billing Information</h3>
-                            <textarea className='invoice-color-textarea w-5/6' value={props.data[0].sender_address} readOnly />
-                            <h3 className="font-bold dark:text-gray-400">Sender Name : <span className="font-normal">{props.data[0].sender_name}</span></h3>
-                            <h3 className="font-bold dark:text-gray-400">Sender Contact Number : <span className='font-normal'>{props.data[0].sender_phone}</span></h3>
+                            <textarea className='invoice-color-textarea w-5/6' value={senderAddress} readOnly />
+                            <h3 className="font-bold dark:text-gray-400">Sender Name : <span className="font-normal">{senderName}</span></h3>
+                            <h3 className="font-bold dark:text-gray-400">Sender Contact Number : <span className='font-normal'>{senderPhone}</span></h3>
                         </div>
                     </div>
                     <div className='mt-4 ml-3 mr-3 md:ml-0 md:mr-0'>
-                        <h3 className='dark:text-red-400 font-bold'>{props.data[0].sender_email}</h3>
+                        <h3 className='dark:text-red-400 font-bold'>{senderEmail}</h3>
                     </div>
                     <div className="mb-3 invoice-issue-container md:mr-0 md:ml-0 ml-3 mr-3">
                         <table className='invoice-issue-table text-center'>
@@ -235,8 +350,19 @@ const InvoiceIssueIndex = (props) => {
                                                         <td>{totalFood}</td>
                                                     </tr>
                                                 }
+                                                {data.item_category_id == "2" &&
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>Clothes</td>
+                                                        <td>
+                                                            <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={clothWeight === 0 ? '' : clothWeight} onChange={clothWeightChange} />
+                                                        </td>
+                                                        <td>{foodUnit}</td>
+                                                        <td>{totalCloth}</td>
+                                                    </tr>
+                                                }
 
-                                                {data.item_category_id == "3" &&
+                                                {data.item_category_id == "4" &&
                                                     <tr>
                                                         <td>2</td>
                                                         <td>Shoes / Bag</td>
@@ -247,7 +373,18 @@ const InvoiceIssueIndex = (props) => {
                                                         <td>{totalShoe}</td>
                                                     </tr>
                                                 }
-                                                {data.item_category_id == "4" &&
+                                                {data.item_category_id == "6" &&
+                                                    <tr>
+                                                        <td>4</td>
+                                                        <td>Frozen Food</td>
+                                                        <td>
+                                                            <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={frozenWeight === 0 ? '' : frozenWeight} onChange={frozenWeightChange} />
+                                                        </td>
+                                                        <td>{frozenUnit}</td>
+                                                        <td>{totalFrozen}</td>
+                                                    </tr>
+                                                }
+                                                {data.item_category_id == "3" &&
                                                     <tr>
                                                         <td>3</td>
                                                         <td>Cosmetics / Medicine/ Supplements</td>
@@ -269,7 +406,7 @@ const InvoiceIssueIndex = (props) => {
                                                         <td>{totalElectronic}</td>
                                                     </tr>
                                                 }
-                                                {data.item_category_id == "6" &&
+                                                {data.item_category_id == "7" &&
                                                     <tr>
                                                         <td>5</td>
                                                         <td>Others - Voltage regulator</td>
@@ -277,7 +414,7 @@ const InvoiceIssueIndex = (props) => {
                                                             <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={othersWeight === 0 ? '' : othersWeight} onChange={othersWeightChange} />
                                                         </td>
                                                         <td>10%</td>
-                                                        <td>$16.00</td>
+                                                        <td>0.00</td>
                                                     </tr>
                                                 }
                                             </React.Fragment>
@@ -290,6 +427,7 @@ const InvoiceIssueIndex = (props) => {
                                     <td>
                                         {
                                             ((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                                            ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
                                             ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
                                             ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
                                             ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
@@ -300,28 +438,51 @@ const InvoiceIssueIndex = (props) => {
                                         <input className='cursor-pointer focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="checkbox" value={handlingFee} onChange={checkboxChange} checked={handlingFee} />
                                         <span className='ms-2'>handling fee 3 kg</span>
                                     </td>
-                                    <td>-</td>
+                                    <td>{handlingFee ? 0.90 : "-"}</td>
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td>SG Home PickUp:</td>
-                                    <td className='text-start' colSpan={2}>{props.data[0].sg_home_pickup == "1" ? "Yes" : "No"}</td>
-                                    <td>-</td>
+                                    <td>{howInSg == undefined ? "SG Home PickUp:" : "Yangon Home Pickup:"}</td>
+                                    <td className='text-start' colSpan={2}>{
+                                        howInSg == undefined ?
+                                            sgPickup == "1" ? "Yes" : "No" :
+                                            ygnPickup == "1" ? "Yes" : "No"
+                                    }</td>
+                                    <td>{(
+                                        sgPickup == "1" &&
+                                        (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                                            ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                                            ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                                            ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                                            ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                                            ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
+                                    ) ? 4.90 : 7.00}</td>
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td>Home/ Bus Station deliver:</td>
+                                    <td>{howInSg == undefined ? "Home/ Bus Station deliver:" : "SG Home Delivery / Self Collection:"}</td>
                                     <td className='text-start' colSpan={2}>
-                                        {props.data[0].how_in_ygn == "1" ? "Yangon Home Delivery Downtown ($3.5)" :
-                                            props.data[0].how_in_ygn == "2" ? "Yangon Home Deliver outside ($5.0)" :
-                                                props.data[0].how_in_ygn == "3" ? "Bus Gate ($3.5)" : "Self Collection"
+                                        {
+                                            howInSg == undefined ?
+                                                howInYgn == "1" ? "Yangon Home Delivery Downtown ($3.5)" :
+                                                    howInYgn == "2" ? "Yangon Home Deliver outside ($5.0)" :
+                                                        howInYgn == "3" ? "Bus Gate ($3.5)" : "Self Collection"
+                                                :
+                                                howInSg == "1" ? "SG Home Delivery (S$5.90 within two days)" :
+                                                    howInSg == "2" ? "SG Home Delivery (S$10.0 within one day)" :
+                                                        "Self Collection"
                                         }
                                     </td>
-                                    <td>-</td>
+                                    <td>
+                                        {howInYgn == "1" ? "3.50" :
+                                            howInYgn == "2" ? "5.00" :
+                                                howInYgn == "3" ? "3.50" : "-"
+                                        }
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td colSpan={2}></td>
-                                    <td className='text-start'>{props.data[0].payment_type == "1" ? "SG PAY" : "MM PAY"}</td>
+                                    <td className='text-start'>{paymentType == "1" ? "SG PAY" : "MM PAY"}</td>
                                     <td colSpan={2}></td>
                                 </tr>
                                 <tr>
@@ -330,9 +491,23 @@ const InvoiceIssueIndex = (props) => {
                                     <td>TOTAL</td>
                                     <td>{
                                         (parseFloat((totalFood == "-" ? 0 : totalFood)) +
+                                            parseFloat((totalCloth == "-" ? 0 : totalCloth)) +
                                             parseFloat((totalShoe == "-" ? 0 : totalShoe)) +
                                             parseFloat((totalCosmetic == "-" ? 0 : totalCosmetic)) +
-                                            parseFloat((totalElectronic == "-" ? 0 : totalElectronic))).toFixed(2)
+                                            parseFloat((totalElectronic == "-" ? 0 : totalElectronic)) +
+                                            ((
+                                                sgPickup == "1" &&
+                                                (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                                                    ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
+                                                    ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
+                                                    ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
+                                                    ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
+                                                    ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))) >= 7
+                                            ) ? 4.90 : 7.00) + (handlingFee ? 0.90 : 0) +
+                                            (howInYgn == "1" ? 3.50 :
+                                                howInYgn == "2" ? 5.00 :
+                                                    howInYgn == "3" ? 3.50 : 0)
+                                        ).toFixed(2)
                                     }</td>
                                 </tr>
                             </tbody>

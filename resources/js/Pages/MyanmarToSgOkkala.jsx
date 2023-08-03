@@ -32,10 +32,10 @@ const MyanmarToSgOkkala = () => {
     const [cargoData, setCargoData] = useState([
         { id: 1, name: "Food", isChecked: false },
         { id: 2, name: "Clothes", isChecked: false },
+        { id: 6, name: "Frozen Food", isChecked: false },
         { id: 3, name: "Cosmetics / Medicine / Supplements", isChecked: false },
-        { id: 4, name: "Frozen Food", isChecked: false },
         { id: 5, name: "Electronic Goods", isChecked: false },
-        { id: 6, name: "Other", isChecked: false }
+        { id: 7, name: "Other", isChecked: false }
     ])
 
     const [storageType, setStorageType] = useState([
