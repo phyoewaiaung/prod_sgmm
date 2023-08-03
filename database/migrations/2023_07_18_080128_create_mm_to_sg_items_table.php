@@ -30,6 +30,9 @@ return new class extends Migration
             $table->string('receiver_address');
             $table->string('receiver_postal_code')->nullable();
             $table->integer('handling_fee')->default(2);
+            $table->integer('form');
+            $table->string('estimated_arrival')->nullable();
+            $table->string('shelf_no')->nullable();
             $table->string('payment_status')->default(1)->comment('1 : pending 2 : received');
             $table->longText('additional_instruction')->nullable();
             $table->timestamps();
@@ -38,31 +41,31 @@ return new class extends Migration
 
     ## MM TO SG 
 
-// sender name *
-// sender phone *
-// sender address 
-// transport * ( Sea or Air )
+    // sender name *
+    // sender phone *
+    // sender address 
+    // transport * ( Sea or Air )
 
-// items_type * -> အစားအစာ, Clothes, Cosmetics,Medicine,Supplements, Frozen Food, Electronic Goods, Other
+    // items_type * -> အစားအစာ, Clothes, Cosmetics,Medicine,Supplements, Frozen Food, Electronic Goods, Other
 
-// (next page -> weight pr)
+    // (next page -> weight pr)
 
-// storage_type * -> Room_Temperature,In NOrmal Fridge, In Freezer
+    // storage_type * -> Room_Temperature,In NOrmal Fridge, In Freezer
 
-// cargo_details 
-// ygn_home_pickup * -> boolean (yes, no)
+    // cargo_details 
+    // ygn_home_pickup * -> boolean (yes, no)
 
-// how_in_sg * -> SG Home Delivery ($5.90 within two days)
-// 	     SG Home Delivery ($10.0 withtin one day)
-// 	     Self Collection
+    // how_in_sg * -> SG Home Delivery ($5.90 within two days)
+    // 	     SG Home Delivery ($10.0 withtin one day)
+    // 	     Self Collection
 
-// payment_type * -> SG Pay, MM Pay
+    // payment_type * -> SG Pay, MM Pay
 
-// receiver_name *
-// receiver_phone *
-// receicer_postal_code 
-// receiver_address
-// additional_instruction 
+    // receiver_name *
+    // receiver_phone *
+    // receicer_postal_code 
+    // receiver_address
+    // additional_instruction 
     /**
      * Reverse the migrations.
      *

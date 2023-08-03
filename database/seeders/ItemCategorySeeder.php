@@ -44,6 +44,11 @@ class ItemCategorySeeder extends Seeder
                 "updated_at"    =>  Carbon::now()->format("Y-m-d H:i:s")
             ],
             [
+                "name"          =>  "Frozen Food",
+                "created_at"    =>  Carbon::now()->format("Y-m-d H:i:s"),
+                "updated_at"    =>  Carbon::now()->format("Y-m-d H:i:s")
+            ],
+            [
                 "name"          =>  "Other",
                 "created_at"    =>  Carbon::now()->format("Y-m-d H:i:s"),
                 "updated_at"    =>  Carbon::now()->format("Y-m-d H:i:s")
