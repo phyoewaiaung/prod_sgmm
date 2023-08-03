@@ -30,6 +30,7 @@ return new class extends Migration
             $table->integer('form')->default(1);
             $table->string('estimated_arrival')->nullable();
             $table->string('shelf_no')->nullable();
+            $table->string('total_price')->nullable();
             $table->integer('handling_fee')->default(2);
             $table->string('payment_status')->default(1)->comment('1 : pending 2 : received');
             $table->longText('note')->nullable();
