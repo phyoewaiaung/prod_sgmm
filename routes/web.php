@@ -26,25 +26,30 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/logistic', [LogisticController::class, 'index'])->name('logistic.index');
-// Route::get('/logistic/sg-mm', [LogisticController::class, 'toSgMm'])->name('logistic.toSgMm');
+# All user get route
 Route::post('/logistic/sg-mm-save', [LogisticController::class, 'saveSGtoMM'])->name('logistic.sg-save');
-
-// Route::get('/logistic/mm-sg', [LogisticController::class, 'toMmSG'])->name('logistic.toMmSg');
 Route::post('/logistic/mm-sg-save', [LogisticController::class, 'saveMMtoSG'])->name('logistic.mm-save');
-Route::post('/logistic/search', [LogisticController::class, 'search'])->name('logistic.search');
-Route::get('/load-pdf', [LogisticController::class, 'createPdf'])->name('loadpdf');
-// Route::post('/save-issue', [LogisticController::class, 'saveIssue'])->name('save-issue');
-Route::post('/save-issue', [LogisticController::class, 'issuceFileCreate'])->name('save-issue');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+# For Testing PDF Generate
+// Route::get('/load-pdf', [LogisticController::class, 'createPdf'])->name('loadpdf');
+// Route::post('/save-issue', [LogisticController::class, 'issuceFileCreate'])->name('save-issue');
+
+// Route::get('/dashboard', function () {
+//     return Inertia::render('Dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/logistic/search', [LogisticController::class, 'search'])->name('logistic.search');
+    
+    Route::get('invoice-issue', [LogisticController::class, 'invoiceIssue'])->name('invoice-issue');
+    Route::post('/save-issue', [LogisticController::class, 'saveIssue'])->name('save-issue');
+    Route::post('/update-shelf', [LogisticController::class, 'updateShelfNo'])->name('update-shelf');
+    Route::post('/set-arrival', [LogisticController::class, 'setEstimatedArrival'])->name('set-arrival');
+    
 });
 
 /**** Pages */
@@ -66,12 +71,12 @@ Route::get('/sg-to-mm', function () {
 
 Route::get('logistic-price-list', function () {
     return Inertia::render('PriceListIndex');
-})->middleware(['auth', 'verified'])->name('logistic-price-list');
+})->name('logistic-price-list');
 
 Route::get('check-invoice', function () {
     return Inertia::render('CheckInvoiceIndex');
 })->middleware(['auth', 'verified'])->name('check-invoice');
 
-Route::get('invoice-issue', [LogisticController::class, 'invoiceIssue'])->name('invoice-issue');
+
 
 require __DIR__ . '/auth.php';
