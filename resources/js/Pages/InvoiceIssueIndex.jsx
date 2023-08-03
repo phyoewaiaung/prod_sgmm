@@ -44,59 +44,59 @@ const InvoiceIssueIndex = (props) => {
 
 
     useEffect(() => {
-        setCategories(props.data[0].category);
-        const foodUnit = props.data[0].shipment_method ?
-            props.data[0].shipment_method == "1" ?
+        setCategories(props.data.category);
+        const foodUnit = props.data.shipment_method ?
+            props.data.shipment_method == "1" ?
                 "6.00" :
-                props.data[0].shipment_method == "2" ?
+                props.data.shipment_method == "2" ?
                     "8.00" :
-                    props.data[0].shipment_method == "3" ?
-                        "3.00" : "8" : props.data[0].transport == "1" ? parseFloat(foodWeight) > 20 ? "4.00" : "4.50" : "8.00";
+                    props.data.shipment_method == "3" ?
+                        "3.00" : "8" : props.data.transport == "1" ? parseFloat(foodWeight) > 20 ? "4.00" : "4.50" : "8.00";
 
-        const shoeUnit = props.data[0].shipment_method ?
-            props.data[0].shipment_method == "1" ?
+        const shoeUnit = props.data.shipment_method ?
+            props.data.shipment_method == "1" ?
                 "8.00" :
-                props.data[0].shipment_method == "2" ?
+                props.data.shipment_method == "2" ?
                     "10.00" :
-                    props.data[0].shipment_method == "3" ?
+                    props.data.shipment_method == "3" ?
                         "4.00" : "12" : "4.5";
 
-        const cosmeticUnit = props.data[0].shipment_method ?
-            props.data[0].shipment_method == "1" ?
+        const cosmeticUnit = props.data.shipment_method ?
+            props.data.shipment_method == "1" ?
                 "9.00" :
-                props.data[0].shipment_method == "2" ?
+                props.data.shipment_method == "2" ?
                     "12.00" :
-                    props.data[0].shipment_method == "3" ?
+                    props.data.shipment_method == "3" ?
                         "5.00" : "14" : "4.5";
 
-        const electronicUnit = props.data[0].shipment_method ?
-            props.data[0].shipment_method == "1" ?
+        const electronicUnit = props.data.shipment_method ?
+            props.data.shipment_method == "1" ?
                 "10.00" :
-                props.data[0].shipment_method == "2" ?
+                props.data.shipment_method == "2" ?
                     "12.00" :
-                    props.data[0].shipment_method == "3" ?
+                    props.data.shipment_method == "3" ?
                         "5.00" : "15" : "4.5";
 
         setFoodUnit(foodUnit);
         setShoeUnit(shoeUnit);
         setCosmeticUnit(cosmeticUnit);
         setElectronicUnit(electronicUnit);
-        setId(props.data[0].id);
-        setInvoiceNo(props.data[0].invoice_no);
-        setSenderName(props.data[0].sender_name);
-        setSenderAddress(props.data[0].sender_address);
-        setSenderPhone(props.data[0].sender_phone);
-        setSenderEmail(props.data[0].sender_email);
-        setTransport(props.data[0].transport);
-        setShipMode(props.data[0].shipment_method);
-        setReceiverName(props.data[0].receiver_name);
-        setReceiverAddress(props.data[0].receiver_address);
-        setReceiverPhone(props.data[0].receiver_phone);
-        setSgPickup(props.data[0].sg_home_pickup);
-        setHowInYgn(props.data[0].how_in_ygn);
-        setYgnPickup(props.data[0].mm_home_pickup);
-        setHowInSg(props.data[0].how_in_sg);
-        setPaymentType(props.data[0].payment_type);
+        setId(props.data.id);
+        setInvoiceNo(props.data.invoice_no);
+        setSenderName(props.data.sender_name);
+        setSenderAddress(props.data.sender_address);
+        setSenderPhone(props.data.sender_phone);
+        setSenderEmail(props.data.sender_email);
+        setTransport(props.data.transport);
+        setShipMode(props.data.shipment_method);
+        setReceiverName(props.data.receiver_name);
+        setReceiverAddress(props.data.receiver_address);
+        setReceiverPhone(props.data.receiver_phone);
+        setSgPickup(props.data.sg_home_pickup);
+        setHowInYgn(props.data.how_in_ygn);
+        setYgnPickup(props.data.mm_home_pickup);
+        setHowInSg(props.data.how_in_sg);
+        setPaymentType(props.data.payment_type);
     }, [])
 
     const foodWeightChange = (e) => {
@@ -167,31 +167,31 @@ const InvoiceIssueIndex = (props) => {
 
     const updateClick = () => {
         let data = categories.map(d => {
-            if (d.item_category_id == "1") {
+            if (d.id == "1") {
                 d.weight = foodWeight;
                 d.unit_price = foodUnit;
             }
-            if (d.item_category_id == "2") {
+            if (d.id == "2") {
                 d.weight = clothWeight;
                 d.unit_price = foodUnit;
             }
-            if (d.item_category_id == "3") {
+            if (d.id == "3") {
                 d.weight = cosmeticWeight;
                 d.unit_price = cosmeticUnit;
             }
-            if (d.item_category_id == "4") {
+            if (d.id == "4") {
                 d.weight = shoeWeight;
                 d.unit_price = shoeUnit;
             }
-            if (d.item_category_id == "5") {
+            if (d.id == "5") {
                 d.weight = electronicWeight;
                 d.unit_price = electronicUnit;
             }
-            if (d.item_category_id == "6") {
+            if (d.id == "6") {
                 d.weight = frozenWeight;
                 d.unit_price = frozenUnit;
             }
-            if (d.item_category_id == "7") {
+            if (d.id == "7") {
                 d.weight = othersWeight;
             }
             return d;
@@ -200,7 +200,7 @@ const InvoiceIssueIndex = (props) => {
         let params = {
             id: id,
             invoice_no: invoiceNo,
-            categroy_data: data,
+            category_data: data,
             handling_fee: handlingFee ? true : false,
             pickup: sgPickup,
 
@@ -396,10 +396,10 @@ const InvoiceIssueIndex = (props) => {
                                     categories.map((data, index) => {
                                         return (
                                             <React.Fragment key={index}>
-                                                {data.item_category_id == "1" &&
+                                                {data.id == "1" &&
                                                     <tr>
-                                                        <td>1</td>
-                                                        <td>Food and Clothes</td>
+                                                        <td>{index + 1}</td>
+                                                        <td>Food</td>
                                                         <td>
                                                             <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={foodWeight === 0 ? '' : foodWeight} onChange={foodWeightChange} />
                                                         </td>
@@ -407,9 +407,9 @@ const InvoiceIssueIndex = (props) => {
                                                         <td>{totalFood}</td>
                                                     </tr>
                                                 }
-                                                {data.item_category_id == "2" &&
+                                                {data.id == "2" &&
                                                     <tr>
-                                                        <td>1</td>
+                                                        <td>{index + 1}</td>
                                                         <td>Clothes</td>
                                                         <td>
                                                             <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={clothWeight === 0 ? '' : clothWeight} onChange={clothWeightChange} />
@@ -419,9 +419,9 @@ const InvoiceIssueIndex = (props) => {
                                                     </tr>
                                                 }
 
-                                                {data.item_category_id == "4" &&
+                                                {data.id == "4" &&
                                                     <tr>
-                                                        <td>2</td>
+                                                        <td>{index + 1}</td>
                                                         <td>Shoes / Bag</td>
                                                         <td>
                                                             <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={shoeWeight === 0 ? '' : shoeWeight} onChange={shoeWeightChange} />
@@ -430,9 +430,9 @@ const InvoiceIssueIndex = (props) => {
                                                         <td>{totalShoe}</td>
                                                     </tr>
                                                 }
-                                                {data.item_category_id == "6" &&
+                                                {data.id == "6" &&
                                                     <tr>
-                                                        <td>4</td>
+                                                        <td>{index + 1}</td>
                                                         <td>Frozen Food</td>
                                                         <td>
                                                             <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={frozenWeight === 0 ? '' : frozenWeight} onChange={frozenWeightChange} />
@@ -441,9 +441,9 @@ const InvoiceIssueIndex = (props) => {
                                                         <td>{totalFrozen}</td>
                                                     </tr>
                                                 }
-                                                {data.item_category_id == "3" &&
+                                                {data.id == "3" &&
                                                     <tr>
-                                                        <td>3</td>
+                                                        <td>{index + 1}</td>
                                                         <td>Cosmetics / Medicine/ Supplements</td>
                                                         <td>
                                                             <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={cosmeticWeight === 0 ? '' : cosmeticWeight} onChange={cosmeticWeightChange} />
@@ -452,9 +452,9 @@ const InvoiceIssueIndex = (props) => {
                                                         <td>{totalCosmetic}</td>
                                                     </tr>
                                                 }
-                                                {data.item_category_id == "5" &&
+                                                {data.id == "5" &&
                                                     <tr>
-                                                        <td>4</td>
+                                                        <td>{index + 1}</td>
                                                         <td>Electronic Item</td>
                                                         <td>
                                                             <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={electronicWeight === 0 ? '' : electronicWeight} onChange={electronicWeightChange} />
@@ -463,9 +463,9 @@ const InvoiceIssueIndex = (props) => {
                                                         <td>{totalElectronic}</td>
                                                     </tr>
                                                 }
-                                                {data.item_category_id == "7" &&
+                                                {data.id == "7" &&
                                                     <tr>
-                                                        <td>5</td>
+                                                        <td>{index + 1}</td>
                                                         <td>Others - Voltage regulator</td>
                                                         <td>
                                                             <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={othersWeight === 0 ? '' : othersWeight} onChange={othersWeightChange} />

@@ -437,12 +437,78 @@ class LogisticController extends Controller
             ->first();
 
         $returndData = [];
+        // $returndData['category'] = [];
         if (!empty($MMSG) || !empty($SGMM)) {
             if (!empty($MMSG)) {
-                array_push($returndData, $MMSG);
+                $MMSG = json_decode($MMSG, true);
+
+                $returndData["id"] = 3;
+                $returndData["sender_email"]    = $MMSG['sender_email'];
+                $returndData["sender_name"]     = $MMSG['sender_name'];
+                $returndData["sender_phone"]    = $MMSG['sender_phone'];
+                $returndData["sender_address"]  = $MMSG['sender_address'];
+                $returndData["transport"]       = $MMSG['transport'];
+                $returndData["storage_type"]    = $MMSG['storage_type'];
+                $returndData["mm_home_pickup"]  = $MMSG['mm_home_pickup'];
+                $returndData["how_in_sg"]       = $MMSG['how_in_sg'];
+                $returndData["invoice_no"]      = $MMSG['invoice_no'];
+                $returndData["payment_type"]    = $MMSG['payment_type'];
+                $returndData["receiver_name"]   = $MMSG['receiver_name'];
+                $returndData["receiver_phone"]  = $MMSG['receiver_phone'];
+                $returndData["receiver_address"]= $MMSG['receiver_address'];
+                $returndData["receiver_postal_code"] = $MMSG['receiver_postal_code'];
+                $returndData["handling_fee"]    = $MMSG['handling_fee'];
+                $returndData["form"]            = $MMSG['form'];
+                $returndData["estimated_arrival"]= $MMSG['estimated_arrival'];
+                $returndData["shelf_no"]        = $MMSG['shelf_no'];
+                $returndData["payment_status"]  = $MMSG['payment_status'];
+                $returndData["additional_instruction"] = $MMSG['additional_instruction'];
+                $returndData["created_at"]      = $MMSG['created_at'];
+                $returndData["category"]        = [];
+
+                foreach($MMSG['category'] as $cat){
+                    $data['id']             = $cat['item_category_id'];
+                    $data['name']           = $cat['category_name']['name'];
+                    $data['weight']         = $cat['weight'];
+                    $data['unit_price']     = $cat['unit_price'];
+                    $data['total_price']    = $cat['total_price'];
+                    array_push($returndData['category'], $data);
+                }
             }
             if (!empty($SGMM)) {
-                array_push($returndData, $SGMM);
+                $SGMM = json_decode($SGMM, true);
+                // return $SGMM;
+                $returndData["id"]              = $SGMM['id'];
+                $returndData["sender_email"]    = $SGMM['sender_email'];
+                $returndData["sender_name"]     = $SGMM['sender_name'];
+                $returndData["sender_phone"]    = $SGMM['sender_phone'];
+                $returndData["sg_home_pickup"]  = $SGMM['sg_home_pickup'];
+                $returndData["sg_address"]      = $SGMM['sg_address'];
+                $returndData["shipment_method"] = $SGMM['shipment_method'];
+                $returndData["invoice_no"]      = $SGMM['invoice_no'];
+                $returndData["how_in_ygn"]      = $SGMM['how_in_ygn'];
+                $returndData["payment_type"]    = $SGMM['payment_type'];
+                $returndData["receiver_name"]   = $SGMM['receiver_name'];
+                $returndData["receiver_address"] = $SGMM['receiver_address'];
+                $returndData["receiver_phone"]  = $SGMM['receiver_phone'];
+                $returndData["form"]            = $SGMM['form'];
+                $returndData["estimated_arrival"] = $SGMM['estimated_arrival'];
+                $returndData["shelf_no"]        = $SGMM['shelf_no'];
+                $returndData["handling_fee"]    = $SGMM['handling_fee'];
+                $returndData["payment_status"]  = $SGMM['payment_status'];
+                $returndData["note"]            = $SGMM['note'];
+                $returndData["created_at"]      = $SGMM['created_at'];
+                $returndData["category"]        = [];
+
+                foreach($SGMM['category'] as $cat){
+                    $data['id']             = $cat['item_category_id'];
+                    $data['name']           = $cat['category_name']['name'];
+                    $data['weight']         = $cat['weight'];
+                    $data['unit_price']     = $cat['unit_price'];
+                    $data['total_price']    = $cat['total_price'];
+                    array_push($returndData['category'], $data);
+                }
+                // array_push($returndData, $SGMM);
             };
             // return response()->json(['status' => 200, 'data' => $returndData]);
             // $fileName = "$data->invoice_no.svg";
@@ -452,9 +518,12 @@ class LogisticController extends Controller
             //     'qr' => "qr_codes/$fileName"
             // ]);
         }
-        return $returndData;
-
-        return Inertia::render('InvoiceIssueIndex', ['data' => $returndData]);
+        // return $returndData;
+        if($returndData){
+            return Inertia::render('InvoiceIssueIndex', ['data' => $returndData]);
+        }else{
+            return abort(404);
+        }
     }
 
     public function saveIssue(Request $request)
@@ -478,10 +547,10 @@ class LogisticController extends Controller
             try {
                 if (!empty($MMSG)) {
                     $data = $MMSG;
-
+                    
                     $dbCategoryData =  $data->category->pluck('item_category_id')->sort()->values();
                     $requestCategoryData = collect($request->category_data)->pluck('id')->sort()->values();
-
+                    
                     if ($dbCategoryData != $requestCategoryData) {
                         return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !']);
                     }
@@ -558,14 +627,15 @@ class LogisticController extends Controller
         $invoiceNo = $generateData['invoice_no'];
 
         $fileName = "$invoiceNo.svg";
-        $path = "qr_codes/$fileName";
-        $qrCodeData  = QrCode::size(250)->generate($invoiceNo, $path);
+        $stpath = storage_path("app/public/qr_code/$fileName");
+        // return $stpath;
+        // $path = "qr_codes/$fileName";
+        $qrCodeData  = QrCode::size(250)->generate($invoiceNo, $stpath);
 
         $generateData = json_decode($generateData, true);
         $mpdf = new Mpdf([
             'tempDir' => storage_path('app/mpdf/custom/temp/dir/path'),
             'format'  => 'A4',
-            // 'orientation' => 'L',
             'margin_left' => 10,
             'margin_right' => 10,
             'margin_top' => 10,
@@ -587,7 +657,7 @@ class LogisticController extends Controller
         $html = View::make('pdf.invoice_issue')
             ->with('form', 2)
             ->with('request', $request)
-            ->with('path', $path)
+            ->with('path', $stpath)
             ->with('data', $generateData);
         $html->render();
         $mpdf->WriteHTML($html);
