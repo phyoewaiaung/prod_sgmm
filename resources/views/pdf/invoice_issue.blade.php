@@ -219,7 +219,7 @@
                         <tr>
                             <td style="border-bottom: 1px solid black;"></td>
                             <td style="border-bottom: 1px solid black;">
-                                {{ $data['form'] == 1 ? 'SG Home PickUp :' : 'MM Home PickUp' }}
+                                {{ $data['form'] == 1 ? 'SG Home PickUp :' : 'Yangon Home PickUp' }}
                             </td>
                             <td style="border-bottom: 1px solid black; text-align: start;" colSpan='2'>
                                 {{ $request->pickup }}
@@ -230,7 +230,9 @@
                         </tr>
                         <tr>
                             <td style="border-bottom: 1px solid black;"></td>
-                            <td style="border-bottom: 1px solid black;">Home/ Bus Station deliver:</td>
+                            <td style="border-bottom: 1px solid black;">
+                                {{ $data['form'] == 1 ? "SG Home Delivery / Self Collection:" : "Home/ Bus Station deliver:" }}                                
+                            </td>
                             <td style="border-bottom: 1px solid black; text-align: start;" colSpan='2'>
                                 {{ $request->collection_type }}
                             </td>
