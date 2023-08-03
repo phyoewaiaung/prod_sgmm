@@ -19,7 +19,7 @@ const CheckInvoiceIndex = () => {
     }
     useEffect(() => {
         setLoading(true);
-        axios.get('/logistic/search')
+        axios.post('/logistic/search')
             .then(res => {
                 setLoading(false);
                 setInvoiceList(res.data.data)
@@ -43,28 +43,28 @@ const CheckInvoiceIndex = () => {
     const searchClick = () => {
         setLoading(true);
         let params = {
-            invoice_no:invoiceNo,
+            invoice_no: invoiceNo,
             status: invoiceSts
         }
-        axios.post('/logistic/search',params)
-        .then(res => {
-            setLoading(false);
-            setInvoiceList(res.data.data)
-        })
-        .catch(e => {
-            setLoading(false);
-            toast.error('Fail To Load Invoice Data!', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
+        axios.post('/logistic/search', params)
+            .then(res => {
+                setLoading(false);
+                setInvoiceList(res.data.data)
             })
-        }
-        )
+            .catch(e => {
+                setLoading(false);
+                toast.error('Fail To Load Invoice Data!', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                })
+            }
+            )
     }
     return (
         <>
@@ -104,19 +104,21 @@ const CheckInvoiceIndex = () => {
                     <div className='md:ml-0 md:mr-0 ml-3 mr-3 invoice-list-container mb-5'>
                         <table className='invoice-list-table text-center break-all'>
                             <thead className='text-white'>
-                                <th width={50}>No</th>
-                                <th width={120}>Invoice ID</th>
-                                <th width={160}>Sender Name</th>
-                                <th width={160}>Recipient Name</th>
-                                <th width={100}>Payment</th>
-                                <th width={150}>Invoice Status</th>
-                                <th colSpan={2} width={210}>Action</th>
+                                <tr>
+                                    <th width={50}>No</th>
+                                    <th width={120}>Invoice ID</th>
+                                    <th width={160}>Sender Name</th>
+                                    <th width={160}>Recipient Name</th>
+                                    <th width={100}>Payment</th>
+                                    <th width={150}>Invoice Status</th>
+                                    <th colSpan={2} width={210}>Action</th>
+                                </tr>
                             </thead>
                             <tbody className='dark:text-gray-400'>
                                 {invoiceList.length > 0 &&
                                     invoiceList.map((data, index) => {
                                         return (
-                                            <tr>
+                                            <tr key={index}>
                                                 <td width={50}>{index + 1}</td>
                                                 <td width={120}>{data.invoice_no}</td>
                                                 <td width={160}>{data.sender_name}</td>
@@ -124,7 +126,7 @@ const CheckInvoiceIndex = () => {
                                                 <td width={100}>{data.payment_type == "1" ? "SG" : "MM"}</td>
                                                 <td width={150}>register</td>
                                                 <td width={120}>
-                                                    <Link href={route('invoice-issue')} method='post' data={{ invoice_no: data.invoice_no }}
+                                                    <Link href={route('invoice-issue')} method='get' data={{ invoice_no: data.invoice_no }}
                                                         preserveState={true}>
                                                         <button className='bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600'>Invoice issue</button>
                                                     </Link>

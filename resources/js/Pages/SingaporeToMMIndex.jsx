@@ -28,11 +28,12 @@ const SingaporeToMMIndex = (props) => {
     ]
 
     const [cargoData, setCargoData] = useState([
-        { id: 1, name: "Food/Clothes", isChecked: false },
-        { id: 2, name: "Cosmetics / Medicine / Supplements", isChecked: false },
-        { id: 3, name: "Shoes / Bags", isChecked: false },
-        { id: 4, name: "Electronic Goods", isChecked: false },
-        { id: 5, name: "Other", isChecked: false }
+        { id: 1, name: "Food", isChecked: false },
+        { id: 2, name: "Clothes", isChecked: false },
+        { id: 3, name: "Cosmetics / Medicine / Supplements", isChecked: false },
+        { id: 4, name: "Shoes / Bags", isChecked: false },
+        { id: 5, name: "Electronic Goods", isChecked: false },
+        { id: 7, name: "Other", isChecked: false }
     ])
 
     const ygnHomeDeli = [
