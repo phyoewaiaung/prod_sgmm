@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { Link } from '@inertiajs/react'
 import { isdigit } from '@/Common/CommonValidation';
 import axios from 'axios';
+import Loading from '@/Common/Loading';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const InvoiceIssueIndex = (props) => {
+    const [loading, setLoading] = useState(false);
     const [foodWeight, setFoodWeight] = useState("");
     const [clothWeight, setClothWeight] = useState("");
     const [frozenWeight, setFrozenWeight] = useState("");
@@ -11,7 +15,7 @@ const InvoiceIssueIndex = (props) => {
     const [cosmeticWeight, setCosmeticWeight] = useState("");
     const [electronicWeight, setElectronicWeight] = useState("");
     const [othersWeight, setOthersWeight] = useState(0);
-    const [handlingFee, setHandlingFee] = useState(false);
+    const [handlingFee, setHandlingFee] = useState(props.data.handling_fee == "1" ? true : false);
     const [categories, setCategories] = useState([]);
     const [foodUnit, setFoodUnit] = useState();
     const [shoeUnit, setShoeUnit] = useState();
@@ -45,6 +49,29 @@ const InvoiceIssueIndex = (props) => {
 
     useEffect(() => {
         setCategories(props.data.category);
+        props.data.category.map(d => {
+            if (d.id == "1" && d.weight != null) {
+                setFoodWeight(d.weight);
+            }
+            if (d.id == "2" && d.weight != null) {
+                setClothWeight(d.weight);
+            }
+            if (d.id == "3" && d.weight != null) {
+                setCosmeticWeight(d.weight);
+            }
+            if (d.id == "4" && d.weight != null) {
+                setShoeWeight(d.weight);
+            }
+            if (d.id == "5" && d.weight != null) {
+                setElectronicWeight(d.weight);
+            }
+            if (d.id == "6" && d.weight != null) {
+                setFrozenWeight(d.weight);
+            }
+            if (d.id == "7" && d.weight != null) {
+                setOthersWeight(d.weight);
+            }
+        })
         const foodUnit = props.data.shipment_method ?
             props.data.shipment_method == "1" ?
                 "6.00" :
@@ -202,7 +229,7 @@ const InvoiceIssueIndex = (props) => {
             invoice_no: invoiceNo,
             category_data: data,
             handling_fee: handlingFee ? true : false,
-            pickup: sgPickup,
+            pickup: howInSg == undefined ? (sgPickup == "1" ? true : false) : (ygnPickup == "1" ? true : false),
 
             pickupAmt: (howInSg == undefined ?
                 (
@@ -296,9 +323,34 @@ const InvoiceIssueIndex = (props) => {
                 )
             ).toFixed(2)
         }
+        setLoading(true);
         axios.post('/save-issue', params)
-            .then(data => console.log(data))
-            .catch(e => console.log(e))
+            .then(res => {
+                setLoading(false);
+                toast.success('Successfully Registered!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            })
+            .catch(e => {
+                setLoading(false);
+                toast.error('Fail To Update!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            })
     }
 
     const sendEmailClick = () => {
@@ -307,6 +359,19 @@ const InvoiceIssueIndex = (props) => {
 
     return (
         <>
+            <Loading start={loading} />
+            <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <header className='mt-10 ml-3 mr-3 md:ml-0 md:mr-0 flex flex-col md:flex-row justify-around items-center gap-10'>
                     <div className='md:pl-[100px] md:pr-[100px]'>
@@ -317,22 +382,43 @@ const InvoiceIssueIndex = (props) => {
                         </Link>
                     </div>
                     <div className='dark:text-gray-400 mt-[-78px] md:mt-0'>
-                        <h3 className='font-bold mb-2'>Singapore Branch</h3>
-                        <h4>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</h4>
-                        <h4>Contact: +65 9325 0329</h4>
-                        <div className="flex md:flex-row flex-col justify-center items-start mt-3 divide-y-2 md:divide-x-2 md:divide-y-0">
-                            <div className='md:pr-4 md:pb-0 pb-3'>
-                                <h3 className='font-bold mb-2'>Myanmar Branch(South Okkalapa)</h3>
-                                <h4>No. 642, Thanthumar Street, 10 </h4>
-                                Ward, South Okkalapa, Yangon
-                                <h4>Contact: +959 962 507 694</h4>
-                            </div>
-                            <div className='md:pl-4 md:pt-0 pt-3'>
-                                <h3 className='font-bold mb-2'>Myanmar Branch(Alone)</h3>
-                                <h4>အမှတ် ၂၂ / သိပ္ပံလမ်း / အလုံမြို့နယ်</h4>
-                                <h4>Contact: 09958450219</h4>
-                            </div>
-                        </div>
+                        {props.data.form == "1" ?
+                            <>
+                                <h3 className='font-bold mb-2'>Singapore Branch</h3>
+                                <h4>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</h4>
+                                <h4>Contact: +65 9325 0329</h4>
+                                <div className="flex md:flex-row flex-col justify-center items-start mt-3 divide-y-2 md:divide-x-2 md:divide-y-0">
+                                    <div className='md:pr-4 md:pb-0 pb-3'>
+                                        <h3 className='font-bold mb-2'>Myanmar Branch(South Okkalapa)</h3>
+                                        <h4>No. 642, Thanthumar Street, 10 </h4>
+                                        Ward, South Okkalapa, Yangon
+                                        <h4>Contact: +959 962 507 694</h4>
+                                    </div>
+                                    <div className='md:pl-4 md:pt-0 pt-3'>
+                                        <h3 className='font-bold mb-2'>Myanmar Branch(Alone)</h3>
+                                        <h4>အမှတ် ၂၂ / သိပ္ပံလမ်း / အလုံမြို့နယ်</h4>
+                                        <h4>Contact: 09958450219</h4>
+                                    </div>
+                                </div>
+                            </> :
+                            props.data.form == "2" ?
+                                <>
+                                    <h4>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</h4>
+                                    <h4>Contact: +65 9325 0329</h4>
+                                    <h4>No.642 Thanthumar Road, 10 Qtr, South Okkalapa, Yangon</h4>
+                                    <h4>Contact:  +959 962 507 694</h4>
+                                    <br />
+                                    <h5>sgmm@sgmyanmar.com / www.sgmyanmar.com</h5>
+                                </> :
+                                <>
+                                    <h4>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</h4>
+                                    <h4>Contact: +65 9325 0329</h4>
+                                    <h4>အမှတ် ၂၂ / သိပ္ပံလမ်း / အလုံမြို့နယ် ရန်ကုန်၊၊</h4>
+                                    <h4>Contact: +95 9958450219</h4>
+                                    <br />
+                                    <h5>sgmm@sgmyanmar.com / www.sgmyanmar.com</h5>
+                                </>
+                        }
                         <div className="flex justify-between">
                             <div>
                                 <h2 className='font-bold text-xl mt-3'>Invoice</h2>
@@ -344,7 +430,7 @@ const InvoiceIssueIndex = (props) => {
                     </div>
                 </header>
                 <main className='md:w-5/6 w-full'>
-                    <hr className='border h-[15px] bg-gray-400 border-gray-400' />
+                    <hr className='border mt-3 h-[15px] bg-gray-400 border-gray-400' />
                     <div className="flex md:flex-row flex-col md:justify-evenly mt-3">
                         <div className='text-center'>
                             <h3 className="font-bold dark:text-gray-400">Date & Time :<span className='text-red-600 font-normal'>17/07/2023 17:35:30 </span></h3>
@@ -366,13 +452,13 @@ const InvoiceIssueIndex = (props) => {
                     <div className="flex md:flex-row flex-col md:justify-evenly mt-3">
                         <div className='md:w-1/2 w-full text-center'>
                             <h3 className="font-bold text-center md:text-start ml-11 dark:text-blue-500">Shipping Information</h3>
-                            <textarea className='invoice-color-textarea w-5/6' value={receiverAddress} readOnly />
+                            <textarea className={props.data.form == "1" ? "form1-bg w-5/6" : props.data.form == "2" ? "form2-bg w-5/6" : "form3-bg w-5/6"} value={receiverAddress} readOnly />
                             <h3 className="font-bold dark:text-gray-400">Recipient Name : <span className="font-normal">{receiverName}</span></h3>
                             <h3 className="font-bold dark:text-gray-400">Recipient Contact Number : <span className='font-normal'>{receiverPhone}</span></h3>
                         </div>
                         <div className='md:w-1/2 w-full text-center'>
                             <h3 className="font-bold text-center md:text-start ml-11 dark:text-blue-500">Billing Information</h3>
-                            <textarea className='invoice-color-textarea w-5/6' value={senderAddress} readOnly />
+                            <textarea className={props.data.form == "1" ? "form1-bg w-5/6" : props.data.form == "2" ? "form2-bg w-5/6" : "form3-bg w-5/6"} value={senderAddress} readOnly />
                             <h3 className="font-bold dark:text-gray-400">Sender Name : <span className="font-normal">{senderName}</span></h3>
                             <h3 className="font-bold dark:text-gray-400">Sender Contact Number : <span className='font-normal'>{senderPhone}</span></h3>
                         </div>
@@ -382,7 +468,7 @@ const InvoiceIssueIndex = (props) => {
                     </div>
                     <div className="mb-3 invoice-issue-container md:mr-0 md:ml-0 ml-3 mr-3">
                         <table className='invoice-issue-table text-center'>
-                            <thead>
+                            <thead className={props.data.form == "1" ? "form1-header" : props.data.form == "2" ? "form2-header" : "form3-header"}>
                                 <tr>
                                     <th width={50}>S/N</th>
                                     <th width={300}>Description</th>
@@ -624,12 +710,23 @@ const InvoiceIssueIndex = (props) => {
                     <div className="ml-5 mr-5 md:mr-0 md:ml-0 flex md:flex-row flex-col md:justify-between mb-5 items-center">
                         <div className='dark:text-gray-400'>
                             <h4 className="font-bold">Terms & Conditions:</h4>
-                            <ol>
-                                <li>All prices stated here are in Singapore Dollars</li>
-                                <li>Any illegal items will not be accepted</li>
-                                <li> Arrival schedule might change due to unforeseen circumstances</li>
-                                <li>We are not responsible for damaged items that are not declared</li>
-                            </ol>
+                            {props.data.form == "1" ?
+                                <ol>
+                                    <li>All prices stated here are in Singapore Dollars</li>
+                                    <li>Any illegal items will not be accepted</li>
+                                    <li> Arrival schedule might change due to unforeseen circumstances</li>
+                                    <li>We are not responsible for damaged items that are not declared</li>
+                                </ol> :
+                                <ol>
+                                    <li>All prices stated here are in Singapore Dollars</li>
+                                    <li>Any illegal items will not be accepted</li>
+                                    <li>Flight schedule might change due to unforeseen circumstances</li>
+                                    <li>Due to tighter restriction, offload is expected to happen</li>
+                                    <li>Please provide full address for SG Home Delivery</li>
+                                    <li>ALL FROZEN FOOD to be packed and sealed properly</li>
+                                    <li>Any Loss or Damage (except FROZEN FOOD) will be refunded 3 times of shipping fees </li>
+                                </ol>
+                            }
                             <span>Items Detail:</span>
                             <div>Filters</div>
                             <div>Special Instruction:</div>

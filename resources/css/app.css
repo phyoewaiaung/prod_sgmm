@@ -35,8 +35,14 @@ table tbody td {
 .invoice-list-table thead th {
     border-right: 1px solid rgb(167, 182, 197);
 }
-.invoice-color-textarea {
+.form1-bg {
     background-color: #b6e0cc;
+}
+.form3-bg{
+    background-color: #9EC6E9;
+}
+.form2-bg{
+    background-color: #ABE2CF;
 }
 .invoice-issue-table {
     min-width: 950px;
@@ -45,8 +51,14 @@ table tbody td {
 .invoice-issue-table td:nth-child(2) {
     text-align: start !important;
 }
-.invoice-issue-table thead {
+.form1-header{
     background-color: #fff2cc;
+}
+.form2-header{
+    background-color: #FFFE1D;
+}
+.form3-header{
+    background-color: #FFD867;
 }
 .invoice-issue-table {
     border: 1px solid black;

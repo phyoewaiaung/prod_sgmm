@@ -260,7 +260,7 @@ const SingaporeToMMIndex = (props) => {
                     setLoading(false);
                     toast.success('Successfully Registered!', {
                         position: "top-right",
-                        autoClose: 3000,
+                        autoClose: 2000,
                         hideProgressBar: false,
                         closeOnClick: true,
                         pauseOnHover: true,
@@ -268,12 +268,25 @@ const SingaporeToMMIndex = (props) => {
                         progress: undefined,
                         theme: "dark",
                     });
+                    setSenderEmail("");
+                    setSenderName("");
+                    setPickUpRadio("");
+                    setSgPickUpAddress("");
+                    setShipModeId("");
+                    setYgnDelId("");
+                    setPayment("");
+                    setRecipientName("");
+                    setRecipientAddress("");
+                    setRecipientPhone("");
+                    setAdditionalNote("");
+                    cargoData.map(d => d.isChecked = false);
+                    setAggrementCheck("");
                 })
                 .catch((e) => {
                     setLoading(false);
                     toast.error('Fail To Register!', {
                         position: "top-right",
-                        autoClose: 3000,
+                        autoClose: 2000,
                         hideProgressBar: false,
                         closeOnClick: true,
                         pauseOnHover: true,
@@ -290,7 +303,7 @@ const SingaporeToMMIndex = (props) => {
             <Loading start={loading} />
             <ToastContainer
                 position="top-right"
-                autoClose={3000}
+                autoClose={2000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick
@@ -302,7 +315,7 @@ const SingaporeToMMIndex = (props) => {
             />
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href='/'>
-                <header className="flex justify-center mt-10">
+                    <header className="flex justify-center mt-10">
                         <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
                     </header>
                 </Link>
