@@ -327,7 +327,7 @@ const InvoiceIssueIndex = (props) => {
         axios.post('/save-issue', params)
             .then(res => {
                 setLoading(false);
-                toast.success('Successfully Registered!', {
+                toast.success('Successfully Update!', {
                     position: "top-right",
                     autoClose: 2000,
                     hideProgressBar: false,

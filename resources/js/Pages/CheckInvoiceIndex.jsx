@@ -14,6 +14,8 @@ const CheckInvoiceIndex = () => {
     const [show, setShow] = useState(false);
     const [modalInvoice, setModalInvoice] = useState("");
     const [type, setType] = useState("");
+    const [location, setLocation] = useState("");
+    const [shelfNo, setShelfNo] = useState("");
 
     const invoiceNoChange = (e) => {
         setInvoiceNo(e.target.value);
@@ -90,13 +92,56 @@ const CheckInvoiceIndex = () => {
         setType(type);
     }
 
+    const locationChange = (e) => {
+        setLocation(e.target.value);
+    }
+    const shelfNoChange = (e) => {
+        setShelfNo(e.target.value);
+    }
+
+    const saveOK = () => {
+        setShow(false);
+        setLoading(true);
+        let url = type == "1" ? "/set-arrival" : "/update-shelf";
+        let params = type == "1" ? { invoice_no: modalInvoice, arrival: location } : { invoice_no: modalInvoice, shelf_no: shelfNo }
+        let text = type == "1" ? "LOCATION" : "SHELF NO";
+        axios.post(url, params)
+            .then(data => {
+                setLoading(false);
+                toast.success('Successfully Update ' + text + '!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            })
+            .catch(e => {
+                setLoading(false);
+                toast.error('Fail To Update ' + text + '!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            })
+
+    }
     return (
         <>
             <Modal
-            show={show}
-            invoiceNo = {modalInvoice}
-            type={type}
-            onClose={()=> setShow(false)}
+                show={show}
+                invoiceNo={modalInvoice}
+                type={type}
+                onClose={() => setShow(false)}
+                saveOK={saveOK}
             />
             <ToastContainer
                 position="top-right"
@@ -178,14 +223,14 @@ const CheckInvoiceIndex = () => {
                                                         <td width={150}>{data.payment_status == "1" ? "Register" : "Collected"}</td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
-                                                                <input className='w-[120px]' type="text" value="" onChange={(e) => locationChange(e, data.invoice_no)} />
-                                                                <button onClick={()=>setClick(1,data)} className='set-btn'>Set</button>
+                                                                <input className='w-[120px]' type="text" value={location} onChange={locationChange} />
+                                                                <button onClick={() => setClick(1, data)} className='set-btn'>Set</button>
                                                             </div>
                                                         </td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
-                                                                <input className='w-[120px]' type="text" value="" onChange={(e) => shelfNoChange(e, data.invoice_no)} />
-                                                                <button onClick={()=>setClick(2,data)} className='set-btn'>Set</button>
+                                                                <input className='w-[120px]' type="text" value={shelfNo} onChange={shelfNoChange} />
+                                                                <button onClick={() => setClick(2, data)} className='set-btn'>Set</button>
                                                             </div>
                                                         </td>
                                                         <td width={120}>

@@ -7,6 +7,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { BrowserRouter } from 'react-router-dom';
 import { useState } from 'react';
 
+
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
 function AppWrapper({ App, props }) {
