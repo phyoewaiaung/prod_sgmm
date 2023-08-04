@@ -19,7 +19,7 @@ const MyanmarToSgOkkala = () => {
     const [senderAddress, setSenderAddress] = useState('');
     const [transportId, setTransportId] = useState('');
     const [cargoDetail, setCartgoDetail] = useState('');
-    const [selfCollectionId, setSelfCollectionid] = useState('');
+    const [selfCollectionId, setSelfCollectionId] = useState('');
     const [recipientPostalCode, setRecipientPostalCode] = useState('');
     const [additionalOpt, setAdditionalOpt] = useState('');
     const [weightFood, setWeightFood] = useState('');
@@ -160,7 +160,7 @@ const MyanmarToSgOkkala = () => {
     }
 
     const selfCollectionChange = (id) => {
-        setSelfCollectionid(id);
+        setSelfCollectionId(id);
         document.getElementById('error-sg-home').textContent = "";
         document.getElementById('sg-home').style.border = '1px solid #BFDBFE';
     }
@@ -304,14 +304,15 @@ const MyanmarToSgOkkala = () => {
                 "receiver_address": recipientAddress,
                 "receiver_phone": recipientPhone,
                 "additional_instruction": additionalOpt,
-                "items": cargoArr
+                "items": cargoArr,
+                "form": "2"
             }
             axios.post('/logistic/mm-sg-save', params)
                 .then(data => {
                     setLoading(false);
                     toast.success('Successfully Registered!', {
                         position: "top-right",
-                        autoClose: 3000,
+                        autoClose: 2000,
                         hideProgressBar: false,
                         closeOnClick: true,
                         pauseOnHover: true,
@@ -319,12 +320,27 @@ const MyanmarToSgOkkala = () => {
                         progress: undefined,
                         theme: "dark",
                     });
+                    setSenderEmail("");
+                    setSenderName("");
+                    setSenderPhone("");
+                    setSenderAddress("");
+                    setTransportId("");
+                    setStorageTypeId("");
+                    setPickUpRadio("");
+                    setSelfCollectionId("");
+                    setPayment("");
+                    setRecipientPostalCode("");
+                    setRecipientName("");
+                    setRecipientAddress("");
+                    setRecipientPhone("");
+                    setAdditionalOpt("");
+                    cargoData.map(d => d.isChecked = false);
                 })
                 .catch((e) => {
                     setLoading(false);
                     toast.error('Fail To Register!', {
                         position: "top-right",
-                        autoClose: 3000,
+                        autoClose: 2000,
                         hideProgressBar: false,
                         closeOnClick: true,
                         pauseOnHover: true,
@@ -341,7 +357,7 @@ const MyanmarToSgOkkala = () => {
             <Loading start={loading} />
             <ToastContainer
                 position="top-right"
-                autoClose={3000}
+                autoClose={2000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick

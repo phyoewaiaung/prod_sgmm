@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
 import Loading from '@/Common/Loading';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Modal from '@/Common/Modal';
 
 const CheckInvoiceIndex = () => {
     const [loading, setLoading] = useState(false);
     const [invoiceNo, setInvoiceNo] = useState('');
     const [invoiceSts, setInvoiceSts] = useState('');
     const [invoiceList, setInvoiceList] = useState([]);
+    const [show, setShow] = useState(false);
+    const [modalInvoice, setModalInvoice] = useState("");
+    const [type, setType] = useState("");
 
     const invoiceNoChange = (e) => {
         setInvoiceNo(e.target.value);
@@ -28,7 +33,7 @@ const CheckInvoiceIndex = () => {
                 setLoading(false);
                 toast.error('Fail To Load Invoice Data!', {
                     position: "top-right",
-                    autoClose: 3000,
+                    autoClose: 2000,
                     hideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
@@ -50,12 +55,24 @@ const CheckInvoiceIndex = () => {
             .then(res => {
                 setLoading(false);
                 setInvoiceList(res.data.data)
+                if (res.data.data.length == 0) {
+                    toast.error('Data is not found!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    });
+                }
             })
             .catch(e => {
                 setLoading(false);
                 toast.error('Fail To Load Invoice Data!', {
                     position: "top-right",
-                    autoClose: 3000,
+                    autoClose: 2000,
                     hideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
@@ -66,8 +83,33 @@ const CheckInvoiceIndex = () => {
             }
             )
     }
+
+    const setClick = (type, data) => {
+        setShow(true);
+        setModalInvoice(data.invoice_no);
+        setType(type);
+    }
+
     return (
         <>
+            <Modal
+            show={show}
+            invoiceNo = {modalInvoice}
+            type={type}
+            onClose={()=> setShow(false)}
+            />
+            <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
             <Loading start={loading} />
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href='/'>
@@ -91,7 +133,12 @@ const CheckInvoiceIndex = () => {
                                 <label htmlFor="">Invoice Status:</label>
                             </div>
                             <div>
-                                <input className='dark:bg-gray-400 mb-2 w-full' type="text" name="" id="" value={invoiceSts} onChange={invoiceStsChange} />
+                                {/* <input className='dark:bg-gray-400 mb-2 w-full' type="text" name="" id="" value={invoiceSts} onChange={invoiceStsChange} /> */}
+                                <select className='dark:bg-gray-400 mb-2 w-full cursor-pointer' onChange={invoiceStsChange} value={invoiceSts}>
+                                    <option value="">Select Invoice Status</option>
+                                    <option value="1">Register</option>
+                                    <option value="2">Collected</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -100,49 +147,67 @@ const CheckInvoiceIndex = () => {
                             Search
                         </button>
                     </div>
-                    <h3 className="ml-3 mr-3 md:ml-0 md:mr-0 font-bold text-xl mb-3 dark:text-gray-400">Check Invoice List</h3>
-                    <div className='md:ml-0 md:mr-0 ml-3 mr-3 invoice-list-container mb-5'>
-                        <table className='invoice-list-table text-center break-all'>
-                            <thead className='text-white'>
-                                <tr>
-                                    <th width={50}>No</th>
-                                    <th width={120}>Invoice ID</th>
-                                    <th width={160}>Sender Name</th>
-                                    <th width={160}>Recipient Name</th>
-                                    <th width={100}>Payment</th>
-                                    <th width={150}>Invoice Status</th>
-                                    <th colSpan={2} width={210}>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className='dark:text-gray-400'>
-                                {invoiceList.length > 0 &&
-                                    invoiceList.map((data, index) => {
-                                        return (
-                                            <tr key={index}>
-                                                <td width={50}>{index + 1}</td>
-                                                <td width={120}>{data.invoice_no}</td>
-                                                <td width={160}>{data.sender_name}</td>
-                                                <td width={160}>{data.receiver_name}</td>
-                                                <td width={100}>{data.payment_type == "1" ? "SG" : "MM"}</td>
-                                                <td width={150}>register</td>
-                                                <td width={120}>
-                                                    <Link href={route('invoice-issue')} method='get' data={{ invoice_no: data.invoice_no }}
-                                                        preserveState={true}>
-                                                        <button className='bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600'>Invoice issue</button>
-                                                    </Link>
-                                                </td>
-                                                <td width={90}>
-                                                    <button className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                    {invoiceList.length > 0 &&
+                        <>
+                            <h3 className="ml-3 mr-3 md:ml-0 md:mr-0 font-bold text-xl mb-3 dark:text-gray-400">Check Invoice List</h3>
+                            <div className='md:ml-0 md:mr-0 ml-3 mr-3 invoice-list-container mb-5'>
+                                <table className='invoice-list-table text-center break-all'>
+                                    <thead className='text-white'>
+                                        <tr>
+                                            <th width={50}>No</th>
+                                            <th width={120}>Invoice ID</th>
+                                            <th width={160}>Sender Name</th>
+                                            <th width={160}>Recipient Name</th>
+                                            <th width={100}>Payment</th>
+                                            <th width={150}>Invoice Status</th>
+                                            <th width={200}>Location</th>
+                                            <th width={200}>Shelf No</th>
+                                            <th colSpan={2} width={210}>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className='dark:text-gray-400'>
+                                        {invoiceList.length > 0 &&
+                                            invoiceList.map((data, index) => {
+                                                return (
+                                                    <tr key={index}>
+                                                        <td width={50}>{index + 1}</td>
+                                                        <td width={120}>{data.invoice_no}</td>
+                                                        <td width={160}>{data.sender_name}</td>
+                                                        <td width={160}>{data.receiver_name}</td>
+                                                        <td width={100}>{data.payment_type == "1" ? "SG" : "MM"}</td>
+                                                        <td width={150}>{data.payment_status == "1" ? "Register" : "Collected"}</td>
+                                                        <td width={200}>
+                                                            <div className='flex justify-center'>
+                                                                <input className='w-[120px]' type="text" value="" onChange={(e) => locationChange(e, data.invoice_no)} />
+                                                                <button onClick={()=>setClick(1,data)} className='set-btn'>Set</button>
+                                                            </div>
+                                                        </td>
+                                                        <td width={200}>
+                                                            <div className='flex justify-center'>
+                                                                <input className='w-[120px]' type="text" value="" onChange={(e) => shelfNoChange(e, data.invoice_no)} />
+                                                                <button onClick={()=>setClick(2,data)} className='set-btn'>Set</button>
+                                                            </div>
+                                                        </td>
+                                                        <td width={120}>
+                                                            <Link href={route('invoice-issue')} method='get' data={{ invoice_no: data.invoice_no }}
+                                                                preserveState={true}>
+                                                                <button className='bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600'>Invoice issue</button>
+                                                            </Link>
+                                                        </td>
+                                                        <td width={90}>
+                                                            <button className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
+                    }
                 </main>
-                <footer className="text-center font-medium ms-8 me-8 dark:text-gray-400">
+                <footer className="text-center mt-4 font-medium ms-8 me-8 dark:text-gray-400">
                     © 2023 by SGMyanmar - Myanmar Online Store - Food Delivery - Logistic Service
                 </footer>
             </div>
