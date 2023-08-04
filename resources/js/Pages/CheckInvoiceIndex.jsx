@@ -4,12 +4,16 @@ import axios from 'axios';
 import Loading from '@/Common/Loading';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Modal from '@/Common/Modal';
 
 const CheckInvoiceIndex = () => {
     const [loading, setLoading] = useState(false);
     const [invoiceNo, setInvoiceNo] = useState('');
     const [invoiceSts, setInvoiceSts] = useState('');
     const [invoiceList, setInvoiceList] = useState([]);
+    const [show, setShow] = useState(false);
+    const [modalInvoice, setModalInvoice] = useState("");
+    const [type, setType] = useState("");
 
     const invoiceNoChange = (e) => {
         setInvoiceNo(e.target.value);
@@ -79,8 +83,21 @@ const CheckInvoiceIndex = () => {
             }
             )
     }
+
+    const setClick = (type, data) => {
+        setShow(true);
+        setModalInvoice(data.invoice_no);
+        setType(type);
+    }
+
     return (
         <>
+            <Modal
+            show={show}
+            invoiceNo = {modalInvoice}
+            type={type}
+            onClose={()=> setShow(false)}
+            />
             <ToastContainer
                 position="top-right"
                 autoClose={2000}
@@ -143,6 +160,8 @@ const CheckInvoiceIndex = () => {
                                             <th width={160}>Recipient Name</th>
                                             <th width={100}>Payment</th>
                                             <th width={150}>Invoice Status</th>
+                                            <th width={200}>Location</th>
+                                            <th width={200}>Shelf No</th>
                                             <th colSpan={2} width={210}>Action</th>
                                         </tr>
                                     </thead>
@@ -156,7 +175,19 @@ const CheckInvoiceIndex = () => {
                                                         <td width={160}>{data.sender_name}</td>
                                                         <td width={160}>{data.receiver_name}</td>
                                                         <td width={100}>{data.payment_type == "1" ? "SG" : "MM"}</td>
-                                                        <td width={150}>register</td>
+                                                        <td width={150}>{data.payment_status == "1" ? "Register" : "Collected"}</td>
+                                                        <td width={200}>
+                                                            <div className='flex justify-center'>
+                                                                <input className='w-[120px]' type="text" value="" onChange={(e) => locationChange(e, data.invoice_no)} />
+                                                                <button onClick={()=>setClick(1,data)} className='set-btn'>Set</button>
+                                                            </div>
+                                                        </td>
+                                                        <td width={200}>
+                                                            <div className='flex justify-center'>
+                                                                <input className='w-[120px]' type="text" value="" onChange={(e) => shelfNoChange(e, data.invoice_no)} />
+                                                                <button onClick={()=>setClick(2,data)} className='set-btn'>Set</button>
+                                                            </div>
+                                                        </td>
                                                         <td width={120}>
                                                             <Link href={route('invoice-issue')} method='get' data={{ invoice_no: data.invoice_no }}
                                                                 preserveState={true}>
