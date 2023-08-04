@@ -44,12 +44,11 @@ Route::middleware('auth')->group(function () {
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/logistic/search', [LogisticController::class, 'search'])->name('logistic.search');
-    
+
     Route::get('invoice-issue', [LogisticController::class, 'invoiceIssue'])->name('invoice-issue');
     Route::post('/save-issue', [LogisticController::class, 'saveIssue'])->name('save-issue');
     Route::post('/update-shelf', [LogisticController::class, 'updateShelfNo'])->name('update-shelf');
     Route::post('/set-arrival', [LogisticController::class, 'setEstimatedArrival'])->name('set-arrival');
-    
 });
 
 /**** Pages */

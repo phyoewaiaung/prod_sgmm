@@ -22,7 +22,7 @@ use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
 
 class LogisticController extends Controller
 {
-   
+
     public function saveSGtoMM(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -121,7 +121,7 @@ class LogisticController extends Controller
                 //         'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
                 //         "logistic" => '(SM...)',
                 //     ];
-        
+
                 //     $files = $getParcelTagFile['fileName'];
                 //     $blade = 'sg_mm_save';
 
@@ -281,7 +281,7 @@ class LogisticController extends Controller
                 //         'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
                 //         "logistic" => '(SM...)',
                 //     ];
-        
+
                 //     $files = $getParcelTagFile['fileName'];
                 //     $blade = 'sg_mm_save';
 
@@ -320,11 +320,11 @@ class LogisticController extends Controller
             $files = [
                 public_path("storage/$file")
             ];
-            
+
             Mail::send("mail.$blade", $data, function ($message) use ($data, $files) {
                 $message->to($data["email"])
                     ->subject($data["title"]);
-                    
+
                 foreach ($files as $file) {
                     $message->attach($file);
                 }
@@ -349,8 +349,8 @@ class LogisticController extends Controller
         }
 
         $returndData = [];
-        $SGMM = SgtoMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status')->orderBy('created_at', 'desc')->get();
-        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status')->orderBy('created_at', 'desc')->get();
+        $SGMM = SgtoMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price')->orderBy('created_at', 'desc')->get();
+        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price')->orderBy('created_at', 'desc')->get();
 
         if (!empty($MMSG) || !empty($SGMM)) {
             if (!empty($MMSG)) {
@@ -364,7 +364,6 @@ class LogisticController extends Controller
                 }
             };
             return response()->json(['status' => 200, 'data' => $returndData]);
-            
         } else {
             return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
         }
@@ -447,18 +446,18 @@ class LogisticController extends Controller
                 $returndData["payment_type"]    = $MMSG['payment_type'];
                 $returndData["receiver_name"]   = $MMSG['receiver_name'];
                 $returndData["receiver_phone"]  = $MMSG['receiver_phone'];
-                $returndData["receiver_address"]= $MMSG['receiver_address'];
+                $returndData["receiver_address"] = $MMSG['receiver_address'];
                 $returndData["receiver_postal_code"] = $MMSG['receiver_postal_code'];
                 $returndData["handling_fee"]    = $MMSG['handling_fee'];
                 $returndData["form"]            = $MMSG['form'];
-                $returndData["estimated_arrival"]= $MMSG['estimated_arrival'];
+                $returndData["estimated_arrival"] = $MMSG['estimated_arrival'];
                 $returndData["shelf_no"]        = $MMSG['shelf_no'];
                 $returndData["payment_status"]  = $MMSG['payment_status'];
                 $returndData["additional_instruction"] = $MMSG['additional_instruction'];
                 $returndData["created_at"]      = $MMSG['created_at'];
                 $returndData["category"]        = [];
 
-                foreach($MMSG['category'] as $cat){
+                foreach ($MMSG['category'] as $cat) {
                     $data['id']             = $cat['item_category_id'];
                     $data['name']           = $cat['category_name']['name'];
                     $data['weight']         = $cat['weight'];
@@ -492,7 +491,7 @@ class LogisticController extends Controller
                 $returndData["created_at"]      = $SGMM['created_at'];
                 $returndData["category"]        = [];
 
-                foreach($SGMM['category'] as $cat){
+                foreach ($SGMM['category'] as $cat) {
                     $data['id']             = $cat['item_category_id'];
                     $data['name']           = $cat['category_name']['name'];
                     $data['weight']         = $cat['weight'];
@@ -502,9 +501,9 @@ class LogisticController extends Controller
                 }
             };
         }
-        if($returndData){
+        if ($returndData) {
             return Inertia::render('InvoiceIssueIndex', ['data' => $returndData]);
-        }else{
+        } else {
             return abort(404);
         }
     }
@@ -549,10 +548,10 @@ class LogisticController extends Controller
             try {
                 if (!empty($MMSG)) {
                     $data = $MMSG;
-                    
+
                     $dbCategoryData =  $data->category->pluck('item_category_id')->sort()->values();
                     $requestCategoryData = collect($request->category_data)->pluck('id')->sort()->values();
-                    
+
                     if ($dbCategoryData != $requestCategoryData) {
                         return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !']);
                     }
@@ -564,14 +563,15 @@ class LogisticController extends Controller
                         $updateData->weight = $updateCat['weight'];
                         $updateData->unit_price = $updateCat['unit_price'];
                         $updateData->total_price = $updateCat['weight'] * $updateCat['unit_price'];
-                        $updateData->update();
+                        $updateData->save();
                     }
                     if ($request->handling_fee) {
                         $data->handling_fee = 1;
                     } else {
                         $data->handling_fee = 2;
                     }
-                    $data->update();
+                    $data->total_price = $request->total_amount;
+                    $data->save();
                     $generateData = MmToSgItem::where('invoice_no', $request->invoice_no)
                         ->with('category:*', 'category.categoryName')
                         ->first();
@@ -592,7 +592,7 @@ class LogisticController extends Controller
                         $updateData->weight = $updateCat['weight'];
                         $updateData->unit_price = $updateCat['unit_price'];
                         $updateData->total_price = $updateCat['weight'] * $updateCat['unit_price'];
-                        $updateData->update();
+                        $updateData->save();
                         $generateData = SgtoMmItem::where('invoice_no', $request->invoice_no)
                             ->with('category:*', 'category.categoryName')
                             ->first();
@@ -603,12 +603,12 @@ class LogisticController extends Controller
                         $data->handling_fee = 2;
                     }
                     $data->total_price = $request->total_amount;
-                    $data->update();
+                    $data->save();
                 };
 
                 $getInvoiceIssueFile = $this->issuceFileCreate($request, $generateData);
 
-                if($getInvoiceIssueFile['status'] == "OK"){
+                if ($getInvoiceIssueFile['status'] == "OK" && $request->mail) {
 
                     $sender = [
                         "email" => $generateData->sender_email,
@@ -616,13 +616,13 @@ class LogisticController extends Controller
                         'title' => 'SGMYANMAR Invoice Issue Notic',
                         "logistic" => '(SM...)',
                     ];
-        
+
                     $files = $getInvoiceIssueFile['fileName'];
                     $blade = 'invoice_issue';
 
                     $mailSend = $this->mailSend($sender, $files, $blade);
 
-                    if(!$mailSend){
+                    if (!$mailSend) {
                         $message = "$message but Send Mail Error";
                     }
                 }
@@ -685,7 +685,7 @@ class LogisticController extends Controller
             ->with('data', $generateData);
         $html->render();
         $mpdf->WriteHTML($html);
-        
+
         $fileName = "$invoiceNo.pdf";
         $storagePath = "invoice-issue/$form/";
 
@@ -702,7 +702,7 @@ class LogisticController extends Controller
         // return $mpdf->Output($fileName, 'i');
     }
 
-    public function updateShelfNo (Request $request)
+    public function updateShelfNo(Request $request)
     {
         $validator = Validator::make($request->all(), [
             "invoice_no"    => "required",
@@ -717,17 +717,17 @@ class LogisticController extends Controller
         }
         $data = $this->getInvoiceData($request);
 
-        if(empty($data)){
+        if (empty($data)) {
             return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
         }
 
         $data->shelf_no = $request->shelf_no;
         $data->update();
 
-        return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data]);       
+        return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data]);
     }
 
-    public function setEstimatedArrival (Request $request)
+    public function setEstimatedArrival(Request $request)
     {
         $validator = Validator::make($request->all(), [
             "invoice_no"    => "required",
@@ -742,7 +742,7 @@ class LogisticController extends Controller
         }
         $data = $this->getInvoiceData($request);
 
-        if(empty($data)){
+        if (empty($data)) {
             return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
         }
 
@@ -752,7 +752,7 @@ class LogisticController extends Controller
         return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data]);
     }
 
-    public function getInvoiceData ($request)
+    public function getInvoiceData($request)
     {
         $searchData = [];
         if (!empty($request->invoice_no) || !is_null($request->invoice_no)) {
