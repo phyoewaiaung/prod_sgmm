@@ -82,14 +82,16 @@
             <hr style='margin-bottom: 5px; height: 15px; background-color: grey' />
 
             <div>
-                <div align="left" style="width: 48%; float: left; text-align: center">
-                    <p><strong>Date & Time :</strong><span style='color: red'>{{ \Carbon\Carbon::parse($data['created_at'])->format('d-m-Y H:i:s')  }} </span></p>
+                <div align="left" style="width: 30%; float: left; text-align: center">
+                    <p><strong>Date & Time :</strong><span
+                            style='color: red'>{{ \Carbon\Carbon::now()->format('d-m-Y H:i:s') }}
+                        </span></p>
                     <p class='font-bold dark:text-gray-400'>
                         <strong>Name :</strong>
                         <span>{{ $data['sender_name'] }}</span>
                     </p>
                 </div>
-                <div align="right" style="width: 50%; float: right; text-align: right;">
+                <div align="right" style="width: 70%; float: right; text-align: right;">
                     <p class='font-bold text-center dark:text-gray-400'>
                         <strong>Delievery Mode :</strong>
                         @if ($data['form'] > 1)
@@ -173,13 +175,14 @@
                                 <td style="border-bottom: 1px solid black;"> $ {{ $cat['total_price'] }}</td>
                             </tr>
                         @endforeach
-                        
+
                         <tr>
                             <td style="border-bottom: 1px solid black;"></td>
                             <td style="border-bottom: 1px solid black;">Total Weight</td>
                             <td style="border-bottom: 1px solid black;">{{ $request->total_weight }}</td>
                             <td style="border-bottom: 1px solid black;">handling fee 3 kg</td>
-                            <td style="border-bottom: 1px solid black;">{{ $data['handling_fee'] ? '$ 0.9' : '-' }}
+                            <td style="border-bottom: 1px solid black;">
+                                {{ $data['handling_fee'] == 1 ? '$ 0.9' : '-' }}
                             </td>
                         </tr>
                         <tr>
@@ -188,7 +191,7 @@
                                 {{ $data['form'] == 1 ? 'SG Home PickUp :' : 'Yangon Home PickUp' }}
                             </td>
                             <td style="border-bottom: 1px solid black; text-align: start;" colSpan='2'>
-                                {{ $request->pickup }}
+                                {{ $request->pickup ? 'Yes' : 'No' }}
                             </td>
                             <td style="border-bottom: 1px solid black;">
                                 $ {{ $request->pickupAmt }}
@@ -197,7 +200,7 @@
                         <tr>
                             <td style="border-bottom: 1px solid black;"></td>
                             <td style="border-bottom: 1px solid black;">
-                                {{ $data['form'] == 1 ? "SG Home Delivery / Self Collection:" : "Home/ Bus Station deliver:" }}                                
+                                {{ $data['form'] == 1 ? 'SG Home Delivery / Self Collection:' : 'Home/ Bus Station deliver:' }}
                             </td>
                             <td style="border-bottom: 1px solid black; text-align: start;" colSpan='2'>
                                 {{ $request->collection_type }}
