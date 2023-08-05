@@ -50,22 +50,44 @@
             </div>
 
             <div align="left" style="width: 55%; float: right;">
-                <div style="margin-bottom: 15px;">
-                    <p>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</p>
-                    <p>Contact: +65 9325 0329</p>
-                </div>
-                <div>
-                    <div align="left" style="width: 48%; float: left; margin-right: 10px">
-                        {{-- <h4 class=''>Myanmar Branch(South Okkalapa)</h4> --}}
+
+                @if ($data['form'] == 1)
+                    <div style="margin-bottom: 15px;">
+                        <p>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</p>
+                        <p>Contact: +65 9325 0329</p>
+                    </div>
+                    <div>
+                        <div align="left" style="width: 48%; float: left; margin-right: 10px">
+                            {{-- <h4 class=''>Myanmar Branch(South Okkalapa)</h4> --}}
+                            <p>No. 642, Thanthumar Street, 10 Ward, South Okkalapa, Yangon</p>
+                            <p>Contact: +959 962 507 694</p>
+                        </div>
+                        <div align="right" style="width: 48%; float: right;">
+                            <p class=''>Myanmar Branch(Alone)</p>
+                            <p>အမှတ် ၂၂ / သိပ္ပံလမ်း / အလုံမြို့နယ်</p>
+                            <p>Contact: 09958450219</p>
+                        </div>
+                    </div>                    
+                @elseif ($data['form'] == 2)
+                    <div style="margin-bottom: 15px;">
+                        <p>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</p>
+                        <p>Contact: +65 9325 0329</p>
                         <p>No. 642, Thanthumar Street, 10 Ward, South Okkalapa, Yangon</p>
                         <p>Contact: +959 962 507 694</p>
+
+                        <p style="margin-top: 5px"> sgmm@sgmyanmar.com / www.sgmyanmar.com "</p>
                     </div>
-                    <div align="right" style="width: 48%; float: right;">
-                        <p class=''>Myanmar Branch(Alone)</p>
+                @elseif ($data['form'] == 3)
+                    <div style="margin-bottom: 15px;">
+                        <p>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</p>
+                        <p>Contact: +65 9325 0329</p>
                         <p>အမှတ် ၂၂ / သိပ္ပံလမ်း / အလုံမြို့နယ်</p>
                         <p>Contact: 09958450219</p>
+
+                        <p style="margin-top: 5px"> sgmm@sgmyanmar.com / www.sgmyanmar.com "</p>
                     </div>
-                </div>
+
+                @endif
 
                 <div style="margin-top: 15px;">
                     <div align="left" style="width: 50%; float: left;">
@@ -75,6 +97,7 @@
                         <h4>VR- {{ $data['invoice_no'] }}</h4>
                     </div>
                 </div>
+
             </div>
         </header>
 
@@ -122,12 +145,23 @@
                 <div align="left" style="width: 50%; float: left; text-align: center;">
                     <div style="margin: auto; width: 80%">
                         <p style="font-weight: bolder; text-align: start">Shipping Information</p>
-                        <p
-                            style='background-color: #B6E0CC; padding: 5px 10px; text-align: start; border: 1px solid black'>
-                            {{-- No. 21,Block C,Thiri Yadanar Retail and Wholesale Market, Thudhamma Road, North Okkalapa
-                            Tsp.Yangon --}}
-                            {{ $data['receiver_address'] }}
-                        </p>
+                        @if ($data['form'] == 1)
+                            <p
+                                style='background-color: #B6E0CC; padding: 5px 10px; text-align: start; border: 1px solid black'>
+                                {{ $data['receiver_address'] }}
+                            </p>
+                            
+                        @elseif ($data['form'] == 2)
+                            <p
+                                style='background-color: #abe2cf; padding: 5px 10px; text-align: start; border: 1px solid black'>
+                                {{ $data['receiver_address'] }}
+                            </p>
+                        @elseif ($data['form'] == 3)
+                            <p
+                                style='background-color: #9ec6e9; padding: 5px 10px; text-align: start; border: 1px solid black'>
+                                {{ $data['receiver_address'] }}
+                            </p>
+                        @endif
                         <p><strong>Recipient Name :</strong> <span>{{ $data['receiver_name'] }}</span></p>
                         <p><strong>Recipient Contact Number :</strong> <span
                                 class=''>{{ $data['receiver_phone'] }}</span></p>
@@ -139,12 +173,22 @@
                 <div align="right" style="width: 50%; float: right; text-align: center;">
                     <div style="margin: auto; width: 80%">
                         <p style="font-weight: bolder; text-align: start">Billing Information</p>
-                        <p
-                            style='background-color: #B6E0CC; padding: 5px 10px; text-align: start; border: 1px solid black'>
-                            {{-- No. 21,Block C,Thiri Yadanar Retail and Wholesale Market, Thudhamma Road, North Okkalapa
-                            Tsp.Yangon --}}
-                            {{ $data['form'] == 1 ? $data['sg_address'] : $data['sender_address'] }}
-                        </p>
+                        @if ($data['form'] == 1)
+                            <p
+                                style='background-color: #B6E0CC; padding: 5px 10px; text-align: start; border: 1px solid black'>
+                                {{ $data['form'] == 1 ? $data['sg_address'] : $data['sender_address'] }}
+                            </p>
+                        @elseif ($data['form'] == 2)
+                            <p
+                                style='background-color: #abe2cf; padding: 5px 10px; text-align: start; border: 1px solid black'>
+                                {{ $data['form'] == 1 ? $data['sg_address'] : $data['sender_address'] }}
+                            </p>
+                        @elseif ($data['form'] == 3)
+                            <p
+                                style='background-color: #9ec6e9; padding: 5px 10px; text-align: start; border: 1px solid black'>
+                                {{ $data['form'] == 1 ? $data['sg_address'] : $data['sender_address'] }}
+                            </p>
+                        @endif
                         <p><strong>Sender Name :</strong> <span class="font-normal">{{ $data['sender_name'] }}</span>
                         </p>
                         <p><strong>Sender Contact Number :</strong> <span
