@@ -49,29 +49,7 @@ const InvoiceIssueIndex = (props) => {
 
     useEffect(() => {
         setCategories(props.data.category);
-        props.data.category.map(d => {
-            if (d.id == "1" && d.weight != null) {
-                setFoodWeight(d.weight);
-            }
-            if (d.id == "2" && d.weight != null) {
-                setClothWeight(d.weight);
-            }
-            if (d.id == "3" && d.weight != null) {
-                setCosmeticWeight(d.weight);
-            }
-            if (d.id == "4" && d.weight != null) {
-                setShoeWeight(d.weight);
-            }
-            if (d.id == "5" && d.weight != null) {
-                setElectronicWeight(d.weight);
-            }
-            if (d.id == "6" && d.weight != null) {
-                setFrozenWeight(d.weight);
-            }
-            if (d.id == "7" && d.weight != null) {
-                setOthersWeight(d.weight);
-            }
-        })
+
         const foodUnit = props.data.shipment_method ?
             props.data.shipment_method == "1" ?
                 "6.00" :
@@ -104,6 +82,36 @@ const InvoiceIssueIndex = (props) => {
                     props.data.shipment_method == "3" ?
                         "5.00" : "15" : "4.5";
 
+        props.data.category.map(d => {
+            if (d.id == "1" && d.weight != null) {
+                setFoodWeight(d.weight);
+                setTotalFood(parseFloat(d.weight * foodUnit).toFixed(2))
+            }
+            if (d.id == "2" && d.weight != null) {
+                setClothWeight(d.weight);
+                setTotalCloth(parseFloat(d.weight * foodUnit).toFixed(2));
+            }
+            if (d.id == "3" && d.weight != null) {
+                setCosmeticWeight(d.weight);
+                setTotalCosmetic(parseFloat(d.weight * cosmeticUnit).toFixed(2));
+            }
+            if (d.id == "4" && d.weight != null) {
+                setShoeWeight(d.weight);
+                setTotalShoe(parseFloat(d.weight * shoeUnit).toFixed(2));
+            }
+            if (d.id == "5" && d.weight != null) {
+                setElectronicWeight(d.weight);
+                setTotalElectronic(parseFloat(d.weight * electronicUnit).toFixed(2));
+            }
+            if (d.id == "6" && d.weight != null) {
+                setFrozenWeight(d.weight);
+                setTotalFrozen(parseFloat(d.weight * frozenUnit).toFixed(2));
+            }
+            if (d.id == "7" && d.weight != null) {
+                setOthersWeight(d.weight);
+                // setOthersWeight(parseFloat(d.weight * oth).toFixed(2));
+            }
+        })
         setFoodUnit(foodUnit);
         setShoeUnit(shoeUnit);
         setCosmeticUnit(cosmeticUnit);
@@ -192,7 +200,7 @@ const InvoiceIssueIndex = (props) => {
         setHandlingFee(!handlingFee);
     }
 
-    const updateClick = () => {
+    const updateClick = (mail) => {
         let data = categories.map(d => {
             if (d.id == "1") {
                 d.weight = foodWeight;
@@ -225,6 +233,7 @@ const InvoiceIssueIndex = (props) => {
         })
 
         let params = {
+            mail: mail,
             id: id,
             invoice_no: invoiceNo,
             category_data: data,
@@ -433,7 +442,7 @@ const InvoiceIssueIndex = (props) => {
                     <hr className='border mt-3 h-[15px] bg-gray-400 border-gray-400' />
                     <div className="flex md:flex-row flex-col md:justify-evenly mt-3">
                         <div className='text-center'>
-                            <h3 className="font-bold dark:text-gray-400">Date & Time :<span className='text-red-600 font-normal'>17/07/2023 17:35:30 </span></h3>
+                            <h3 className="font-bold dark:text-gray-400">Date & Time :<span className='text-red-600 font-normal'>{new Date().toLocaleString()}</span></h3>
                             <h3 className='font-bold dark:text-gray-400'>Name :<span className='font-normal'>{senderName}</span></h3>
                         </div>
                         <div>
@@ -733,10 +742,10 @@ const InvoiceIssueIndex = (props) => {
                         </div>
                         <div className='md:mr-[80px] md:mt-0 mt-4'>
                             <div>
-                                <button onClick={sendEmailClick} className='invoice-issue-button'>Send Email</button>
+                                <button onClick={() => updateClick(true)} className='invoice-issue-button'>Send Email</button>
                             </div>
                             <div className='mt-3'>
-                                <button onClick={updateClick} className='invoice-issue-button'>Update</button>
+                                <button onClick={() => updateClick(false)} className='invoice-issue-button'>Update</button>
                             </div>
                         </div>
                     </div>

@@ -5,14 +5,25 @@ import { createRoot } from 'react-dom/client';
 import { Link, createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { BrowserRouter } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import EventEmitter from './utils/EventEmitter';
 
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
 function AppWrapper({ App, props }) {
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const isAuth = props.initialPage.props.auth.user ? true : false;
+    const [isAuth,setIsAuth] = useState(false);
+
+    useEffect(()=> {
+        const onAuth = (eventData) => {
+            setIsAuth(eventData.auth);
+        }
+        const listener = EventEmitter.addListener("auth", onAuth);
+        return () => {
+            listener.remove();
+        }
+    })
 
     const themeClick = () => {
         setIsDarkMode(!isDarkMode);

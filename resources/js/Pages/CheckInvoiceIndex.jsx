@@ -26,10 +26,15 @@ const CheckInvoiceIndex = () => {
     }
     useEffect(() => {
         setLoading(true);
+
+        formload();
+    }, [])
+    
+    const formload = () => {
         axios.post('/logistic/search')
             .then(res => {
                 setLoading(false);
-                setInvoiceList(res.data.data)
+                setInvoiceList(res.data.data);
             })
             .catch(e => {
                 setLoading(false);
@@ -45,7 +50,7 @@ const CheckInvoiceIndex = () => {
                 })
             }
             )
-    }, [])
+    }
 
     const searchClick = () => {
         setLoading(true);
@@ -89,14 +94,31 @@ const CheckInvoiceIndex = () => {
     const setClick = (type, data) => {
         setShow(true);
         setModalInvoice(data.invoice_no);
+        setLocation(data.estimated_arrival);
+        setShelfNo(data.shelf_no);
         setType(type);
     }
 
-    const locationChange = (e) => {
-        setLocation(e.target.value);
+    const locationChange = (e, id) => {
+        setModalInvoice(id);
+        let data = invoiceList.map(d => {
+            if (d.invoice_no == id) {
+                d.estimated_arrival = e.target.value;
+                setLocation(e.target.value);
+            }
+            return d;
+        })
+        setInvoiceList(data);
     }
-    const shelfNoChange = (e) => {
-        setShelfNo(e.target.value);
+    const shelfNoChange = (e, id) => {
+        setModalInvoice(id);
+        let data = invoiceList.map(d => {
+            if (d.invoice_no == id) {
+                d.shelf_no = e.target.value;
+            }
+            return d;
+        })
+        setInvoiceList(data);
     }
 
     const saveOK = () => {
@@ -118,6 +140,7 @@ const CheckInvoiceIndex = () => {
                     progress: undefined,
                     theme: "dark",
                 });
+                formload();
             })
             .catch(e => {
                 setLoading(false);
@@ -223,13 +246,13 @@ const CheckInvoiceIndex = () => {
                                                         <td width={150}>{data.payment_status == "1" ? "Register" : "Collected"}</td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
-                                                                <input className='w-[120px]' type="text" value={location} onChange={locationChange} />
+                                                                <input className='dark:text-black w-[120px]' type="text" value={data.estimated_arrival} onChange={(e) => locationChange(e, data.invoice_no)} />
                                                                 <button onClick={() => setClick(1, data)} className='set-btn'>Set</button>
                                                             </div>
                                                         </td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
-                                                                <input className='w-[120px]' type="text" value={shelfNo} onChange={shelfNoChange} />
+                                                                <input className='dark:text-black w-[120px]' type="text" value={data.shelf_no} onChange={(e) => shelfNoChange(e, data.invoice_no)} />
                                                                 <button onClick={() => setClick(2, data)} className='set-btn'>Set</button>
                                                             </div>
                                                         </td>

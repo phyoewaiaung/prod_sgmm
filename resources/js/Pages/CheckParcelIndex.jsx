@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from '@inertiajs/react'
 import QrScanner from './QrScanner';
+import Loading from '@/Common/Loading';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CheckParcelIndex = (props) => {
 
+    const [loading, setLoading] = useState(false);
     const [receiptNo, setReceiptNo] = useState('');
     const [receiptNumber, setReceiptNumber] = useState('');
     const [estimatedArr, setEstimatedArr] = useState('');
@@ -11,6 +15,66 @@ const CheckParcelIndex = (props) => {
     const [collectionType, setCollectionType] = useState('');
     const [shelfNo, setShelfNo] = useState('');
     const [key, setKey] = useState('');
+
+    useEffect(() => {
+
+        if (receiptNumber != "") {
+            search();
+        }
+    }, [receiptNumber]);
+
+    const search = () => {
+        setLoading(true);
+        axios.post('/logistic/search', { invoice_no: receiptNo })
+            .then(res => {
+                setLoading(false);
+                if (res.data.data.length > 0) {
+                    toast.success('Data is found! Please Check!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    })
+                    setReceiptNumber(receiptNo);
+                    setEstimatedArr(res.data.data[0].estimated_arrival);
+                    setShelfNo(res.data.data[0].shelf_no);
+                    setTotalCost(res.data.data[0].total_price);
+                } else {
+                    setReceiptNumber("");
+                    setEstimatedArr("");
+                    setShelfNo("");
+                    setTotalCost("");
+                    toast.error('Data is not found!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    })
+                }
+            })
+            .catch(e => {
+                setLoading(false);
+                toast.error('Something Was Wrong!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                })
+            }
+            )
+    }
 
     const receiptNoChange = (e) => {
         setReceiptNo(e.target.value);
@@ -21,11 +85,25 @@ const CheckParcelIndex = (props) => {
     }
 
     const handelCallBack = (qrResult) => {
-        setReceiptNo((JSON.parse(qrResult)).id);
+        setReceiptNo(qrResult);
+        setReceiptNumber(qrResult);
     }
 
     return (
         <>
+            <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
+            <Loading start={loading} />
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
                 <Link href='/'>
                     <header className="flex justify-center mt-10">
@@ -46,7 +124,7 @@ const CheckParcelIndex = (props) => {
                         </h4>
                         <QrScanner qrParentCallBack={handelCallBack} />
                         <div className='lg:w-[40%] md:w-[50%] w-[60%] mt-3 relative'>
-                            <button className='absolute bg-gray-300 hover:bg-gray-400 p-2 font-bold rounded w-[100px] right-[-113px] top-[23px]'>Track</button>
+                            <button onClick={search} className='absolute bg-gray-300 hover:bg-gray-400 p-2 font-bold rounded w-[100px] right-[-113px] top-[23px]'>Track</button>
                             <div className=' dark:text-gray-400'>
                                 <label htmlFor="">Enter Receipt No:</label>
                             </div>
@@ -71,9 +149,9 @@ const CheckParcelIndex = (props) => {
                                 <label htmlFor="">Shelf No:</label>
                             </div>
                             <input className='bg-gray-300 mb-2 w-full' type="text" name="" id="" value={shelfNo} readOnly />
-                            <h4 className='w-full font-bold text-red-700'>Invoice issued data:</h4>
+                            <h4 className='w-full font-bold text-red-700'>Invoice issued date:</h4>
                         </div>
-                        {props.auth.user ?
+                        {props.auth.user?.role == "1" ?
                             <div className='mt-3 dark:bg-gray-400 bg-blue-200 p-5 font-serif lg:w-[40%] md:w-[50%] w-[100%] overflow-auto'>
                                 <h3 className="font-bold text-xl text-center mb-2">Office Use</h3>
                                 <hr className='mt-3 border mb-3 border-gray-400' />
