@@ -5,6 +5,7 @@ import Loading from '@/Common/Loading';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '@/Common/Modal';
+import Pagination from './Pagination';
 
 const CheckInvoiceIndex = () => {
     const [loading, setLoading] = useState(false);
@@ -16,6 +17,9 @@ const CheckInvoiceIndex = () => {
     const [type, setType] = useState("");
     const [location, setLocation] = useState("");
     const [shelfNo, setShelfNo] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalRow, setTotalRow] = useState('');
 
     const invoiceNoChange = (e) => {
         setInvoiceNo(e.target.value);
@@ -29,12 +33,15 @@ const CheckInvoiceIndex = () => {
 
         formload();
     }, [])
-    
+
     const formload = () => {
-        axios.post('/logistic/search')
+        axios.post('/logistic/search?page=1')
             .then(res => {
                 setLoading(false);
-                setInvoiceList(res.data.data);
+                setInvoiceList(res.data.data.data);
+                setTotalPages(res.data.data.last_page);
+                setCurrentPage(res.data.data.current_page);
+                setTotalRow(res.data.data.total);
             })
             .catch(e => {
                 setLoading(false);
@@ -52,17 +59,20 @@ const CheckInvoiceIndex = () => {
             )
     }
 
-    const searchClick = () => {
+    const searchClick = (page = 1) => {
         setLoading(true);
         let params = {
             invoice_no: invoiceNo,
             status: invoiceSts
         }
-        axios.post('/logistic/search', params)
+        axios.post('/logistic/search?page=' + page, params)
             .then(res => {
                 setLoading(false);
-                setInvoiceList(res.data.data)
-                if (res.data.data.length == 0) {
+                setInvoiceList(res.data.data.data);
+                setTotalPages(res.data.data.last_page);
+                setCurrentPage(res.data.data.current_page);
+                setTotalRow(res.data.data.total);
+                if (res.data.data.data.length == 0) {
                     toast.error('Data is not found!', {
                         position: "top-right",
                         autoClose: 2000,
@@ -157,6 +167,11 @@ const CheckInvoiceIndex = () => {
             })
 
     }
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        searchClick(pageNumber);
+    };
     return (
         <>
             <Modal
@@ -211,7 +226,7 @@ const CheckInvoiceIndex = () => {
                         </div>
                     </div>
                     <div className='text-center mt-3 mb-3'>
-                        <button onClick={searchClick} type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
+                        <button onClick={()=>searchClick()} type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
                             Search
                         </button>
                     </div>
@@ -272,6 +287,13 @@ const CheckInvoiceIndex = () => {
                                     </tbody>
                                 </table>
                             </div>
+                            {totalRow > 5 &&
+                                <Pagination
+                                    totalPages={totalPages}
+                                    currentPage={currentPage}
+                                    onPageChange={handlePageChange}
+                                />
+                            }
                         </>
                     }
                 </main>

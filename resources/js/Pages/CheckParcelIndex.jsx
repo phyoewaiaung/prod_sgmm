@@ -4,6 +4,7 @@ import QrScanner from './QrScanner';
 import Loading from '@/Common/Loading';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const CheckParcelIndex = (props) => {
 
@@ -15,20 +16,23 @@ const CheckParcelIndex = (props) => {
     const [collectionType, setCollectionType] = useState('');
     const [shelfNo, setShelfNo] = useState('');
     const [key, setKey] = useState('');
+    const [collectId, setCollectId] = useState('');
+    const [paymentId, setPaymentId] = useState('');
+    const [qrId, setQrId] = useState('');
 
     useEffect(() => {
 
-        if (receiptNumber != "") {
+        if (qrId != "") {
             search();
         }
-    }, [receiptNumber]);
+    }, [qrId]);
 
     const search = () => {
         setLoading(true);
         axios.post('/logistic/search', { invoice_no: receiptNo })
             .then(res => {
                 setLoading(false);
-                if (res.data.data.length > 0) {
+                if (res.data.data.data.length > 0) {
                     toast.success('Data is found! Please Check!', {
                         position: "top-right",
                         autoClose: 2000,
@@ -40,14 +44,15 @@ const CheckParcelIndex = (props) => {
                         theme: "dark",
                     })
                     setReceiptNumber(receiptNo);
-                    setEstimatedArr(res.data.data[0].estimated_arrival);
-                    setShelfNo(res.data.data[0].shelf_no);
-                    setTotalCost(res.data.data[0].total_price);
+                    setEstimatedArr(res.data.data.data[0].estimated_arrival);
+                    setShelfNo(res.data.data.data[0].shelf_no);
+                    setTotalCost(res.data.data.data[0].total_price);
                 } else {
                     setReceiptNumber("");
                     setEstimatedArr("");
                     setShelfNo("");
                     setTotalCost("");
+                    setQrId("");
                     toast.error('Data is not found!', {
                         position: "top-right",
                         autoClose: 2000,
@@ -62,6 +67,7 @@ const CheckParcelIndex = (props) => {
             })
             .catch(e => {
                 setLoading(false);
+                setQrId("");
                 toast.error('Something Was Wrong!', {
                     position: "top-right",
                     autoClose: 2000,
@@ -87,6 +93,19 @@ const CheckParcelIndex = (props) => {
     const handelCallBack = (qrResult) => {
         setReceiptNo(qrResult);
         setReceiptNumber(qrResult);
+        setQrId(qrResult);
+    }
+
+    const collectChange = (e) => {
+        setCollectId(e.target.value);
+    }
+
+    const paymentChange = (e) => {
+        setPaymentId(e.target.value);
+    }
+
+    const updateClick = () => {
+        // axios.post('/check-parcel')
     }
 
     return (
@@ -160,9 +179,9 @@ const CheckParcelIndex = (props) => {
                                         <label htmlFor="">Collection Status:</label>
                                     </div>
                                     <div>
-                                        <select name="" id="">
-                                            <option value="1">Collected</option>
-                                            <option value="2">Not Collected</option>
+                                        <select >
+                                            <option value="1" onChange={collectChange}>Collected</option>
+                                            <option value="2" onChange={collectChange}>Not Collected</option>
                                         </select>
                                     </div>
                                 </div>
@@ -171,11 +190,11 @@ const CheckParcelIndex = (props) => {
                                         <label htmlFor="">Payment Type:</label>
                                     </div>
                                     <div>
-                                        <select name="" id="">
-                                            <option value="1">Cash</option>
-                                            <option value="2">Paynow TZ</option>
-                                            <option value="3">Paynow SGMM</option>
-                                            <option value="4">Paid</option>
+                                        <select>
+                                            <option value="1" onChange={paymentChange}>Cash</option>
+                                            <option value="2" onChange={paymentChange}>Paynow TZ</option>
+                                            <option value="3" onChange={paymentChange}>Paynow SGMM</option>
+                                            <option value="4" onChange={paymentChange}>Paid</option>
                                         </select>
                                     </div>
                                 </div>
@@ -187,7 +206,7 @@ const CheckParcelIndex = (props) => {
                                         <input type="text" name="" id="" value={key} onChange={keyChange} />
                                     </div>
                                     <div className='md:mt-0 mt-3'>
-                                        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
+                                        <button onClick={updateClick} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
                                             Update
                                         </button>
                                     </div>
