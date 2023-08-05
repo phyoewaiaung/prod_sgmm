@@ -5,6 +5,7 @@ import Loading from '@/Common/Loading';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '@/Common/Modal';
+import Pagination from './Pagination';
 
 const CheckInvoiceIndex = () => {
     const [loading, setLoading] = useState(false);
@@ -14,6 +15,11 @@ const CheckInvoiceIndex = () => {
     const [show, setShow] = useState(false);
     const [modalInvoice, setModalInvoice] = useState("");
     const [type, setType] = useState("");
+    const [location, setLocation] = useState("");
+    const [shelfNo, setShelfNo] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalRow, setTotalRow] = useState('');
 
     const invoiceNoChange = (e) => {
         setInvoiceNo(e.target.value);
@@ -24,10 +30,18 @@ const CheckInvoiceIndex = () => {
     }
     useEffect(() => {
         setLoading(true);
-        axios.post('/logistic/search')
+
+        formload();
+    }, [])
+
+    const formload = () => {
+        axios.post('/logistic/search?page=1')
             .then(res => {
                 setLoading(false);
-                setInvoiceList(res.data.data)
+                setInvoiceList(res.data.data.data);
+                setTotalPages(res.data.data.last_page);
+                setCurrentPage(res.data.data.current_page);
+                setTotalRow(res.data.data.total);
             })
             .catch(e => {
                 setLoading(false);
@@ -43,19 +57,22 @@ const CheckInvoiceIndex = () => {
                 })
             }
             )
-    }, [])
+    }
 
-    const searchClick = () => {
+    const searchClick = (page = 1) => {
         setLoading(true);
         let params = {
             invoice_no: invoiceNo,
             status: invoiceSts
         }
-        axios.post('/logistic/search', params)
+        axios.post('/logistic/search?page=' + page, params)
             .then(res => {
                 setLoading(false);
-                setInvoiceList(res.data.data)
-                if (res.data.data.length == 0) {
+                setInvoiceList(res.data.data.data);
+                setTotalPages(res.data.data.last_page);
+                setCurrentPage(res.data.data.current_page);
+                setTotalRow(res.data.data.total);
+                if (res.data.data.data.length == 0) {
                     toast.error('Data is not found!', {
                         position: "top-right",
                         autoClose: 2000,
@@ -87,16 +104,82 @@ const CheckInvoiceIndex = () => {
     const setClick = (type, data) => {
         setShow(true);
         setModalInvoice(data.invoice_no);
+        setLocation(data.estimated_arrival);
+        setShelfNo(data.shelf_no);
         setType(type);
     }
 
+    const locationChange = (e, id) => {
+        setModalInvoice(id);
+        let data = invoiceList.map(d => {
+            if (d.invoice_no == id) {
+                d.estimated_arrival = e.target.value;
+                setLocation(e.target.value);
+            }
+            return d;
+        })
+        setInvoiceList(data);
+    }
+    const shelfNoChange = (e, id) => {
+        setModalInvoice(id);
+        let data = invoiceList.map(d => {
+            if (d.invoice_no == id) {
+                d.shelf_no = e.target.value;
+            }
+            return d;
+        })
+        setInvoiceList(data);
+    }
+
+    const saveOK = () => {
+        setShow(false);
+        setLoading(true);
+        let url = type == "1" ? "/set-arrival" : "/update-shelf";
+        let params = type == "1" ? { invoice_no: modalInvoice, arrival: location } : { invoice_no: modalInvoice, shelf_no: shelfNo }
+        let text = type == "1" ? "LOCATION" : "SHELF NO";
+        axios.post(url, params)
+            .then(data => {
+                setLoading(false);
+                toast.success('Successfully Update ' + text + '!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+                formload();
+            })
+            .catch(e => {
+                setLoading(false);
+                toast.error('Fail To Update ' + text + '!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            })
+
+    }
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        searchClick(pageNumber);
+    };
     return (
         <>
             <Modal
-            show={show}
-            invoiceNo = {modalInvoice}
-            type={type}
-            onClose={()=> setShow(false)}
+                show={show}
+                invoiceNo={modalInvoice}
+                type={type}
+                onClose={() => setShow(false)}
+                saveOK={saveOK}
             />
             <ToastContainer
                 position="top-right"
@@ -143,7 +226,7 @@ const CheckInvoiceIndex = () => {
                         </div>
                     </div>
                     <div className='text-center mt-3 mb-3'>
-                        <button onClick={searchClick} type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
+                        <button onClick={()=>searchClick()} type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
                             Search
                         </button>
                     </div>
@@ -178,14 +261,14 @@ const CheckInvoiceIndex = () => {
                                                         <td width={150}>{data.payment_status == "1" ? "Register" : "Collected"}</td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
-                                                                <input className='w-[120px]' type="text" value="" onChange={(e) => locationChange(e, data.invoice_no)} />
-                                                                <button onClick={()=>setClick(1,data)} className='set-btn'>Set</button>
+                                                                <input className='dark:text-black w-[120px]' type="text" value={data.estimated_arrival} onChange={(e) => locationChange(e, data.invoice_no)} />
+                                                                <button onClick={() => setClick(1, data)} className='set-btn'>Set</button>
                                                             </div>
                                                         </td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
-                                                                <input className='w-[120px]' type="text" value="" onChange={(e) => shelfNoChange(e, data.invoice_no)} />
-                                                                <button onClick={()=>setClick(2,data)} className='set-btn'>Set</button>
+                                                                <input className='dark:text-black w-[120px]' type="text" value={data.shelf_no} onChange={(e) => shelfNoChange(e, data.invoice_no)} />
+                                                                <button onClick={() => setClick(2, data)} className='set-btn'>Set</button>
                                                             </div>
                                                         </td>
                                                         <td width={120}>
@@ -204,6 +287,13 @@ const CheckInvoiceIndex = () => {
                                     </tbody>
                                 </table>
                             </div>
+                            {totalRow > 5 &&
+                                <Pagination
+                                    totalPages={totalPages}
+                                    currentPage={currentPage}
+                                    onPageChange={handlePageChange}
+                                />
+                            }
                         </>
                     }
                 </main>
