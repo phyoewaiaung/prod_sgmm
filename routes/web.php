@@ -51,6 +51,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/set-arrival', [LogisticController::class, 'setEstimatedArrival'])->name('set-arrival');
 });
 
+# Track Parcel
+Route::post('/track-parcel', [LogisticController::class, 'trackParcel'])->name('track-parcel');
+
+
 /**** Pages */
 Route::get('/check-parcel', function () {
     return Inertia::render('CheckParcelIndex');

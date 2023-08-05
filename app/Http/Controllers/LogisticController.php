@@ -11,17 +11,22 @@ use App\Models\SgtoMmItem;
 use Illuminate\Http\Request;
 use App\Models\MmCategoryItem;
 use App\Models\SgCategoryItem;
+use App\Traits\CommonTrait;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
 
 class LogisticController extends Controller
 {
+    use CommonTrait;
 
     public function saveSGtoMM(Request $request)
     {
@@ -314,28 +319,28 @@ class LogisticController extends Controller
             ->exists();
     }
 
-    public function mailSend($data, $file, $blade)
-    {
-        try {
-            $files = [
-                public_path("storage/$file")
-            ];
+    // public function mailSend($data, $file, $blade)
+    // {
+    //     try {
+    //         $files = [
+    //             public_path("storage/$file")
+    //         ];
 
-            Mail::send("mail.$blade", $data, function ($message) use ($data, $files) {
-                $message->to($data["email"])
-                    ->subject($data["title"]);
+    //         Mail::send("mail.$blade", $data, function ($message) use ($data, $files) {
+    //             $message->to($data["email"])
+    //                 ->subject($data["title"]);
 
-                foreach ($files as $file) {
-                    $message->attach($file);
-                }
-            });
+    //             foreach ($files as $file) {
+    //                 $message->attach($file);
+    //             }
+    //         });
 
-            return true;
-        } catch (\Exception $e) {
-            Log::info($e);
-            return false;
-        }
-    }
+    //         return true;
+    //     } catch (\Exception $e) {
+    //         Log::info($e);
+    //         return false;
+    //     }
+    // }
 
     public function search(Request $request)
     {
@@ -363,6 +368,8 @@ class LogisticController extends Controller
                     array_push($returndData, $data);
                 }
             };
+
+            $returndData = $this->paginate($returndData);
             return response()->json(['status' => 200, 'data' => $returndData]);
         } else {
             return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
@@ -772,4 +779,55 @@ class LogisticController extends Controller
         }
         return $data;
     }
+
+    // public function paginate($items, $perPage = null, $page = null,$options = [])
+    // {
+    //     $paginateLimit  = 10;
+    //     $perPage        = $perPage ? (int)$perPage : $paginateLimit;
+    //     $page           = $page ?: (Paginator::resolveCurrentPage() ?: config('ONE'));
+    //     $items          = $items instanceof Collection ? $items : Collection::make($items);
+    //     $returnData     = [];
+    //     foreach ($items->forPage($page, $perPage) as  $data) {
+    //         array_push($returnData, $data);
+    //     }
+    //     return new LengthAwarePaginator($returnData, $items->count(), $perPage, $page, $options);
+    // }
+
+    public function trackParcel (Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "invoice_no"    => "required",
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'    =>  'NG',
+                'message'   =>  $validator->errors()->all(),
+            ], 422);
+        }
+
+        $searchData = [];
+        if (!empty($request->invoice_no) || !is_null($request->invoice_no)) {
+            $searchData[] = ['invoice_no', $request->invoice_no];
+        }
+
+        // $returndData = [];
+        $SGMM = SgtoMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price')->first();
+        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price')->first();
+
+        if(!empty($SGMM) || !empty($MMSG)) {
+            if (!empty($MMSG)) {
+                $data = $MMSG;
+            }
+            if (!empty($SGMM)) {
+                $data = $SGMM;
+            };
+            return response()->json(['status' => 200, 'data' => $data]);
+        }else {
+            return response()->json(['status' => 404, 'message' => "Data is not Found !"]);
+        }
+
+        return $request;
+    }
+
 }
