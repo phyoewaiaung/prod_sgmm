@@ -67,7 +67,7 @@
                             <p>အမှတ် ၂၂ / သိပ္ပံလမ်း / အလုံမြို့နယ်</p>
                             <p>Contact: 09958450219</p>
                         </div>
-                    </div>                    
+                    </div>
                 @elseif ($data['form'] == 2)
                     <div style="margin-bottom: 15px;">
                         <p>111 North Bridge Road, #02-02A, Peninsula Plaza, Singapore 179098</p>
@@ -86,7 +86,6 @@
 
                         <p style="margin-top: 5px"> sgmm@sgmyanmar.com / www.sgmyanmar.com "</p>
                     </div>
-
                 @endif
 
                 <div style="margin-top: 15px;">
@@ -150,7 +149,6 @@
                                 style='background-color: #B6E0CC; padding: 5px 10px; text-align: start; border: 1px solid black'>
                                 {{ $data['receiver_address'] }}
                             </p>
-                            
                         @elseif ($data['form'] == 2)
                             <p
                                 style='background-color: #abe2cf; padding: 5px 10px; text-align: start; border: 1px solid black'>
@@ -259,7 +257,13 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <td colSpan='2'><b>PayNow to mobile 93250329 or UEN number 53413642K</b></td>
+                            @if ($data['form'] == 1)
+                                <td colSpan='2'><b>PayNow to mobile 93250329 or UEN number 53413642K</b></td>
+                            @elseif ($data['form'] == 2)
+                                <td colSpan='2'><b>PayNow to SGMYANMAR UEN 53413642K or 93250329</b></td>
+                            @elseif ($data['form'] == 3)
+                                <td colSpan='2'><b>PayNow to UEN 53413642K or 93250329</b></td>
+                            @endif
                             <td><strong>TOTAL</strong></td>
                             <td>$ {{ $request->total_amount }}</td>
                         </tr>
@@ -276,11 +280,20 @@
             <div style="margin-top: 10px;">
                 <div align="left" style="width: 70%; float: left;">
                     <h4 style="margin-bottom: 5px;">Terms & Conditions:</h4>
-                    <p>1. All prices stated here are in Singapore Dollars</p>
-                    <p>2. Any illegal items will not be accepted</p>
-                    <p>3. Arrival schedule might change due to unforeseen circumstances</p>
-                    <p>4. We are not responsible for damaged items that are not declared</p>
-
+                    @if ($data['form'] == 1)
+                        <p>1. All prices stated here are in Singapore Dollars</p>
+                        <p>2. Any illegal items will not be accepted</p>
+                        <p>3. Arrival schedule might change due to unforeseen circumstances</p>
+                        <p>4. We are not responsible for damaged items that are not declared</p>
+                    @else
+                        <p>1. All prices stated here are in Singapore Dollars</p>
+                        <p>2. Any illegal items will not be accepted</p>
+                        <p>3. Flight schedule might change due to unforeseen circumstances</p>
+                        <p>4. Due to tighter restriction, offload is expected to happen</p>
+                        <p>5. Please provide full address for SG Home Delivery</p>
+                        <p>6. ALL FROZEN FOOD to be packed and sealed properly</p>
+                        <p>7. Any Loss or Damage (except FROZEN FOOD) will be refunded 3 times of shipping fees</p>
+                    @endif
                     <span>Items Detail:</span>
                     <div>Filters</div>
                     <div>Special Instruction:</div>
