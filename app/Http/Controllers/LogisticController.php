@@ -130,17 +130,17 @@ class LogisticController extends Controller
                     }
                 }
             } else {
-                return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
+                return response()->json(['status' => 403, 'message' => 'Aleast one item must be selected'], 403);
             }
 
             DB::commit();
-            return response()->json(['status' => 200, 'message' => $message]);
+            return response()->json(['status' => 200, 'message' => $message], 200);
         } catch (\Exception $e) {
             Log::info(' ========================== saveSGtoMM Error Log ============================== ');
             Log::info($e);
             Log::info(' ========================== saveSGtoMM Error Log ============================== ');
             DB::rollback();
-            return response()->json(['status' => 500, 'message' => 'Something was Wrong']);
+            return response()->json(['status' => 500, 'message' => 'Something was Wrong'], 500);
         }
     }
 
@@ -290,17 +290,17 @@ class LogisticController extends Controller
                     }
                 }
             } else {
-                return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
+                return response()->json(['status' => 403, 'message' => 'Aleast one item must be selected'], 403);
             }
 
             DB::commit();
-            return response()->json(['status' => 200, 'message' => $message]);
+            return response()->json(['status' => 200, 'message' => $message], 200);
         } catch (\Exception $e) {
             Log::info(' ========================== saveMMtoSG Error Log ============================== ');
             Log::info($e);
             Log::info(' ========================== saveMMtoSG Error Log ============================== ');
             DB::rollback();
-            return response()->json(['status' => 500, 'message' => 'Something Was Wrong']);
+            return response()->json(['status' => 500, 'message' => 'Something Was Wrong'], 500);
         }
     }
 
@@ -363,9 +363,9 @@ class LogisticController extends Controller
             };
 
             $returndData = $this->paginate($returndData, 5);
-            return response()->json(['status' => 200, 'data' => $returndData]);
+            return response()->json(['status' => 200, 'data' => $returndData], 200);
         } else {
-            return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !'], 404);
         }
     }
 
@@ -553,7 +553,7 @@ class LogisticController extends Controller
                     $requestCategoryData = collect($request->category_data)->pluck('id')->sort()->values();
 
                     if ($dbCategoryData != $requestCategoryData) {
-                        return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !']);
+                        return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !'], 403);
                     }
                     foreach ($request->category_data as $updateCat) {
                         $updateData = MmCategoryItem::where('mm_to_sg_id', $data->id)
@@ -582,7 +582,7 @@ class LogisticController extends Controller
                     $requestCategoryData = collect($request->category_data)->pluck('id')->sort()->values();
 
                     if ($dbCategoryData != $requestCategoryData) {
-                        return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !']);
+                        return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !'], 403);
                     }
                     foreach ($request->category_data as $updateCat) {
                         $updateData = SgCategoryItem::where('sg_to_mm_id', $data->id)
@@ -629,16 +629,16 @@ class LogisticController extends Controller
 
                 DB::commit();
 
-                return response()->json(['status' => 200, 'message' => $message]);
+                return response()->json(['status' => 200, 'message' => $message], 200);
             } catch (\Exception $e) {
                 Log::info(' ========================== Save Issue Error Log ============================== ');
                 Log::info($e);
                 Log::info(' ========================== Save Issue Error Log ============================== ');
                 DB::rollback();
-                return response()->json(['status' => 500, 'message' => 'Something Was Wrong']);
+                return response()->json(['status' => 500, 'message' => 'Something Was Wrong'], 500);
             }
         } else {
-            return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !'], 404);
         }
     }
 
@@ -718,13 +718,13 @@ class LogisticController extends Controller
         $data = $this->getInvoiceData($request);
 
         if (empty($data)) {
-            return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !'], 404);
         }
 
         $data->shelf_no = $request->shelf_no;
         $data->update();
 
-        return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data]);
+        return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data], 200);
     }
 
     public function setEstimatedArrival(Request $request)
@@ -743,13 +743,13 @@ class LogisticController extends Controller
         $data = $this->getInvoiceData($request);
 
         if (empty($data)) {
-            return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !'], 404);
         }
 
         $data->estimated_arrival = $request->arrival;
         $data->update();
 
-        return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data]);
+        return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data], 200);
     }
 
     public function getInvoiceData($request)
@@ -815,9 +815,9 @@ class LogisticController extends Controller
             if (!empty($SGMM)) {
                 $data = $SGMM;
             };
-            return response()->json(['status' => 200, 'data' => $data]);
+            return response()->json(['status' => 200, 'data' => $data], 200);
         } else {
-            return response()->json(['status' => 404, 'message' => "Data is not Found !"]);
+            return response()->json(['status' => 404, 'message' => "Data is not Found !"], 404);
         }
 
         return $request;
