@@ -33,20 +33,33 @@ const CheckParcelIndex = (props) => {
             .then(res => {
                 setLoading(false);
                 if (res.data.data.data.length > 0) {
-                    toast.success('Data is found! Please Check!', {
-                        position: "top-right",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "dark",
-                    })
-                    setReceiptNumber(receiptNo);
-                    setEstimatedArr(res.data.data.data[0].estimated_arrival);
-                    setShelfNo(res.data.data.data[0].shelf_no);
-                    setTotalCost(res.data.data.data[0].total_price);
+                    if (res.data.data.data[0].estimated_arrival == null && res.data.data.data[0].shelf_no == null && res.data.data.data[0].total_price == null) {
+                        toast.error('Data is not found!', {
+                            position: "top-right",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "dark",
+                        });
+                    } else {
+                        toast.success('Data is found! Please Check!', {
+                            position: "top-right",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "dark",
+                        })
+                        setReceiptNumber(receiptNo);
+                        setEstimatedArr(res.data.data.data[0].estimated_arrival);
+                        setShelfNo(res.data.data.data[0].shelf_no);
+                        setTotalCost(res.data.data.data[0].total_price);
+                    }
                 } else {
                     setReceiptNumber("");
                     setEstimatedArr("");

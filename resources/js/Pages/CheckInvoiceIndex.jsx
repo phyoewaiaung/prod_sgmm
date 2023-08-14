@@ -150,7 +150,7 @@ const CheckInvoiceIndex = () => {
                     progress: undefined,
                     theme: "dark",
                 });
-                formload();
+                searchClick(currentPage);
             })
             .catch(e => {
                 setLoading(false);
@@ -261,13 +261,13 @@ const CheckInvoiceIndex = () => {
                                                         <td width={150}>{data.payment_status == "1" ? "Register" : "Collected"}</td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
-                                                                <input className='dark:text-black w-[120px]' type="text" value={data.estimated_arrival} onChange={(e) => locationChange(e, data.invoice_no)} />
+                                                                <input className='dark:text-black w-[120px]' type="text" value={data.estimated_arrival == null ? "": data.estimated_arrival} onChange={(e) => locationChange(e, data.invoice_no)} />
                                                                 <button onClick={() => setClick(1, data)} className='set-btn'>Set</button>
                                                             </div>
                                                         </td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
-                                                                <input className='dark:text-black w-[120px]' type="text" value={data.shelf_no} onChange={(e) => shelfNoChange(e, data.invoice_no)} />
+                                                                <input className='dark:text-black w-[120px]' type="text" value={data.shelf_no == null ? "": data.shelf_no} onChange={(e) => shelfNoChange(e, data.invoice_no)} />
                                                                 <button onClick={() => setClick(2, data)} className='set-btn'>Set</button>
                                                             </div>
                                                         </td>
