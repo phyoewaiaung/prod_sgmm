@@ -12,17 +12,12 @@ use Illuminate\Http\Request;
 use App\Models\MmCategoryItem;
 use App\Models\SgCategoryItem;
 use App\Traits\CommonTrait;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
 
 class LogisticController extends Controller
 {
@@ -110,7 +105,6 @@ class LogisticController extends Controller
                     $data['item_category_id']   = $item;
                     $data['created_at']         = Carbon::now()->format("Y-m-d H:i:s");
                     $data['updated_at']         = Carbon::now()->format("Y-m-d H:i:s");
-                    // $data['weight']             = null;
                     array_push($items, $data);
                 }
 
@@ -118,36 +112,35 @@ class LogisticController extends Controller
 
                 $getParcelTagFile = $this->createPdf($logistic);
 
-                // if($getParcelTagFile['status'] == "OK"){
+                if ($getParcelTagFile['status'] == "OK") {
 
-                //     $sender = [
-                //         "email" => $logistic->sender_email,
-                //         "user_name" => $logistic->sender_name,
-                //         'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
-                //         "logistic" => '(SM...)',
-                //     ];
+                    $sender = [
+                        "email" => $logistic->sender_email,
+                        "user_name" => $logistic->sender_name,
+                        'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
+                        "logistic" => '(SM...)',
+                    ];
 
-                //     $files = $getParcelTagFile['fileName'];
-                //     $blade = 'sg_mm_save';
+                    $files = $getParcelTagFile['fileName'];
+                    $blade = 'sg_mm_save';
 
-                //     $mailSend = $this->mailSend($sender, $files, $blade);
-                //     if(!$mailSend){
-                //         $message = "$message but Send Mail Error";
-                //     }
-                // }
-
+                    $mailSend = $this->mailSend($sender, $files, $blade);
+                    if (!$mailSend) {
+                        $message = "$message but Send Mail Error";
+                    }
+                }
             } else {
-                return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
+                return response()->json(['status' => 403, 'message' => 'Aleast one item must be selected'], 403);
             }
 
             DB::commit();
-            return response()->json(['status' => 200, 'message' => $message]);
+            return response()->json(['status' => 200, 'message' => $message], 200);
         } catch (\Exception $e) {
             Log::info(' ========================== saveSGtoMM Error Log ============================== ');
             Log::info($e);
             Log::info(' ========================== saveSGtoMM Error Log ============================== ');
             DB::rollback();
-            return response()->json(['status' => 500, 'message' => 'Something was Wrong']);
+            return response()->json(['status' => 500, 'message' => 'Something was Wrong'], 500);
         }
     }
 
@@ -278,36 +271,36 @@ class LogisticController extends Controller
 
                 $getParcelTagFile = $this->createPdf($logistic, 2);
 
-                // if($getParcelTagFile['status'] == "OK"){
+                if ($getParcelTagFile['status'] == "OK") {
 
-                //     $sender = [
-                //         "email" => $logistic->sender_email,
-                //         "user_name" => $logistic->sender_name,
-                //         'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
-                //         "logistic" => '(SM...)',
-                //     ];
+                    $sender = [
+                        "email" => $logistic->sender_email,
+                        "user_name" => $logistic->sender_name,
+                        'title' => 'SGMYANMAR SG to MM Pick up acknowledgement',
+                        "logistic" => '(SM...)',
+                    ];
 
-                //     $files = $getParcelTagFile['fileName'];
-                //     $blade = 'sg_mm_save';
+                    $files = $getParcelTagFile['fileName'];
+                    $blade = 'sg_mm_save';
 
-                //     $mailSend = $this->mailSend($sender, $files, $blade);
+                    $mailSend = $this->mailSend($sender, $files, $blade);
 
-                //     if(!$mailSend){
-                //         $message = "$message but Send Mail Error";
-                //     }
-                // }
+                    if (!$mailSend) {
+                        $message = "$message but Send Mail Error";
+                    }
+                }
             } else {
-                return response()->json(['status' => 200, 'message' => 'Aleast one item must be selected']);
+                return response()->json(['status' => 403, 'message' => 'Aleast one item must be selected'], 403);
             }
 
             DB::commit();
-            return response()->json(['status' => 200, 'message' => $message]);
+            return response()->json(['status' => 200, 'message' => $message], 200);
         } catch (\Exception $e) {
             Log::info(' ========================== saveMMtoSG Error Log ============================== ');
             Log::info($e);
             Log::info(' ========================== saveMMtoSG Error Log ============================== ');
             DB::rollback();
-            return response()->json(['status' => 500, 'message' => 'Something Was Wrong']);
+            return response()->json(['status' => 500, 'message' => 'Something Was Wrong'], 500);
         }
     }
 
@@ -369,10 +362,10 @@ class LogisticController extends Controller
                 }
             };
 
-            $returndData = $this->paginate($returndData);
-            return response()->json(['status' => 200, 'data' => $returndData]);
+            $returndData = $this->paginate($returndData, 5);
+            return response()->json(['status' => 200, 'data' => $returndData], 200);
         } else {
-            return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !'], 404);
         }
     }
 
@@ -560,7 +553,7 @@ class LogisticController extends Controller
                     $requestCategoryData = collect($request->category_data)->pluck('id')->sort()->values();
 
                     if ($dbCategoryData != $requestCategoryData) {
-                        return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !']);
+                        return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !'], 403);
                     }
                     foreach ($request->category_data as $updateCat) {
                         $updateData = MmCategoryItem::where('mm_to_sg_id', $data->id)
@@ -589,7 +582,7 @@ class LogisticController extends Controller
                     $requestCategoryData = collect($request->category_data)->pluck('id')->sort()->values();
 
                     if ($dbCategoryData != $requestCategoryData) {
-                        return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !']);
+                        return response()->json(['status' => 403, 'message' => 'Cataegory Item are not same !'], 403);
                     }
                     foreach ($request->category_data as $updateCat) {
                         $updateData = SgCategoryItem::where('sg_to_mm_id', $data->id)
@@ -636,16 +629,16 @@ class LogisticController extends Controller
 
                 DB::commit();
 
-                return response()->json(['status' => 200, 'message' => $message]);
+                return response()->json(['status' => 200, 'message' => $message], 200);
             } catch (\Exception $e) {
                 Log::info(' ========================== Save Issue Error Log ============================== ');
                 Log::info($e);
                 Log::info(' ========================== Save Issue Error Log ============================== ');
                 DB::rollback();
-                return response()->json(['status' => 500, 'message' => 'Something Was Wrong']);
+                return response()->json(['status' => 500, 'message' => 'Something Was Wrong'], 500);
             }
         } else {
-            return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !'], 404);
         }
     }
 
@@ -725,13 +718,13 @@ class LogisticController extends Controller
         $data = $this->getInvoiceData($request);
 
         if (empty($data)) {
-            return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !'], 404);
         }
 
         $data->shelf_no = $request->shelf_no;
         $data->update();
 
-        return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data]);
+        return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data], 200);
     }
 
     public function setEstimatedArrival(Request $request)
@@ -750,13 +743,13 @@ class LogisticController extends Controller
         $data = $this->getInvoiceData($request);
 
         if (empty($data)) {
-            return response()->json(['status' => 404, 'message' => 'Data is Not Found !']);
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !'], 404);
         }
 
         $data->estimated_arrival = $request->arrival;
         $data->update();
 
-        return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data]);
+        return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data], 200);
     }
 
     public function getInvoiceData($request)
@@ -793,7 +786,7 @@ class LogisticController extends Controller
     //     return new LengthAwarePaginator($returnData, $items->count(), $perPage, $page, $options);
     // }
 
-    public function trackParcel (Request $request)
+    public function trackParcel(Request $request)
     {
         $validator = Validator::make($request->all(), [
             "invoice_no"    => "required",
@@ -815,19 +808,18 @@ class LogisticController extends Controller
         $SGMM = SgToMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price')->first();
         $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price')->first();
 
-        if(!empty($SGMM) || !empty($MMSG)) {
+        if (!empty($SGMM) || !empty($MMSG)) {
             if (!empty($MMSG)) {
                 $data = $MMSG;
             }
             if (!empty($SGMM)) {
                 $data = $SGMM;
             };
-            return response()->json(['status' => 200, 'data' => $data]);
-        }else {
-            return response()->json(['status' => 404, 'message' => "Data is not Found !"]);
+            return response()->json(['status' => 200, 'data' => $data], 200);
+        } else {
+            return response()->json(['status' => 404, 'message' => "Data is not Found !"], 404);
         }
 
         return $request;
     }
-
 }
