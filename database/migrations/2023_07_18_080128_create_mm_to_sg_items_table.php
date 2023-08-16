@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('mm_to_sg_items', function (Blueprint $table) {
             $table->id();
-            $table->string('sender_email');
+            $table->string('sender_email')->nullable();
             $table->string('sender_name');
             $table->string('sender_phone');
             $table->string('sender_address');
@@ -25,6 +25,7 @@ return new class extends Migration
             $table->tinyInteger('how_in_sg')->comment('1: SG Home Delivery ($5.90 within two days) 2: SG Home Delivery ($10.0 withtin one day) 3: Self Collection');
             $table->string('invoice_no');
             $table->tinyInteger('payment_type')->comment('1: SG Pay 2: MM Pay');
+            $table->string('pay_with')->nullable();
             $table->string('receiver_name');
             $table->string('receiver_phone');
             $table->string('receiver_address');

@@ -80,7 +80,7 @@ class LogisticController extends Controller
                     ]);
                 }
 
-                $no = $this->getInvoiceNo(['name' => 'SGMM']);
+                $no = $this->getInvoiceNo(['name' => 'SGMM', 'form' => 1]);
 
                 $logistic = SgToMmItem::create([
                     'sender_email' => $request->sender_email,
@@ -97,6 +97,8 @@ class LogisticController extends Controller
                     'receiver_phone' => $request->receiver_phone,
                     'form' => 1,
                     'note' => $request->note,
+                    'created_at' => now(),
+                    'updated_at' => null
                 ]);
 
                 $items = [];
@@ -144,46 +146,62 @@ class LogisticController extends Controller
         }
     }
 
+    # sample format 
+    # SG        -> SM23-08W3002
+    # Okkala    -> MS23-08W3F002
+    # Alone     -> MS23-08W3F502
     public function getInvoiceNo($data)
     {
-        // sample --> SM23-07W3006
         $date = today();
         $default = "";
-        $no = '001';
+        $no = '002';
         $carbonDate = Carbon::parse($date);
         $month = Carbon::parse($date)->format('m');
         $year = Carbon::parse($date)->format('y');
         $Y = Carbon::parse($date)->format('Y');
+        $dayAlpha = substr(Carbon::parse($date)->format('D'), 0, 1);
         $weekOfMonth = ceil(($carbonDate->day) / 7);
 
         $firstDayOfMonth = Carbon::createFromDate($Y, $month, 1)->startOfDay();
         $lastDayOfMonth = Carbon::createFromDate($Y, $month, 1)->endOfMonth()->endOfDay();
 
         if ($data['name'] === 'SGMM') {
-            $lastNo = SgToMmItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
-                ->orderBy('created_at', 'desc')->first();
-
+            $lastNo = SgToMmItem::orderBy('created_at', 'desc')->first();
             $default = "SM";
-        } else if ($data['name'] === 'MMSG') {
-            $lastNo = MmToSgItem::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
-                ->orderBy('created_at', 'desc')->first();
-            $default = "MS";
-        }
 
-        if (!empty($lastNo)) {
-            $dbNo = $lastNo->invoice_no;
-            $number = substr($dbNo, -3);
-            $incrementedNumber = (int)$number + 1;
-            $no = str_pad($incrementedNumber, strlen($number), '0', STR_PAD_LEFT);
+            if (!empty($lastNo)) {
+                $dbNo = $lastNo->invoice_no;
+
+                $number = substr($dbNo, 9);
+                $incrementedNumber = (int)$number + 1;
+                $no = str_pad($incrementedNumber, strlen($number), '0', STR_PAD_LEFT);
+            }
+            $invoiceNo = "$default$year-$month" . "W" . "$weekOfMonth$no";
+            return $invoiceNo;
+        } else if ($data['name'] === 'MMSG') {
+            if ($data['form'] == 2) {
+                $lastNo = MmToSgItem::where('invoice_no', 'like', '%MS%')->orderBy('created_at', 'desc')->first();
+                $default = "MS";
+            } else if ($data['form'] == 3) {
+                $lastNo = MmToSgItem::where('invoice_no', 'like', '%AS%')->orderBy('created_at', 'desc')->first();
+                $default = "AS";
+                $no = '502';
+            }
+            if (!empty($lastNo)) {
+                $dbNo = $lastNo->invoice_no;
+                $number = substr($dbNo, 10);
+                $incrementedNumber = (int)$number + 1;
+                $no = str_pad($incrementedNumber, strlen($number), '0', STR_PAD_LEFT);
+            }
+            $invoiceNo = "$default$year-$month" . "W" . "$weekOfMonth$dayAlpha$no";
+            return $invoiceNo;
         }
-        $invoiceNo = "$default$year-$month" . "W" . "$weekOfMonth$no";
-        return $invoiceNo;
     }
 
     public function saveMMtoSG(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "sender_email" => "required|email",
+            // "sender_email" => "required|email",
             "sender_name" => "required",
             "sender_phone" => "required",
             "sender_address" => "required",
@@ -237,7 +255,7 @@ class LogisticController extends Controller
                         'flag' => 2
                     ]);
                 }
-                $no = $this->getInvoiceNo(['name' => 'MMSG']);
+                $no = $this->getInvoiceNo(['name' => 'MMSG', 'form' => $request->form]);
                 $logistic = MmToSgItem::create([
                     'sender_email' => $request->sender_email,
                     'sender_name' => $request->sender_name,
@@ -255,12 +273,16 @@ class LogisticController extends Controller
                     'receiver_postal_code' => $request->receiver_postal_code,
                     'form' => $request->form,
                     'additional_instruction' => $request->additional_instruction,
+                    'created_at' => now(),
+                    'updated_at' => null
                 ]);
 
                 $items = [];
                 foreach ($request->items as $item) {
                     $data['mm_to_sg_id']        = $logistic->id;
-                    $data['item_category_id']   = $item;
+                    $data['item_category_id']   = $item['id'];
+                    $data['name']               = $item['name'];
+                    $data['weight']             = $item['weight'];
                     $data['created_at']         = Carbon::now()->format("Y-m-d H:i:s");
                     $data['updated_at']         = Carbon::now()->format("Y-m-d H:i:s");
                     // $data['weight']             = null;
@@ -271,7 +293,7 @@ class LogisticController extends Controller
 
                 $getParcelTagFile = $this->createPdf($logistic, 2);
 
-                if ($getParcelTagFile['status'] == "OK") {
+                if ($getParcelTagFile['status'] == "OK" && $logistic->email != null) {
 
                     $sender = [
                         "email" => $logistic->sender_email,
@@ -347,8 +369,8 @@ class LogisticController extends Controller
         }
 
         $returndData = [];
-        $SGMM = SgToMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price')->orderBy('created_at', 'desc')->get();
-        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price')->orderBy('created_at', 'desc')->get();
+        $SGMM = SgToMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
+        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
 
         if (!empty($MMSG) || !empty($SGMM)) {
             if (!empty($MMSG)) {
@@ -361,7 +383,9 @@ class LogisticController extends Controller
                     array_push($returndData, $data);
                 }
             };
-
+            $returndData = collect($returndData)->sortBy([
+                ['created_at', 'desc']
+            ]);
             $returndData = $this->paginate($returndData, 5);
             return response()->json(['status' => 200, 'data' => $returndData], 200);
         } else {
@@ -370,13 +394,12 @@ class LogisticController extends Controller
     }
 
     public function createPdf($data)
-    // public function createPdf ()
+    // public function createPdf()
     {
-        // $data = SgToMmItem::first();
-        // $data = MmToSgItem::first();
+        // $data = SgToMmItem::orderBy('id', 'desc')->first();
+        // $data = MmToSgItem::orderBy('id', 'desc')->first();
         $flag = $data->form;
         $invoiceNo = $data->invoice_no;
-        // return $data;
 
         $mpdf = new Mpdf([
             'tempDir' => storage_path('app/mpdf/custom/temp/dir/path'),
@@ -759,8 +782,8 @@ class LogisticController extends Controller
             $searchData[] = ['invoice_no', $request->invoice_no];
         }
         $data = null;
-        $SGMM = SgToMmItem::where($searchData)->first();
-        $MMSG = MmToSgItem::where($searchData)->first();
+        $SGMM = SgToMmItem::with('category')->where($searchData)->first();
+        $MMSG = MmToSgItem::with('category')->where($searchData)->first();
 
         if (!empty($MMSG) || !empty($SGMM)) {
             if (!empty($MMSG)) {
@@ -805,8 +828,8 @@ class LogisticController extends Controller
         }
 
         // $returndData = [];
-        $SGMM = SgToMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price')->first();
-        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price')->first();
+        $SGMM = SgToMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status as collection_status', 'estimated_arrival', 'shelf_no', 'total_price', 'how_in_ygn as collection_type', 'pay_with', 'updated_at')->first();
+        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status as collection_status', 'estimated_arrival', 'shelf_no', 'total_price', 'how_in_sg as collection_type', 'pay_with', 'updated_at')->first();
 
         if (!empty($SGMM) || !empty($MMSG)) {
             if (!empty($MMSG)) {
@@ -821,5 +844,26 @@ class LogisticController extends Controller
         }
 
         return $request;
+    }
+
+    public function deleteData(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "invoice_no"    => "required",
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'    =>  'NG',
+                'message'   =>  $validator->errors()->all(),
+            ], 422);
+        }
+
+        $data = $this->getInvoiceData($request);
+        // return $data;
+        $data->category()->delete();
+        $data->delete();
+
+        return 'del pp';
     }
 }
