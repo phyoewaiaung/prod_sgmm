@@ -10,10 +10,13 @@
         body {
             font-family: Arial, sans-serif;
         }
-        p, h5 {
+
+        p,
+        h5 {
             margin: 0;
             margin-bottom: 0;
         }
+
         .card {
             width: 100%;
             height: 100px;
@@ -21,22 +24,27 @@
             border: 0.3px solid black !important;
             display: inline-block;
         }
+
         .card-header {
             padding: 10px;
             border-top-left-radius: 5px;
             border-top-right-radius: 5px;
         }
+
         .card-title {
             font-size: 18px;
             margin: 0;
         }
+
         .card-subtitle {
             font-size: 14px;
             margin-top: 5px;
         }
+
         .card-body {
             padding: 10px;
         }
+
         .card-content {
             font-size: 16px;
         }
@@ -50,12 +58,12 @@
         <div style="width: 100%; border: 1px solid black; padding: 20px; border-radius: 5px;">
             {{-- logo and invoice section --}}
             <div align="left" class="">
-                <div align="left" style="width: 30%; float: left;">
-                    <img src="images/SGMYANMAR.png" width="100px" alt="">
+                <div align="left" style="width: 25%; float: left;">
+                    <img src="images/SGMYANMAR.png" width="150px" alt="">
                 </div>
                 <div>
-                    <div align="left" style="width: 50%; float: left;">
-                        <h2>{{ $data->invoice_no }}</h2>
+                    <div align="left" style="width: 60%; float: left;">
+                        <h1>{{ $data->invoice_no }}</h1>
                         @if ($data->shipment_method == 1)
                             <h6>Land (2 weeks from shipment)</h6>
                         @elseif ($data->shipment_method == 2)
@@ -68,8 +76,16 @@
                             <h6></h6>
                         @endif
                     </div>
-                    <div align="left" style="width: 50%; float: right;">
-                        <h2>SEA</h2>                    
+                    <div align="left" style="width: 35%; float: right;">
+                        @if ($data->shipment_method == 1 || $data->shipment_method == 2)
+                            <h2>LAND</h2>
+                        @elseif ($data->shipment_method == 3)
+                            <h2>SEA</h2>
+                        @elseif ($data->shipment_method == 4)
+                            <h2>AIR</h2>
+                        @else
+                            <h6></h6>
+                        @endif
                         {{-- <h5><strong>Date Time : </strong><span>{{ Carbon::parse($data->created_at)->format('d/m/Y  H:i:s') }}</span></h5> --}}
                         <h5><strong>Date Time : </strong><span>{{ $data->created_at }}</span></h5>
                     </div>
@@ -91,10 +107,10 @@
                         <div class="card-content" style="width:60%; float: right;">
                             : {{ $data->sender_name }} <br>
                             : {{ $data->sender_phone }} <br>
-                            : {{ $data->sg_address }} 
-                        </div>      
-            
-                    </div>        
+                            : {{ $data->sg_address }}
+                        </div>
+
+                    </div>
                 </div>
                 <p><strong>Special Instruction :</strong> <span>{{ $data->note }}</span></p>
                 @if ($data->how_in_ygn == 1)
@@ -109,7 +125,7 @@
                     <p></p>
                 @endif
             </div>
-        
+
             {{-- receiver section --}}
             <div align="left" style="width: 49%;float: right;">
                 <h5>To</h5>
@@ -126,8 +142,8 @@
                             : {{ $data->receiver_name }} <br>
                             : {{ $data->receiver_phone }} <br>
                             : {{ $data->receiver_address }}
-                        </div>     
-                    
+                        </div>
+
                     </div>
                 </div>
                 <p></p>
@@ -139,12 +155,12 @@
         <div style="width: 100%; border: 1px solid black; padding: 20px; border-radius: 5px;">
             {{-- logo and invoice section --}}
             <div align="left" class="">
-                <div align="left" style="width: 30%; float: left;">
-                    <img src="images/SGMYANMAR.png" width="100px" alt="">
+                <div align="left" style="width: 25%; float: left;">
+                    <img src="images/SGMYANMAR.png" width="150px" alt="">
                 </div>
                 <div>
-                    <div align="left" style="width: 50%; float: left;">
-                        <h2>{{ $data->invoice_no }}</h2>
+                    <div align="left" style="width: 60%; float: left;">
+                        <h1>{{ $data->invoice_no }}</h1>
                         @if ($data->transport == 1)
                             <h6>Sea Transport</h6>
                         @elseif ($data->transport == 2)
@@ -153,8 +169,14 @@
                             <h6></h6>
                         @endif
                     </div>
-                    <div align="left" style="width: 50%; float: right;">
-                        <h2>SEA</h2>                    
+                    <div align="left" style="width: 35%; float: right;">
+                        @if ($data->transport == 1)
+                            <h2>SEA</h2>
+                        @elseif ($data->transport == 2)
+                            <h2>AIR</h2>
+                        @else
+                            <h6></h6>
+                        @endif
                         {{-- <h5><strong>Date Time : </strong><span>{{ Carbon::parse($data->created_at)->format('d/m/Y  H:i:s') }}</span></h5> --}}
                         <h5><strong>Date Time : </strong><span>{{ $data->created_at }}</span></h5>
                     </div>
@@ -176,10 +198,10 @@
                         <div class="card-content" style="width:60%; float: right;">
                             : {{ $data->sender_name }} <br>
                             : {{ $data->sender_phone }} <br>
-                            : {{ $data->sender_address }} 
-                        </div>      
-            
-                    </div>        
+                            : {{ $data->sender_address }}
+                        </div>
+
+                    </div>
                 </div>
                 <p><strong>Special Instruction :</strong> <span>{{ $data->additional_instruction }}</span></p>
                 @if ($data->how_in_sg == 1)
@@ -192,7 +214,7 @@
                     <p></p>
                 @endif
             </div>
-        
+
             {{-- receiver section --}}
             <div align="left" style="width: 49%;float: right;">
                 <h5>To</h5>
@@ -209,8 +231,8 @@
                             : {{ $data->receiver_name }} <br>
                             : {{ $data->receiver_phone }} <br>
                             : {{ $data->receiver_address }}
-                        </div>     
-                    
+                        </div>
+
                     </div>
                 </div>
                 <p></p>

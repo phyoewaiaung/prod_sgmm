@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/save-issue', [LogisticController::class, 'saveIssue'])->name('save-issue');
     Route::post('/update-shelf', [LogisticController::class, 'updateShelfNo'])->name('update-shelf');
     Route::post('/set-arrival', [LogisticController::class, 'setEstimatedArrival'])->name('set-arrival');
+    Route::post('/delete', [LogisticController::class, 'deleteData'])->name('delete');
 });
 
 # Track Parcel

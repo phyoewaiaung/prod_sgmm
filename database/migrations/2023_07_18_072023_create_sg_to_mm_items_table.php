@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('invoice_no');
             $table->tinyInteger('how_in_ygn')->comment('1: Yangon Home Delivery($3.5) 2:Yangon Home Deliver Outside ($5.0) 3: Bus Gate ($3.5) 4: Self Collection');
             $table->tinyInteger('payment_type')->comment('1:SG Pay 2:MM Pay');
+            $table->string('pay_with')->nullable();
             $table->string('receiver_name');
             $table->string('receiver_address');
             $table->string('receiver_phone');
