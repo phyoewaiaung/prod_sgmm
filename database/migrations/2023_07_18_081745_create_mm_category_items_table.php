@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('mm_to_sg_id');
             $table->integer('item_category_id');
+            $table->string('name')->nullable();
             $table->string('weight')->nullable();
             $table->string('unit_price')->nullable();
             $table->string('total_price')->nullable();
