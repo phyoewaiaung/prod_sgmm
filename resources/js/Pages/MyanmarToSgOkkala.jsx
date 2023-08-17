@@ -372,12 +372,12 @@ const MyanmarToSgOkkala = () => {
                     setRecipientAddress("");
                     setRecipientPhone("");
                     setAdditionalOpt("");
-                    setWeightFood('');
-                    setWeightCloth('');
-                    setWeightCos('');
-                    setWeightFrozen('');
-                    setWeightOther('');
-                    setOtherCargo('')
+                    setWeightFood("");
+                    setWeightCloth("");
+                    setWeightCos("");
+                    setWeightFrozen("");
+                    setWeightOther("");
+                    setOtherCargo("")
                     cargoData.map(d => d.isChecked = false);
                 })
                 .catch((e) => {
