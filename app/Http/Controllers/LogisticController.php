@@ -796,10 +796,14 @@ class LogisticController extends Controller
 
         if (!empty($SGMM) || !empty($MMSG)) {
             if (!empty($MMSG)) {
+                $collectionType = ['SG Home Delivery within two days', 'SG Home Delivery within one day', 'Self Collection'];
                 $data = $MMSG;
+                $data->collection_type = $collectionType[$data->collection_type -  1];
             }
             if (!empty($SGMM)) {
+                $collectionType = ['Yangon Home Delivery Downtown', 'Yangon Home Deliver outside', 'Bus Gate', 'Self Collection'];
                 $data = $SGMM;
+                $data->collection_type = $collectionType[$data->collection_type -  1];
             };
             return response()->json(['status' => 200, 'data' => $data], 200);
         } else {
