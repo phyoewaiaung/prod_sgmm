@@ -184,7 +184,7 @@ const CheckInvoiceIndex = () => {
         setShow(false);
         setLoading(true);
         let text = type == "1" ? "LOCATION" : "SHELF NO";
-        axios.post('/delete', {invoice_no:deleteId})
+        axios.post('delete', {invoice_no:deleteId})
             .then(data => {
                 setLoading(false);
                 toast.success('Successfully Deleted!', {
@@ -268,7 +268,7 @@ const CheckInvoiceIndex = () => {
                                 {/* <input className='dark:bg-gray-400 mb-2 w-full' type="text" name="" id="" value={invoiceSts} onChange={invoiceStsChange} /> */}
                                 <select className='dark:bg-gray-400 mb-2 w-full cursor-pointer' onChange={invoiceStsChange} value={invoiceSts}>
                                     <option value="">Select Invoice Status</option>
-                                    <option value="1">Register</option>
+                                    <option value="1">Not Collected</option>
                                     <option value="2">Collected</option>
                                 </select>
                             </div>
@@ -310,7 +310,7 @@ const CheckInvoiceIndex = () => {
                                                         <td width={160}>{data.sender_name}</td>
                                                         <td width={160}>{data.receiver_name}</td>
                                                         <td width={100}>{data.payment_type == "1" ? "SG" : "MM"}</td>
-                                                        <td width={150}>{data.payment_status == "1" ? "Register" : "Collected"}</td>
+                                                        <td width={150}>{data.payment_status == "1" ? "Not Collected" : "Collected"}</td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
                                                                 <input className='dark:text-black w-[120px]' type="text" value={data.estimated_arrival == null ? "": data.estimated_arrival} onChange={(e) => locationChange(e, data.invoice_no)} />
