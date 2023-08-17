@@ -1,7 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300&display=swap');
+* {
+    font-family: "Barlow", sans-serif;
+    font-size: 15px;
+}
 .required:after {
     content: " *";
     color: red;
@@ -56,8 +60,8 @@ table tbody td {
     min-width: 950px;
     width: 100%;
 }
-.cancel-bg{
-    background:red;
+.cancel-bg {
+    background: red;
 }
 .invoice-issue-table td:nth-child(2) {
     text-align: start !important;
@@ -87,6 +91,10 @@ table tbody td {
     border: 1px solid lightslategray;
     background-color: #cfe2f3;
     padding: 7px;
+    border-radius: 2px;
+}
+.invoice-issue-button:hover {
+    background-color: #8dbde7;
 }
 .qr-style {
     width: 40%;
