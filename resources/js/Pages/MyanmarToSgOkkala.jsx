@@ -28,6 +28,7 @@ const MyanmarToSgOkkala = () => {
     const [weightFrozen, setWeightFrozen] = useState('');
     const [weightOther, setWeightOther] = useState('');
     const [storageTypeId, setStorageTypeId] = useState('');
+    const [otherCargo, setOtherCargo] = useState('');
 
     const [cargoData, setCargoData] = useState([
         { id: 1, name: "Food", isChecked: false },
@@ -147,6 +148,10 @@ const MyanmarToSgOkkala = () => {
         }
     }
 
+    const otherCargoChange = (e) => {
+        setOtherCargo(e.target.value);
+    }
+
     const storageTypeChange = (id) => {
         setStorageTypeId(id);
         document.getElementById('error-storage').textContent = "";
@@ -199,15 +204,15 @@ const MyanmarToSgOkkala = () => {
             }
         })
 
-        if (checkNullOrBlank(senderEmail)) {
-            document.getElementById('senderEmail').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            document.getElementById('senderEmail').style.border = '1px solid red';
-            let error = document.getElementById('error-sender-email');
-            error.textContent = 'Please Fill Sender Email!';
-            error.style.color = 'red';
-            error.style.marginTop = '10px';
-        }
-        else if (checkNullOrBlank(senderName)) {
+        // if (checkNullOrBlank(senderEmail)) {
+        //     document.getElementById('senderEmail').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        //     document.getElementById('senderEmail').style.border = '1px solid red';
+        //     let error = document.getElementById('error-sender-email');
+        //     error.textContent = 'Please Fill Sender Email!';
+        //     error.style.color = 'red';
+        //     error.style.marginTop = '10px';
+        // }
+        if (checkNullOrBlank(senderName)) {
             document.getElementById('senderName').scrollIntoView({ behavior: 'smooth', block: 'center' });
             document.getElementById('senderName').style.border = '1px solid red';
             let error = document.getElementById('error-sender-name');
@@ -305,6 +310,12 @@ const MyanmarToSgOkkala = () => {
                 "receiver_phone": recipientPhone,
                 "additional_instruction": additionalOpt,
                 "items": cargoArr,
+                "weight_food":weightFood,
+                "weight_cloth":weightCloth,
+                "weight_cosmetic":weightCos,
+                "weight_frozen":weightFrozen,
+                "weight_other":weightOther,
+                "other_cargo":otherCargo,
                 "form": "2"
             }
             axios.post('/logistic/mm-sg-save', params)
@@ -334,6 +345,12 @@ const MyanmarToSgOkkala = () => {
                     setRecipientAddress("");
                     setRecipientPhone("");
                     setAdditionalOpt("");
+                    setWeightFood('');
+                    setWeightCloth('');
+                    setWeightCos('');
+                    setWeightFrozen('');
+                    setWeightOther('');
+                    setOtherCargo('')
                     cargoData.map(d => d.isChecked = false);
                 })
                 .catch((e) => {
@@ -424,7 +441,7 @@ const MyanmarToSgOkkala = () => {
                     <div className=' pt-4 pb-4'>
                         <div className='me-4 ms-4'>
                             <div id='senderEmail' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
-                                <label htmlFor="" className='dark:text-gray-400 required mb-2'>Email</label>
+                                <label htmlFor="" className='dark:text-gray-400 mb-2'>Sender's Email</label>
                                 <input className=' dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="email" name="" id="" value={senderEmail} onChange={senderEmailChange} />
                                 <span id="error-sender-email"></span>
                             </div>
@@ -435,12 +452,12 @@ const MyanmarToSgOkkala = () => {
                             </div>
                             <div id='senderPhone' className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Sender's Contact Number / ပေးပို့သူ၏ ဖုန်းနံပါတ်</label>
-                                <input className=' dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderPhone} onChange={senderPhoneChange} />
+                                <input className=' dark:bg-gray-400 dark:text-black w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderPhone} onChange={senderPhoneChange} />
                                 <span id="error-sender-phone"></span>
                             </div>
                             <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='mb-2'>Sender's Address /ပေးပို့သူ၏ နေရပ်လိပ်စာ (optional)</label>
-                                <input className=' dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderAddress} onChange={senderAddressChange} />
+                                <input className=' dark:bg-gray-400 dark:text-black w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderAddress} onChange={senderAddressChange} />
                             </div>
                             <div id='transportId' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Sea Transport or Air Transport?</label>
@@ -460,6 +477,9 @@ const MyanmarToSgOkkala = () => {
                                             <div className='mb-2' key={data.id}>
                                                 <input className=' dark:bg-gray-400 focus:ring cursor-pointer focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="checkbox" id={data.name} value={data.id} onChange={function () { cargoOnChage(data.id) }} checked={data.isChecked} />
                                                 <label htmlFor={data.name} className='ms-2 cursor-pointer'>{data.name}</label>
+                                                {data.id == 7 &&
+                                                    <input className='dark:text-black dark:bg-gray-400 w-1/2 ml-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={otherCargo} onChange={otherCargoChange} />
+                                                }
                                             </div>
                                         )
                                     })}
@@ -521,52 +541,52 @@ const MyanmarToSgOkkala = () => {
                             </div>
                             <div id='rec-name' className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Name / လက်ခံမည့်သူ၏ နာမည်</label>
-                                <input className=' dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientName} onChange={recipientNameChange} />
+                                <input className='dark:text-black dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientName} onChange={recipientNameChange} />
                                 <span id="error-rec-name"></span>
                             </div>
                             <div id='rec-phone' className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Contact Number / လက်ခံမည့်သူ၏ ဖုန်းနံပါတ်</label>
-                                <input className=' dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientPhone} onChange={recipientPhoneChange} />
+                                <input className='dark:text-black dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientPhone} onChange={recipientPhoneChange} />
                                 <span id="error-rec-phone"></span>
                             </div>
                             <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='mb-2'>Recipient's Postal Code</label>
-                                <input className=' dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientPostalCode} onChange={recipientPostalCodeChange} />
+                                <input className='dark:text-black dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientPostalCode} onChange={recipientPostalCodeChange} />
                             </div>
                             <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='mb-2'>Recipient's Address /လက်ခံမည့်သူ၏ နေရပ်လိပ်စာ</label>
-                                <input className=' dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientAddress} onChange={recipientAddressChange} />
+                                <input className='dark:text-black dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientAddress} onChange={recipientAddressChange} />
                             </div>
                             <div className='flex dark:text-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='mb-2'>Additional Instructions? (optional)</label>
-                                <input className=' dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={additionalOpt} onChange={additionalOptChange} />
+                                <input className='dark:text-black dark:bg-gray-400 w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={additionalOpt} onChange={additionalOptChange} />
                             </div>
                             <div className='p-4 bg-gray-200 dark:bg-gray-900 dark:text-gray-400'>
                                 <h2 className='font-bold mb-3'>Weight of Cargo (leave blank if not sure)</h2>
                                 <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
                                     <div className='flex dark:text-gray-400 border-blue-300 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                         <label htmlFor="" className='mb-2'>Weight Of Food</label>
-                                        <input className=' dark:bg-gray-400  mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={weightFood} onChange={weightFoodChange} />
+                                        <input className='dark:text-black dark:bg-gray-400  mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={weightFood} onChange={weightFoodChange} />
                                     </div>
                                     <div className='flex dark:text-gray-400 border-blue-300 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                         <label htmlFor="" className='mb-2'>Weight Of Clothes</label>
-                                        <input className=' dark:bg-gray-400  mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={weightCloth} onChange={weightClothChange} />
+                                        <input className='dark:text-black dark:bg-gray-400  mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={weightCloth} onChange={weightClothChange} />
                                     </div>
                                 </div>
                                 <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
                                     <div className='flex dark:text-gray-400 border-blue-300 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                         <label htmlFor="" className='mb-2'>Weight of Cosmetics/Medicine  / Supplements</label>
-                                        <input className=' dark:bg-gray-400  mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={weightCos} onChange={weightCosChange} />
+                                        <input className='dark:text-black dark:bg-gray-400  mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={weightCos} onChange={weightCosChange} />
                                     </div>
                                     <div className='flex dark:text-gray-400 border-blue-300 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                         <label htmlFor="" className='mb-2'>Weight of Frozen Food</label>
-                                        <input className=' dark:bg-gray-400  mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={weightFrozen} onChange={weightFrozenChange} />
+                                        <input className='dark:text-black dark:bg-gray-400  mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={weightFrozen} onChange={weightFrozenChange} />
                                     </div>
                                 </div>
                                 <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
                                     <div className='flex dark:text-gray-400 border-blue-300 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                         <label htmlFor="" className='mb-2'>Weight of other items</label>
-                                        <input className=' dark:bg-gray-400  mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={weightOther} onChange={weightOtherChange} />
+                                        <input className='dark:text-black dark:bg-gray-400  mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={weightOther} onChange={weightOtherChange} />
                                     </div>
                                 </div>
                             </div>

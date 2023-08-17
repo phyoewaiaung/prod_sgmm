@@ -11,6 +11,7 @@ const SingaporeToMMIndex = (props) => {
     const [shipModeId, setShipModeId] = useState('');
     const [senderName, setSenderName] = useState('');
     const [senderEmail, setSenderEmail] = useState('');
+    const [senderPhone, setSenderPhone] = useState('');
     const [ygnDelId, setYgnDelId] = useState('');
     const [payment, setPayment] = useState('');
     const [recipientName, setRecipientName] = useState('');
@@ -19,6 +20,7 @@ const SingaporeToMMIndex = (props) => {
     const [aggrementCheck, setAggrementCheck] = useState(false);
     const [additionalNote, setAdditionalNote] = useState('');
     const [sgPickUpAddress, setSgPickUpAddress] = useState('');
+    const [otherCargo, setOtherCargo] = useState('');
 
     const shipmentMode = [
         { id: 1, name: "Land (2 weeks from shipment)" },
@@ -61,6 +63,15 @@ const SingaporeToMMIndex = (props) => {
             document.getElementById('senderEmail').style.border = '1px solid #BFDBFE';
         }
     }
+
+    const senderPhoneChange = (e) => {
+        setSenderPhone(e.target.value);
+        if (!checkNullOrBlank(e.target.value)) {
+            document.getElementById('error-sender-phone').textContent = "";
+            document.getElementById('senderPhone').style.border = '1px solid #BFDBFE';
+        }
+    }
+
     const senderNameChange = (e) => {
         setSenderName(e.target.value)
         if (!checkNullOrBlank(e.target.value)) {
@@ -97,6 +108,9 @@ const SingaporeToMMIndex = (props) => {
             error.style.color = 'red';
             error.style.marginTop = '10px';
         }
+    }
+    const otherCargoChange = (e) => {
+        setOtherCargo(e.target.value);
     }
     const ygnHomeDeliChange = (e) => {
         setYgnDelId(e.target.value);
@@ -165,6 +179,14 @@ const SingaporeToMMIndex = (props) => {
             document.getElementById('senderName').style.border = '1px solid red';
             let error = document.getElementById('error-sender-name');
             error.textContent = 'Please Fill Sender Name!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        }
+        else if (checkNullOrBlank(senderPhone)) {
+            document.getElementById('senderPhone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('senderPhone').style.border = '1px solid red';
+            let error = document.getElementById('error-sender-phone');
+            error.textContent = 'Please Fill Sender Phone Number!';
             error.style.color = 'red';
             error.style.marginTop = '10px';
         }
@@ -243,7 +265,7 @@ const SingaporeToMMIndex = (props) => {
             let params = {
                 "sender_email": senderEmail,
                 "sender_name": senderName,
-                "sender_phone": "098765432",
+                "sender_phone": senderPhone,
                 "sg_home_pickup": pickUpRadio,
                 "sg_address": sgPickUpAddress,
                 "shipment_method": shipModeId,
@@ -253,6 +275,7 @@ const SingaporeToMMIndex = (props) => {
                 "receiver_address": recipientAddress,
                 "receiver_phone": recipientPhone,
                 "note": additionalNote,
+                "other_cargo":otherCargo,
                 "items": cargoArr
             }
             axios.post('/logistic/sg-mm-save', params)
@@ -270,6 +293,7 @@ const SingaporeToMMIndex = (props) => {
                     });
                     setSenderEmail("");
                     setSenderName("");
+                    setSenderPhone("");
                     setPickUpRadio("");
                     setSgPickUpAddress("");
                     setShipModeId("");
@@ -279,6 +303,7 @@ const SingaporeToMMIndex = (props) => {
                     setRecipientAddress("");
                     setRecipientPhone("");
                     setAdditionalNote("");
+                    setOtherCargo('')
                     cargoData.map(d => d.isChecked = false);
                     setAggrementCheck("");
                 })
@@ -361,13 +386,18 @@ const SingaporeToMMIndex = (props) => {
                         <div className='me-4 ms-4'>
                             <div id='senderEmail' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Email</label>
-                                <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="email" name="" id="" value={senderEmail} onChange={senderEmailChange} />
+                                <input className='dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="email" name="" id="" value={senderEmail} onChange={senderEmailChange} />
                                 <span id='error-sender-email'></span>
                             </div>
                             <div id='senderName' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Sender's Name / ပေးပို့သူအမည်</label>
-                                <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderName} onChange={senderNameChange} />
+                                <input className='w-1/2 mt-3 dark:bg-gray-400  border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderName} onChange={senderNameChange} />
                                 <span id="error-sender-name"></span>
+                            </div>
+                            <div id='senderPhone' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                                <label htmlFor="" className='dark:text-gray-400 required mb-2'>Sender's Contact Number / ပေးပို့သူ၏ ဖုန်းနံပါတ်</label>
+                                <input className='dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={senderPhone} onChange={senderPhoneChange} />
+                                <span id="error-sender-phone"></span>
                             </div>
                             <div id='sg-home-pick' className='flex border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='dark:text-gray-400 required mb-2'>Choose SG Home Pick up? </label>
@@ -384,9 +414,9 @@ const SingaporeToMMIndex = (props) => {
                                 </div>
                                 <span id="error-sg-home"></span>
                             </div>
-                            <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
-                                <label htmlFor="" className='mb-2'>Singapore Address for SG Home Pick Up</label>
-                                <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={sgPickUpAddress} onChange={sgPickUpAddressChange} />
+                            <div className='flex  cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                                <label htmlFor="" className='mb-2 dark:text-gray-400'>Singapore Address for SG Home Pick Up</label>
+                                <input className='dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={sgPickUpAddress} onChange={sgPickUpAddressChange} />
                             </div>
                             <div id='ship-mode' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Shipment Mode / ကုန်ပစ္စည်း ပို့ဆောင်မှု ပုံစံများ</label>
@@ -414,7 +444,12 @@ const SingaporeToMMIndex = (props) => {
                                         return (
                                             <div className='mb-2' key={data.id}>
                                                 <input className='focus:ring cursor-pointer focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none' type="checkbox" id={data.name} value={data.id} onChange={function () { cargoOnChage(data.id) }} checked={data.isChecked} />
-                                                <label htmlFor={data.name} className='ms-2 cursor-pointer'>{data.name}</label>
+                                                <label htmlFor={data.name} className='ms-2 cursor-pointer'>
+                                                    {data.name}
+                                                </label>
+                                                {data.id == 7 &&
+                                                <input className='dark:bg-gray-400 dark:text-black w-1/2 ml-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={otherCargo} onChange={otherCargoChange} />
+                                                }
                                             </div>
                                         )
                                     })}
@@ -457,21 +492,21 @@ const SingaporeToMMIndex = (props) => {
                                 </div>
                                 <span id="error-payment"></span>
                             </div>
-                            <div id='rec-name' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
-                                <label htmlFor="" className='required mb-2'>Recipient's Name / လက်ခံမည့်သူ၏ နာမည်</label>
-                                <input className='w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientName} onChange={recipientNameChange} />
+                            <div id='rec-name' className='flex cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
+                                <label htmlFor="" className='dark:text-gray-400 required mb-2'>Recipient's Name / လက်ခံမည့်သူ၏ နာမည်</label>
+                                <input className='dark:bg-gray-400 w-1/2 mt-3 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientName} onChange={recipientNameChange} />
                                 <span id="error-rec-name"></span>
                             </div>
                             <div id='rec-add' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Address /လက်ခံမည့်သူ၏ နေရပ်လိပ်စာ</label>
                                 Please fill in 'NA' or 'Yangon' if self collection
-                                <input className='w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientAddress} onChange={recipientAddressChange} />
+                                <input className='dark:bg-gray-400 dark:text-black w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientAddress} onChange={recipientAddressChange} />
                                 <span id="error-rec-add"></span>
                             </div>
                             <div id='rec-ph' className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='required mb-2'>Recipient's Contact Number / လက်ခံမည့်သူ၏ ဖုန်းနံပါတ်</label>
                                 you can fill in more than 1 contact number
-                                <input className='w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientPhone} onChange={recipientPhoneChange} />
+                                <input className='dark:bg-gray-400 dark:text-black w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={recipientPhone} onChange={recipientPhoneChange} />
                                 <span id="error-rec-ph"></span>
                             </div>
                             <div className='flex dark:text-gray-400 cursor-po border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
@@ -491,7 +526,7 @@ const SingaporeToMMIndex = (props) => {
                                 <label className='mb-2' htmlFor="">
                                     please note we may charge base on volumetric weight (LxWxH/6000 = kg) if item is too light.
                                 </label>
-                                <input className='w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={additionalNote} onChange={additionNoteChange} />
+                                <input className='dark:bg-gray-400 dark:text-black w-1/2 mt-4 border-b-indigo-400 border-t-0 border-s-0 border-e-0 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50' type="text" name="" id="" value={additionalNote} onChange={additionNoteChange} />
                             </div>
                             <div className='flex bg-blue-100 dark:bg-gray-400 border-blue-200 dark:border-blue-500 border p-6 flex-col mb-4 rounded'>
                                 <label htmlFor="" className='mb-2'>Terms and Conditions (Please Read)</label>

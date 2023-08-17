@@ -5,6 +5,7 @@ import Loading from '@/Common/Loading';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import { checkNullOrBlank } from '@/Common/CommonValidation';
 
 const CheckParcelIndex = (props) => {
 
@@ -19,6 +20,7 @@ const CheckParcelIndex = (props) => {
     const [collectId, setCollectId] = useState('');
     const [paymentId, setPaymentId] = useState('');
     const [qrId, setQrId] = useState('');
+    const [issueDate, setIssueDate] = useState('');
 
     useEffect(() => {
 
@@ -59,6 +61,9 @@ const CheckParcelIndex = (props) => {
                         setEstimatedArr(res.data.data.data[0].estimated_arrival);
                         setShelfNo(res.data.data.data[0].shelf_no);
                         setTotalCost(res.data.data.data[0].total_price);
+                        setCollectionType(res.data.data.data[0].collection_type);
+                        // setCollectionType(res.data.data.data[0].collection_type);
+                        // setIssueDate(res.data.data.data[0].issue_date)
                     }
                 } else {
                     setReceiptNumber("");
@@ -101,6 +106,10 @@ const CheckParcelIndex = (props) => {
 
     const keyChange = (e) => {
         setKey(e.target.value);
+        if (!checkNullOrBlank(e.target.value)) {
+            document.getElementById('key-error').textContent = "";
+            document.getElementById('key').style.border = '1px solid #BFDBFE';
+        }
     }
 
     const handelCallBack = (qrResult) => {
@@ -118,7 +127,47 @@ const CheckParcelIndex = (props) => {
     }
 
     const updateClick = () => {
-        // axios.post('/check-parcel')
+        if (checkNullOrBlank(key)) {
+            document.getElementById('key').style.border = '1px solid red';
+            let error = document.getElementById('key-error');
+            error.textContent = 'Please Enter Your Key!';
+            error.style.color = 'red';
+            error.style.marginTop = '10px';
+        } else {
+            let params = {
+                collection_id: collectId,
+                payment_id: paymentId
+            }
+            setLoading(true);
+            axios.post('/', params)
+                .then(data => {
+                    setLoading(false);
+                    toast.success('Successfully Update!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    });
+                    searchClick(currentPage);
+                })
+                .catch(e => {
+                    setLoading(false);
+                    toast.error('Fail To Update!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "dark",
+                    });
+                })
+        }
     }
 
     return (
@@ -181,7 +230,7 @@ const CheckParcelIndex = (props) => {
                                 <label htmlFor="">Shelf No:</label>
                             </div>
                             <input className='bg-gray-300 mb-2 w-full' type="text" name="" id="" value={shelfNo} readOnly />
-                            <h4 className='w-full font-bold text-red-700'>Invoice issued date:</h4>
+                            <h4 className='w-full font-bold text-red-700'>Invoice issued date: {issueDate}</h4>
                         </div>
                         {props.auth.user?.role == "1" ?
                             <div className='mt-3 dark:bg-gray-400 bg-blue-200 p-5 font-serif lg:w-[40%] md:w-[50%] w-[100%] overflow-auto'>
@@ -192,9 +241,9 @@ const CheckParcelIndex = (props) => {
                                         <label htmlFor="">Collection Status:</label>
                                     </div>
                                     <div>
-                                        <select >
-                                            <option value="1" onChange={collectChange}>Collected</option>
-                                            <option value="2" onChange={collectChange}>Not Collected</option>
+                                        <select value={collectId} onChange={collectChange}>
+                                            <option value="1">Not Collected</option>
+                                            <option value="2">Collected</option>
                                         </select>
                                     </div>
                                 </div>
@@ -203,11 +252,11 @@ const CheckParcelIndex = (props) => {
                                         <label htmlFor="">Payment Type:</label>
                                     </div>
                                     <div>
-                                        <select>
-                                            <option value="1" onChange={paymentChange}>Cash</option>
-                                            <option value="2" onChange={paymentChange}>Paynow TZ</option>
-                                            <option value="3" onChange={paymentChange}>Paynow SGMM</option>
-                                            <option value="4" onChange={paymentChange}>Paid</option>
+                                        <select value={paymentId} onChange={paymentChange}>
+                                            <option value="1">Cash</option>
+                                            <option value="2">Paynow TZ</option>
+                                            <option value="3">Paynow SGMM</option>
+                                            <option value="4">Paid</option>
                                         </select>
                                     </div>
                                 </div>
@@ -216,7 +265,8 @@ const CheckParcelIndex = (props) => {
                                 </div>
                                 <div className="flex md:flex-row flex-col md:items-center md:gap-8">
                                     <div>
-                                        <input type="text" name="" id="" value={key} onChange={keyChange} />
+                                        <input type="text" name="" id="key" value={key} onChange={keyChange} />
+                                        <p id='key-error'></p>
                                     </div>
                                     <div className='md:mt-0 mt-3'>
                                         <button onClick={updateClick} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">

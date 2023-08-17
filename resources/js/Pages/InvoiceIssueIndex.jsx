@@ -22,13 +22,13 @@ const InvoiceIssueIndex = (props) => {
     const [frozenUnit, setFronzenUnit] = useState(8.5);
     const [cosmeticUnit, setCosmeticUnit] = useState();
     const [electronicUnit, setElectronicUnit] = useState();
-    const [totalFood, setTotalFood] = useState('0');
-    const [totalCloth, setTotalCloth] = useState('0');
-    const [totalFrozen, setTotalFrozen] = useState('0');
-    const [totalShoe, setTotalShoe] = useState('0');
-    const [totalCosmetic, setTotalCosmetic] = useState('0');
-    const [totalElectronic, setTotalElectronic] = useState('0');
-    const [totalOther, setTotalOther] = useState('0');
+    const [totalFood, setTotalFood] = useState('-');
+    const [totalCloth, setTotalCloth] = useState('-');
+    const [totalFrozen, setTotalFrozen] = useState('-');
+    const [totalShoe, setTotalShoe] = useState('-');
+    const [totalCosmetic, setTotalCosmetic] = useState('-');
+    const [totalElectronic, setTotalElectronic] = useState('-');
+    const [totalOther, setTotalOther] = useState('-');
     const [id, setId] = useState('');
     const [invoiceNo, setInvoiceNo] = useState('');
     const [senderName, setSenderName] = useState('');
@@ -45,7 +45,7 @@ const InvoiceIssueIndex = (props) => {
     const [ygnPickup, setYgnPickup] = useState('');
     const [howInSg, setHowInSg] = useState('');
     const [paymentType, setPaymentType] = useState('');
-
+    const [othersUnit, setOthersUnit] = useState(0.00);
 
     useEffect(() => {
         setCategories(props.data.category);
@@ -119,7 +119,7 @@ const InvoiceIssueIndex = (props) => {
         setId(props.data.id);
         setInvoiceNo(props.data.invoice_no);
         setSenderName(props.data.sender_name);
-        setSenderAddress(props.data.sender_address);
+        setSenderAddress(props.data.sender_address ? props.data.sender_address : props.data.sg_address);
         setSenderPhone(props.data.sender_phone);
         setSenderEmail(props.data.sender_email);
         setTransport(props.data.transport);
@@ -194,6 +194,16 @@ const InvoiceIssueIndex = (props) => {
             setTotalOther("-");
         } else if (isdigit(e.target.value)) {
             setOthersWeight(e.target.value);
+            setTotalOther((parseFloat(e.target.value) * othersUnit).toFixed(2));
+        }
+    }
+    const othersUnitChange = (e) => {
+        if (!e.target.value) {
+            setOthersUnit("");
+            setTotalOther("-");
+        } else if (isdigit(e.target.value)) {
+            setOthersUnit(e.target.value);
+            setTotalOther((parseFloat(e.target.value) * parseFloat(othersWeight)).toFixed(2));
         }
     }
     const checkboxChange = () => {
@@ -333,10 +343,11 @@ const InvoiceIssueIndex = (props) => {
             ).toFixed(2)
         }
         setLoading(true);
+        let text = mail ? 'Successfully Sent Email And Update!' : 'Successfully Update!';
         axios.post('/save-issue', params)
             .then(res => {
                 setLoading(false);
-                toast.success('Successfully Update!', {
+                toast.success(text, {
                     position: "top-right",
                     autoClose: 2000,
                     hideProgressBar: false,
@@ -360,10 +371,6 @@ const InvoiceIssueIndex = (props) => {
                     theme: "dark",
                 });
             })
-    }
-
-    const sendEmailClick = () => {
-
     }
 
     return (
@@ -565,8 +572,10 @@ const InvoiceIssueIndex = (props) => {
                                                         <td>
                                                             <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={othersWeight === 0 ? '' : othersWeight} onChange={othersWeightChange} />
                                                         </td>
-                                                        <td>10%</td>
-                                                        <td>0.00</td>
+                                                        <td>
+                                                            <input className="w-1/2 dark:bg-gray-400 dark:text-white" type="text" value={othersUnit === 0 ? '' : othersUnit} onChange={othersUnitChange} />
+                                                        </td>
+                                                        <td>{totalOther}</td>
                                                     </tr>
                                                 }
                                             </React.Fragment>
@@ -673,6 +682,7 @@ const InvoiceIssueIndex = (props) => {
                                             parseFloat((totalShoe == "-" ? 0 : totalShoe)) +
                                             parseFloat((totalCosmetic == "-" ? 0 : totalCosmetic)) +
                                             parseFloat((totalElectronic == "-" ? 0 : totalElectronic)) +
+                                            parseFloat((totalOther == "-" ? 0 : totalOther)) +
                                             (handlingFee ? 0.90 : 0) +
                                             (howInSg == undefined ?
                                                 ((
