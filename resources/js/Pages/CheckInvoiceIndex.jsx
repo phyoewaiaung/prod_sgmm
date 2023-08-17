@@ -184,7 +184,7 @@ const CheckInvoiceIndex = () => {
         setShow(false);
         setLoading(true);
         let text = type == "1" ? "LOCATION" : "SHELF NO";
-        axios.post('delete', {invoice_no:deleteId})
+        axios.post('delete', { invoice_no: deleteId })
             .then(data => {
                 setLoading(false);
                 toast.success('Successfully Deleted!', {
@@ -275,15 +275,15 @@ const CheckInvoiceIndex = () => {
                         </div>
                     </div>
                     <div className='text-center mt-3 mb-3'>
-                        <button onClick={()=>searchClick()} type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
+                        <button onClick={() => searchClick()} type="submit" className="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 font-sans">
                             Search
                         </button>
                     </div>
                     {invoiceList.length > 0 &&
                         <>
                             <div className='flex flex-row justify-between'>
-                            <h3 className="ml-3 mr-3 md:ml-0 md:mr-0 font-bold text-xl mb-3 dark:text-gray-400">Check Invoice List</h3>
-                            <p>Total Row(s): {totalRow}</p>
+                                <h3 className="ml-3 mr-3 md:ml-0 md:mr-0 font-bold text-xl mb-3 dark:text-gray-400">Check Invoice List</h3>
+                                <p>Total Row(s): {totalRow}</p>
                             </div>
                             <div className='md:ml-0 md:mr-0 ml-3 mr-3 invoice-list-container bg-blue-100 rounded border border-gray-400 mb-5'>
                                 <table className='invoice-list-table text-center break-all'>
@@ -305,7 +305,7 @@ const CheckInvoiceIndex = () => {
                                             invoiceList.map((data, index) => {
                                                 return (
                                                     <tr key={index}>
-                                                        <td width={50}>{parseInt(indexNumber)+ index + 1}</td>
+                                                        <td width={50}>{parseInt(indexNumber) + index + 1}</td>
                                                         <td width={120}>{data.invoice_no}</td>
                                                         <td width={160}>{data.sender_name}</td>
                                                         <td width={160}>{data.receiver_name}</td>
@@ -313,13 +313,13 @@ const CheckInvoiceIndex = () => {
                                                         <td width={150}>{data.payment_status == "1" ? "Not Collected" : "Collected"}</td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
-                                                                <input className='dark:text-black w-[120px]' type="text" value={data.estimated_arrival == null ? "": data.estimated_arrival} onChange={(e) => locationChange(e, data.invoice_no)} />
+                                                                <input className='dark:text-black w-[120px]' type="text" value={data.estimated_arrival == null ? "" : data.estimated_arrival} onChange={(e) => locationChange(e, data.invoice_no)} />
                                                                 <button onClick={() => setClick(1, data)} className='set-btn'>Set</button>
                                                             </div>
                                                         </td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
-                                                                <input className='dark:text-black w-[120px]' type="text" value={data.shelf_no == null ? "": data.shelf_no} onChange={(e) => shelfNoChange(e, data.invoice_no)} />
+                                                                <input className='dark:text-black w-[120px]' type="text" value={data.shelf_no == null ? "" : data.shelf_no} onChange={(e) => shelfNoChange(e, data.invoice_no)} />
                                                                 <button onClick={() => setClick(2, data)} className='set-btn'>Set</button>
                                                             </div>
                                                         </td>
@@ -330,7 +330,10 @@ const CheckInvoiceIndex = () => {
                                                             </Link>
                                                         </td>
                                                         <td width={90}>
-                                                            <button onClick={()=>deleteClick(data.invoice_no)} className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button>
+                                                            {data.payment_status == "2" ?
+                                                                <button onClick={() => deleteClick(data.invoice_no)} className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button> :
+                                                                <button disabled className='cursor-not-allowed bg-gradient-to-r from-gray-400 to-gray-500 text-white p-2 rounded '>Delete</button>
+                                                            }
                                                         </td>
                                                     </tr>
                                                 )

@@ -587,13 +587,13 @@ const InvoiceIssueIndex = (props) => {
                                     <td>Total Weight</td>
                                     <td>
                                         {
-                                            ((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
+                                            (((foodWeight == "") ? 0.0 : parseFloat(foodWeight)) +
                                             ((clothWeight == "") ? 0.0 : parseFloat(clothWeight)) +
                                             ((frozenWeight == "") ? 0.0 : parseFloat(frozenWeight)) +
                                             ((shoeWeight == "") ? 0.0 : parseFloat(shoeWeight)) +
                                             ((cosmeticWeight == "") ? 0.0 : parseFloat(cosmeticWeight)) +
                                             ((electronicWeight == "") ? 0.0 : parseFloat(electronicWeight)) +
-                                            ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))
+                                            ((othersWeight == "") ? 0.0 : parseFloat(othersWeight))).toFixed(2)
                                         }
                                     </td>
                                     <td>
