@@ -146,6 +146,13 @@ class LogisticController extends Controller
         }
     }
 
+    public function chkCusOrReceiver($data, $flag)
+    {
+        return Customer::where($data)
+            ->where('flag', $flag)
+            ->exists();
+    }
+
     # sample format 
     # SG        -> SM23-08W3002
     # Okkala    -> MS23-08W3F002
@@ -325,37 +332,6 @@ class LogisticController extends Controller
             return response()->json(['status' => 500, 'message' => 'Something Was Wrong'], 500);
         }
     }
-
-
-    public function chkCusOrReceiver($data, $flag)
-    {
-        return Customer::where($data)
-            ->where('flag', $flag)
-            ->exists();
-    }
-
-    // public function mailSend($data, $file, $blade)
-    // {
-    //     try {
-    //         $files = [
-    //             public_path("storage/$file")
-    //         ];
-
-    //         Mail::send("mail.$blade", $data, function ($message) use ($data, $files) {
-    //             $message->to($data["email"])
-    //                 ->subject($data["title"]);
-
-    //             foreach ($files as $file) {
-    //                 $message->attach($file);
-    //             }
-    //         });
-
-    //         return true;
-    //     } catch (\Exception $e) {
-    //         Log::info($e);
-    //         return false;
-    //     }
-    // }
 
     public function search(Request $request)
     {
@@ -796,19 +772,6 @@ class LogisticController extends Controller
         return $data;
     }
 
-    // public function paginate($items, $perPage = null, $page = null,$options = [])
-    // {
-    //     $paginateLimit  = 10;
-    //     $perPage        = $perPage ? (int)$perPage : $paginateLimit;
-    //     $page           = $page ?: (Paginator::resolveCurrentPage() ?: config('ONE'));
-    //     $items          = $items instanceof Collection ? $items : Collection::make($items);
-    //     $returnData     = [];
-    //     foreach ($items->forPage($page, $perPage) as  $data) {
-    //         array_push($returnData, $data);
-    //     }
-    //     return new LengthAwarePaginator($returnData, $items->count(), $perPage, $page, $options);
-    // }
-
     public function trackParcel(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -860,10 +823,44 @@ class LogisticController extends Controller
         }
 
         $data = $this->getInvoiceData($request);
-        // return $data;
-        $data->category()->delete();
-        $data->delete();
+        if (!empty($data)) {
+            if ($data->payment_status == 2) {
+                return response()->json(['status' => 403, 'message' => "Payment success data can't be delete !"], 403);
+            }
+            $data->category()->delete();
+            $data->delete();
+            return response()->json(['status' => 200, 'message' => 'Delete Successfully', 'data' => $data], 200);
+        } else {
+            return response()->json(['status' => 404, 'message' => "Data is not Found !"], 404);
+        }
+    }
 
-        return 'del pp';
+    public function paymetUpdate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "invoice_no"    => "required",
+            "collection_status" => "required|in:1,2",
+            "pay_with" => "required"
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'    =>  'NG',
+                'message'   =>  $validator->errors()->all(),
+            ], 422);
+        }
+        $data = $this->getInvoiceData($request);
+        if (!empty($data)) {
+            if ($data->payment_status == 2) {
+                return response()->json(['status' => 403, 'message' => "Payment success data can't be update !"], 403);
+            }
+            $data->payment_status = $request->collection_status;
+            $data->pay_with = $request->pay_with;
+            $data->update();
+
+            return response()->json(['status' => 200, 'message' => 'Payment Update Successfully', 'data' => $data], 200);
+        } else {
+            return response()->json(['status' => 404, 'message' => "Data is not Found !"], 404);
+        }
     }
 }
