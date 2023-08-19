@@ -6,9 +6,14 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { checkNullOrBlank } from '@/Common/CommonValidation';
+import EventEmitter from '@/utils/EventEmitter';
 
 const CheckParcelIndex = (props) => {
-
+    useEffect(()=> {
+        EventEmitter.emit("auth",{
+            auth:props.auth.user?true:false
+        })
+    },[props])
     const [loading, setLoading] = useState(false);
     const [receiptNo, setReceiptNo] = useState('');
     const [receiptNumber, setReceiptNumber] = useState('');
@@ -35,7 +40,7 @@ const CheckParcelIndex = (props) => {
         axios.post('track-parcel', { invoice_no: receiptNo })
             .then(res => {
                 setLoading(false);
-                if (res.data.data.estimated_arrival == null && res.data.data.shelf_no == null && res.data.data.total_price == null) {
+                if (res.data.data.estimated_arrival == null && res.data.data.shelf_no == null && res.data.data.total_price == null && res.data.data.collection_type == null) {
                     setReceiptNumber("");
                     setEstimatedArr("");
                     setShelfNo("");

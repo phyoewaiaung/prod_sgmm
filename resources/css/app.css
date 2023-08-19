@@ -98,6 +98,7 @@ table tbody td {
 }
 .qr-style {
     width: 40%;
+    margin: 0 auto;
 }
 .qr-style > div {
     display: flex;
@@ -154,4 +155,10 @@ table tbody td {
 .shapeshifter.play {
     animation-name: play60;
     animation-iteration-count: infinite;
+}
+
+@media (max-width:758px) {
+    .qr-style{
+        width: 70%;
+    }
 }

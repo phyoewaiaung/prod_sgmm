@@ -1,12 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { checkNullOrBlank, emailChk, isdigit } from '@/Common/CommonValidation';
 import Loading from '@/Common/Loading';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import EventEmitter from '@/utils/EventEmitter';
 
 
-const MyanmarToSgAlon = () => {
+const MyanmarToSgAlon = (props) => {
+    useEffect(()=> {
+        EventEmitter.emit("auth",{
+            auth:props.auth.user?true:false
+        })
+    },[props])
     const [loading, setLoading] = useState(false);
     const [pickUpRadio, setPickUpRadio] = useState('');
     const [senderName, setSenderName] = useState('');

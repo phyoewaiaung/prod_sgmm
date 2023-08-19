@@ -1,6 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from '@inertiajs/react'
-const PriceListIndex = () => {
+import EventEmitter from '@/utils/EventEmitter'
+const PriceListIndex = (props) => {
+    useEffect(()=> {
+        EventEmitter.emit("auth",{
+            auth:props.auth.user?true:false
+        })
+    },[props])
     return (
         <>
             <div className="relative pt-6 pb-6 sm:flex sm:justify-center flex-col sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
@@ -9,7 +15,7 @@ const PriceListIndex = () => {
                         <img className="mt-[-70px]" src='images/SGMYANMAR.png' width="250" height="100" alt="sgmyanmar logo" />
                     </header>
                 </Link>
-                <main className='w-5/6 mt-[-35px]'>
+                <main className='md:w-5/6 mt-[-35px]'>
                     <div className="flex flex-col justify-center align-middle">
                         <h2 className="ont-extrabold text-transparent bg-clip-text bg-gradient-to-r text-blue-700 text-center text-2xl from-purple-700 to-pink-600 ">LOGISTIC PRICE LIST</h2>
                     </div>
