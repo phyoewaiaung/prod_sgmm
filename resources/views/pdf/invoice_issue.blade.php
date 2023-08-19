@@ -247,7 +247,7 @@
                             <td style="border-bottom: 1px solid black; text-align: start;" colSpan='2'>
                                 {{ $request->collection_type }}
                             </td>
-                            <td style="border-bottom: 1px solid black;">-</td>
+                            <td style="border-bottom: 1px solid black;">$ {{$request->collection_amount}}</td>
                         </tr>
                         <tr>
                             <td style="border-bottom: 1px solid black;" colSpan='2'></td>

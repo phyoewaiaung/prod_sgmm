@@ -6,8 +6,16 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from '@/Common/Modal';
 import Pagination from './Pagination';
+import EventEmitter from '@/utils/EventEmitter';
 
-const CheckInvoiceIndex = () => {
+const CheckInvoiceIndex = (props) => {
+
+    useEffect(() => {
+        EventEmitter.emit("auth", {
+            auth: props.auth.user ? true : false
+        })
+    }, [props])
+
     const [loading, setLoading] = useState(false);
     const [invoiceNo, setInvoiceNo] = useState('');
     const [invoiceSts, setInvoiceSts] = useState('');
@@ -285,7 +293,7 @@ const CheckInvoiceIndex = () => {
                                 <h3 className="ml-3 mr-3 md:ml-0 md:mr-0 font-bold text-xl mb-3 dark:text-gray-400">Check Invoice List</h3>
                                 <p>Total Row(s): {totalRow}</p>
                             </div>
-                            <div className='md:ml-0 md:mr-0 ml-3 mr-3 invoice-list-container bg-blue-100 rounded border border-gray-400 mb-5'>
+                            <div className='md:ml-0 md:mr-0 ml-3 mr-3 invoice-list-container  bg-blue-100 rounded border border-gray-400 mb-5'>
                                 <table className='invoice-list-table text-center break-all'>
                                     <thead className='text-white'>
                                         <tr>
@@ -305,12 +313,12 @@ const CheckInvoiceIndex = () => {
                                             invoiceList.map((data, index) => {
                                                 return (
                                                     <tr key={index}>
-                                                        <td width={50}>{parseInt(indexNumber) + index + 1}</td>
-                                                        <td width={120}>{data.invoice_no}</td>
-                                                        <td width={160}>{data.sender_name}</td>
-                                                        <td width={160}>{data.receiver_name}</td>
-                                                        <td width={100}>{data.payment_type == "1" ? "SG" : "MM"}</td>
-                                                        <td width={150}>{data.payment_status == "1" ? "Not Collected" : "Collected"}</td>
+                                                        <td className='dark:text-black' width={50}>{parseInt(indexNumber) + index + 1}</td>
+                                                        <td className='dark:text-black' width={120}>{data.invoice_no}</td>
+                                                        <td className='dark:text-black' width={160}>{data.sender_name}</td>
+                                                        <td className='dark:text-black' width={160}>{data.receiver_name}</td>
+                                                        <td className='dark:text-black' width={100}>{data.payment_type == "1" ? "SG" : "MM"}</td>
+                                                        <td className='dark:text-black' width={150}>{data.payment_status == "1" ? "Not Collected" : "Collected"}</td>
                                                         <td width={200}>
                                                             <div className='flex justify-center'>
                                                                 <input className='dark:text-black w-[120px]' type="text" value={data.estimated_arrival == null ? "" : data.estimated_arrival} onChange={(e) => locationChange(e, data.invoice_no)} />
@@ -330,10 +338,7 @@ const CheckInvoiceIndex = () => {
                                                             </Link>
                                                         </td>
                                                         <td width={90}>
-                                                            {data.payment_status == "2" ?
-                                                                <button onClick={() => deleteClick(data.invoice_no)} className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button> :
-                                                                <button disabled className='cursor-not-allowed bg-gradient-to-r from-gray-400 to-gray-500 text-white p-2 rounded '>Delete</button>
-                                                            }
+                                                            <button onClick={() => deleteClick(data.invoice_no)} className='bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600'>Delete</button>
                                                         </td>
                                                     </tr>
                                                 )

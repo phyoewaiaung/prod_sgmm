@@ -5,8 +5,14 @@ import axios from 'axios';
 import Loading from '@/Common/Loading';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import EventEmitter from '@/utils/EventEmitter';
 
 const InvoiceIssueIndex = (props) => {
+    useEffect(()=> {
+        EventEmitter.emit("auth",{
+            auth:props.auth.user?true:false
+        })
+    },[props])
     const [loading, setLoading] = useState(false);
     const [foodWeight, setFoodWeight] = useState("");
     const [clothWeight, setClothWeight] = useState("");
@@ -49,7 +55,11 @@ const InvoiceIssueIndex = (props) => {
 
     useEffect(() => {
         setCategories(props.data.category);
-
+        props.data.category.map(d => {
+            if(d.id == 7){
+                setOthersUnit(d.unit_price)
+            }
+        })
         const foodUnit = props.data.shipment_method ?
             props.data.shipment_method == "1" ?
                 "6.00" :
@@ -109,7 +119,7 @@ const InvoiceIssueIndex = (props) => {
             }
             if (d.id == "7" && d.weight != null) {
                 setOthersWeight(d.weight);
-                // setOthersWeight(parseFloat(d.weight * oth).toFixed(2));
+                setTotalOther(parseFloat(d.weight * d.unit_price).toFixed(2));
             }
         })
         setFoodUnit(foodUnit);
@@ -238,6 +248,7 @@ const InvoiceIssueIndex = (props) => {
             }
             if (d.id == "7") {
                 d.weight = othersWeight;
+                d.unit_price = othersUnit
             }
             return d;
         })
@@ -305,6 +316,7 @@ const InvoiceIssueIndex = (props) => {
                 parseFloat((totalShoe == "-" ? 0 : totalShoe)) +
                 parseFloat((totalCosmetic == "-" ? 0 : totalCosmetic)) +
                 parseFloat((totalElectronic == "-" ? 0 : totalElectronic)) +
+                parseFloat((totalOther == "-" ? 0 : totalOther)) +
                 (handlingFee ? 0.90 : 0) +
                 (howInSg == undefined ?
                     ((

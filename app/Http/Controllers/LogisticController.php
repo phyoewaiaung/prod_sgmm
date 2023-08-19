@@ -153,7 +153,7 @@ class LogisticController extends Controller
             ->exists();
     }
 
-    # sample format 
+    # sample format
     # SG        -> SM23-08W3002
     # Okkala    -> MS23-08W3F002
     # Alone     -> MS23-08W3F502
@@ -828,9 +828,9 @@ class LogisticController extends Controller
 
         $data = $this->getInvoiceData($request);
         if (!empty($data)) {
-            if ($data->payment_status == 2) {
-                return response()->json(['status' => 403, 'message' => "Payment success data can't be delete !"], 403);
-            }
+            // if ($data->payment_status == 1) {
+            //     return response()->json(['status' => 403, 'message' => "Payment success data can't be delete !"], 403);
+            // }
             $data->category()->delete();
             $data->delete();
             return response()->json(['status' => 200, 'message' => 'Delete Successfully', 'data' => $data], 200);
