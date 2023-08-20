@@ -81,7 +81,7 @@ const CheckParcelIndex = (props) => {
                         res.data.data.pay_with == "Paynow TZ" ? "2" :
                             res.data.data.pay_with == "Paid" ? "4" : "1"
                     )
-                    setStatus(res.data.data.collection_status ? true : false)
+                    setStatus(res.data.data.pay_with ? true : false)
                 }
             })
             .catch(e => {
@@ -157,6 +157,8 @@ const CheckParcelIndex = (props) => {
                         progress: undefined,
                         theme: "dark",
                     });
+                    setStatus(true);
+                    setKey('');
                 })
                 .catch(e => {
                     setLoading(false);
