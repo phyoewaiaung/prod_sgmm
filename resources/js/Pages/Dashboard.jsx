@@ -1,7 +1,14 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import EventEmitter from '@/utils/EventEmitter';
 import { Head } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 export default function Dashboard(props) {
+    useEffect(()=> {
+        EventEmitter.emit("auth",{
+            auth:props.auth.user?true:false
+        })
+    },[props])
     return (
         <AuthenticatedLayout
             auth={props.auth}

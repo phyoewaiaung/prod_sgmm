@@ -9,4 +9,9 @@ class MmToSgItem extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    public function category()
+    {
+        return $this->hasMany(MmCategoryItem::class, 'mm_to_sg_id');
+    }
 }
