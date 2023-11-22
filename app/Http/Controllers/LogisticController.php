@@ -8,13 +8,16 @@ use Inertia\Inertia;
 use App\Models\Customer;
 use App\Models\MmToSgItem;
 use App\Models\SgToMmItem;
+use App\Traits\CommonTrait;
 use Illuminate\Http\Request;
+use App\Logics\LogisticLogic;
+use App\Exports\InvoiceExport;
 use App\Models\MmCategoryItem;
 use App\Models\SgCategoryItem;
-use App\Traits\CommonTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -22,6 +25,13 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class LogisticController extends Controller
 {
     use CommonTrait;
+
+    protected $logisticLogic;
+
+    public function __construct(LogisticLogic $logisticLogic)
+    {
+        $this->logisticLogic = $logisticLogic;
+    }
 
     public function saveSGtoMM(Request $request)
     {
@@ -173,8 +183,8 @@ class LogisticController extends Controller
         $lastDayOfMonth = Carbon::createFromDate($Y, $month, 1)->endOfMonth()->endOfDay();
 
         if ($data['name'] === 'SGMM') {
-            $lastNo = SgToMmItem::orderBy('created_at', 'desc')->first();
             $default = "SM";
+            $lastNo = SgToMmItem::where('invoice_no', 'like', "%$default$year-$month" . "W" . "$weekOfMonth%")->orderBy('created_at', 'desc')->first();
 
             if (!empty($lastNo)) {
                 $dbNo = $lastNo->invoice_no;
@@ -187,11 +197,11 @@ class LogisticController extends Controller
             return $invoiceNo;
         } else if ($data['name'] === 'MMSG') {
             if ($data['form'] == 2) {
-                $lastNo = MmToSgItem::where('invoice_no', 'like', '%MS%')->orderBy('created_at', 'desc')->first();
                 $default = "MS";
+                $lastNo = MmToSgItem::where('invoice_no', 'like', "%$default$year-$month" . "W" . "$weekOfMonth%")->orderBy('created_at', 'desc')->first();
             } else if ($data['form'] == 3) {
-                $lastNo = MmToSgItem::where('invoice_no', 'like', '%AS%')->orderBy('created_at', 'desc')->first();
                 $default = "AS";
+                $lastNo = MmToSgItem::where('invoice_no', 'like', "%$default$year-$month" . "W" . "$weekOfMonth%")->orderBy('created_at', 'desc')->first();
                 $no = '502';
             }
             if (!empty($lastNo)) {
@@ -866,5 +876,49 @@ class LogisticController extends Controller
         } else {
             return response()->json(['status' => 404, 'message' => "Data is not Found !"], 404);
         }
+    }
+
+    public function monthlyInvoice(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "month"    => "required",
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'    =>  'NG',
+                'message'   =>  $validator->errors()->all(),
+            ], 422);
+        }
+
+        $firstDayOfMonth = Carbon::createFromDate($request->month, 1)->startOfDay();
+        $lastDayOfMonth = Carbon::createFromDate($request->month, 1)->endOfMonth()->endOfDay();
+
+        $exportDatas = [];
+        $SGMM = SgToMmItem::with('category', 'category.categoryName:id,name')->whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])->get();
+        $MMSG = MmToSgItem::with('category', 'category.categoryName:id,name')->whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])->get();
+
+        if (!empty($MMSG) || !empty($SGMM)) {
+            if (!empty($MMSG)) {
+                foreach ($MMSG as $data) {
+                    array_push($exportDatas, $data);
+                }
+            }
+            if (!empty($SGMM)) {
+                foreach ($SGMM as $data) {
+                    array_push($exportDatas, $data);
+                }
+            };
+            $exportDatas = collect($exportDatas)->sortBy([
+                ['created_at', 'desc']
+            ]);
+        }
+
+        $ready = $this->logisticLogic->prepareDataForExcel($exportDatas);
+        return $ready;
+        $fileName = "excel.xlsx";
+        $headers = 'header';
+        $tableHeader = ['Date', 'Collection Status', '', 'Receipt number', 'Location', 'Box', 'Sender Name', 'Sender Address', 'Sender Contact No', 'Sea Transpoart or Air Transport', 'Please provide details of your cargo (optional)', 'Weight', 'Yangon Home Pickup S$3.50?', 'What are you sending ?', 'Choose SG Home Delivery / Self Collection?', 'Payment in Singapore (SG) or in Myanmar (MM)?', "Recipient's Name", "Recipient's Address ", "Recipient's Postal code", "Recipient's Contact Number", "Weight of Food ", "price", "Weight of Clothes", "price", "Weight of Frozen Food", "price", "Weight of other items", "price", "Weight of Cosmetics/Medicine / Supplements", "price", "Email Address", "Additional Instructions? (optional) ", "Storage type", "Ygn Pick up", "SG home dilvery", "Total", "Total Weight (kg)", "No. of Packages", "Recieved", "Balance", "Handling Fee"];
+        return Excel::download(new InvoiceExport($ready, $tableHeader), $fileName);
     }
 }
