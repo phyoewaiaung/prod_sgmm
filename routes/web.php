@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/delete', [LogisticController::class, 'deleteData'])->name('delete');
     Route::post('/payment', [LogisticController::class, 'paymetUpdate'])->name('payment');
 });
+Route::post('/mothly-invoice', [LogisticController::class, 'monthlyInvoice']);
 
 # Track Parcel
 Route::post('/track-parcel', [LogisticController::class, 'trackParcel'])->name('track-parcel');
