@@ -240,8 +240,8 @@ class LogisticLogic
         }
 
         $returndData = [];
-        $SGMM = SgToMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
-        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
+        $SGMM = SgToMmItem::with('category')->where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
+        $MMSG = MmToSgItem::with('category')->where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
 
         if (!empty($MMSG) || !empty($SGMM)) {
             if (!empty($MMSG)) {
@@ -523,7 +523,9 @@ class LogisticLogic
         $SGMM = SgToMmItem::with('category', 'category.categoryName:id,name')->whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])->get();
         $MMSG = MmToSgItem::with('category', 'category.categoryName:id,name')->whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])->get();
 
-        if (!empty($MMSG) || !empty($SGMM)) {
+
+        if (count($MMSG) || count($SGMM)) {
+            Log::info('shi');
             if (!empty($MMSG)) {
                 foreach ($MMSG as $data) {
                     array_push($exportDatas, $data);
@@ -537,12 +539,14 @@ class LogisticLogic
             $exportDatas = collect($exportDatas)->sortBy([
                 ['created_at', 'desc']
             ]);
+        } else {
+            return response()->json(['status' => 404, 'message' => 'Data is Not Found !'], 404);
         }
 
         $ready = $this->prepareDataForExcel($exportDatas);
 
         $fileName = "$request->month-invoice.xlsx";
-        $tableHeader = ['Date', 'Collection Status', '', 'Receipt number', 'Location', 'Box', 'Sender Name', 'Sender Address', 'Sender Contact No', 'Sea Transpoart or Air Transport', 'Please provide details of your cargo (optional)', 'Weight', 'Yangon Home Pickup S$3.50?', 'What are you sending ?', 'Choose SG Home Delivery / Self Collection?', 'Payment in Singapore (SG) or in Myanmar (MM)?', "Recipient's Name", "Recipient's Address ", "Recipient's Postal code", "Recipient's Contact Number", "Weight of Food ", "price", "Weight of Clothes", "price", "Weight of Frozen Food", "price", "Weight of other items", "price", "Weight of Cosmetics/Medicine / Supplements", "price", "Email Address", "Additional Instructions? (optional) ", "Storage type", "Ygn Pick up", "SG home dilvery", "Total", "Total Weight (kg)", "No. of Packages", "Recieved", "Balance", "Handling Fee"];
+        $tableHeader = ['Receipt number', 'Date', 'Collection Status', 'Location', 'Box', 'Sender Name', 'Sender Address', 'Sender Contact No', 'Sea Transpoart or Air Transport', 'Please provide details of your cargo (optional)', 'Weight', 'Yangon Home Pickup S$3.50?', 'What are you sending ?', 'Choose SG Home Delivery / Self Collection?', 'Payment in Singapore (SG) or in Myanmar (MM)?', "Recipient's Name", "Recipient's Address ", "Recipient's Postal code", "Recipient's Contact Number", "Weight of Food ", "price", "Weight of Clothes", "price", "Weight of Frozen Food", "price", "Weight of other items", "price", "Weight of Cosmetics/Medicine / Supplements", "price", "Email Address", "Additional Instructions? (optional) ", "Storage type", "Ygn Pick up", "SG home dilvery", "Total Price (category)", "Total Weight (kg)", "No. of Packages", "Recieved", "Handling Fee", "Balance"];
         return Excel::download(new InvoiceExport($ready, $tableHeader), $fileName);
     }
 
@@ -553,17 +557,18 @@ class LogisticLogic
         $storageType = ['Room Temperature', 'In Normal Fridge', 'In Freezer'];
         $ready = [];
         foreach ($datas as $key => $exportData) {
+            $data = json_decode($exportData, true);
+
             $ready[$key]['date'] = Carbon::parse($exportData['created_at'])->format('m/d/Y H:m:s');
-            $ready[$key]['collection_status'] = 'ma ti tay';
-            $ready[$key]['____'] = "-----";
+            $ready[$key]['collection_status'] = $exportData['payment_status'] == 1 ? 'Pending' : 'Collected';;
             $ready[$key]['receipt_no'] = $exportData['invoice_no'];
             $ready[$key]['location'] = 'ma ti tay';
             $ready[$key]['box'] = 'ma ti tay';
             $ready[$key]['sender_name'] = $exportData['sender_name'];
             $ready[$key]['sender_address'] = $exportData['sender_address'];
             $ready[$key]['sender_contact_no'] = $exportData['sender_phone'];
-            $ready[$key]['what_sending'] = "Accessiores";
-            $ready[$key]['payment_type'] =  $exportData['payment_type'] === 1 ? 'SG Pay' : 'MM Pay';
+            $ready[$key]['what_sending'] = collect($data['category'])->pluck('category_name')->pluck('name')->implode(', ');
+            $ready[$key]['payment_type'] =  $exportData['payment_type'] == 1 ? 'SG Pay' : 'MM Pay';
             $ready[$key]['receiver_name'] = $exportData['receiver_name'];
             $ready[$key]['receiver_address'] = $exportData['receiver_address'];
             $ready[$key]['receiver_contact_no'] = $exportData['receiver_phone'];
@@ -585,19 +590,19 @@ class LogisticLogic
             $ready[$key]['cosmetic_price'] = '';
 
             foreach ($exportData['category'] as $item) {
-                if ($item['item_category_id'] === 1) {
+                if ($item['item_category_id'] == 1) {
                     $ready[$key]['food_weight'] = $item['weight'];
                     $ready[$key]['food_price'] = $item['total_price'];
-                } elseif ($item['item_category_id'] === 2) {
+                } elseif ($item['item_category_id'] == 2) {
                     $ready[$key]['clothes_weight'] = $item['weight'];
                     $ready[$key]['clothes_price'] = $item['total_price'];
-                } elseif ($item['item_category_id'] === 6) {
+                } elseif ($item['item_category_id'] == 6) {
                     $ready[$key]['frozen_food_weight'] = $item['weight'];
                     $ready[$key]['frozen_food_price'] = $item['total_price'];
-                } elseif ($item['item_category_id'] === 7) {
+                } elseif ($item['item_category_id'] == 7) {
                     $ready[$key]['other_weight'] = $item['weight'];
                     $ready[$key]['other_price'] = $item['total_price'];
-                } elseif ($item['item_category_id'] === 3) {
+                } elseif ($item['item_category_id'] == 3) {
                     $ready[$key]['cosmetic_weight'] = $item['weight'];
                     $ready[$key]['cosmetic_price'] = $item['total_price'];
                 }
@@ -607,7 +612,7 @@ class LogisticLogic
             $ready[$key]['total_price'] = collect($exportData['category'])->pluck('total_price')->sum();
             $ready[$key]['total_weight'] = collect($exportData['category'])->pluck('weight')->sum();
             $ready[$key]['no_of_package'] = count($exportData['category']);
-            $ready[$key]['received'] = $exportData['payment_status'] === 1 ? 'Pending' : 'Received';
+            $ready[$key]['received'] = $exportData['payment_status'] == 1 ? 'Pending' : 'Received';
             $ready[$key]['balance'] = 1000;
             $ready[$key]['handling'] = $exportData['handling_fee'];
 
@@ -621,12 +626,12 @@ class LogisticLogic
                 $ready[$key]['addational_instruction'] = '';
                 $ready[$key]['storage_type'] = '';
                 $ready[$key]['how_in_ygn'] = $howInYGN[$exportData['how_in_ygn'] - 1];
-                $ready[$key]['sg_home_pickup'] = $exportData['sg_home_pickup'] === 1 ? 'Yes' : 'No';
+                $ready[$key]['sg_home_pickup'] = $exportData['sg_home_pickup'] == 1 ? 'Yes' : 'No';
             } else {
                 $ready[$key]['sea_or_air'] = $exportData['transport'] == 1 ? 'Sea Cargo' : 'Air Cargo';
                 $ready[$key]['details_of_cargo'] = '';
                 $ready[$key]['weight'] = '';
-                $ready[$key]['ygn_home_pickup'] = $exportData['mm_home_pickup'] === 1 ? 'Yes' : 'No';
+                $ready[$key]['ygn_home_pickup'] = $exportData['mm_home_pickup'] == 1 ? 'Yes' : 'No';
                 $ready[$key]['how_in_sg'] =  $howInSG[$exportData['how_in_sg'] - 1];
                 $ready[$key]['receiver_postalcode'] = $exportData['receiver_postal_code'];
                 $ready[$key]['addational_instruction'] = $exportData['additional_instruction'];
