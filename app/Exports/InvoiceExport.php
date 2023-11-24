@@ -2,12 +2,13 @@
 
 namespace App\Exports;
 
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Sheet;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use Maatwebsite\Excel\Concerns\FromCollection;
 
 
@@ -44,6 +45,7 @@ class InvoiceExport implements WithHeadings, WithEvents, WithTitle
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
+                $event->sheet->freezePane('D2');
                 # style array
                 $styleArray = [
                     'headerFont' => [
@@ -62,7 +64,7 @@ class InvoiceExport implements WithHeadings, WithEvents, WithTitle
                     ],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'color' => ['rgb' => config('EXCEL_HEADER_BG_COLOR')]
+                        'color' => ['rgb' => 'c5e3f6']
                     ],
                     'borderStyle' => [
                         'allBorders' => [
@@ -71,14 +73,14 @@ class InvoiceExport implements WithHeadings, WithEvents, WithTitle
                     ],
                     'red' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'color' => ['rgb' => 'B0E0E6'] //for blue color
+                        'color' => ['rgb' => 'ff304f']
                     ],
                 ];
                 $this->setColumnWidth($event, count($this->tableHeader));
                 $this->setTitleAndStyle($event, $styleArray);
                 $this->setExportdata($event, $styleArray);
                 $event->sheet->getDelegate()->getRowDimension(1)->setRowHeight(50);
-                $event->sheet->getDelegate()->getStyle('A1:AZ1')->getAlignment()->setWrapText(true);
+                $event->sheet->getDelegate()->getStyle($event->sheet->calculateWorksheetDimension())->getAlignment()->setWrapText(true);
             }
         ];
     }
@@ -123,53 +125,64 @@ class InvoiceExport implements WithHeadings, WithEvents, WithTitle
     {
         $row = 2;
         $no = 1;
+        $column = 1;
         $lastExcelRow = count($this->exportData);
-        $totalMins = $totalOtDays = config('ZERO');
-        # set ovetime data
+        // $columnAlpa = Coordinate::stringFromColumnIndex($column);
         foreach ($this->exportData as $key => $data) {
-            $event->sheet->setCellValue("A" . $row, $data["date"]);
-            $event->sheet->setCellValue("B" . $row, $data["collection_status"]);
-            $event->sheet->setCellValue("C" . $row, $data["____"]);
-            $event->sheet->setCellValue("D" . $row, $data["receipt_no"]);
-            $event->sheet->setCellValue("E" . $row, $data["location"]);
-            $event->sheet->setCellValue("F" . $row, $data["box"]);;
-            $event->sheet->setCellValue("G" . $row, $data["sender_name"]);
-            $event->sheet->setCellValue("H" . $row, $data["sender_address"]);
-            $event->sheet->setCellValue("I" . $row, $data["sender_contact_no"]);
-            $event->sheet->setCellValue("J" . $row, $data["sea_or_air"]);
-            $event->sheet->setCellValue("K" . $row, $data["details_of_cargo"]);
-            $event->sheet->setCellValue("L" . $row, $data["weight"]);
-            $event->sheet->setCellValue("M" . $row, $data["ygn_home_pickup"]);
-            $event->sheet->setCellValue("N" . $row, $data["what_sending"]);
-            $event->sheet->setCellValue("O" . $row, $data["how_in_sg"]);
-            $event->sheet->setCellValue("P" . $row, $data["payment_type"]);
-            $event->sheet->setCellValue("Q" . $row, $data["receiver_name"]);
-            $event->sheet->setCellValue("R" . $row, $data["receiver_address"]);
-            $event->sheet->setCellValue("S" . $row, $data["receiver_postalcode"]);
-            $event->sheet->setCellValue("T" . $row, $data["receiver_contact_no"]);
-            $event->sheet->setCellValue("U" . $row, $data["food_weight"]);
-            $event->sheet->setCellValue("V" . $row, $data["food_price"]);
-            $event->sheet->setCellValue("W" . $row, $data["clothes_weight"]);
-            $event->sheet->setCellValue("X" . $row, $data["clothes_price"]);
-            $event->sheet->setCellValue("Y" . $row, $data["frozen_food_weight"]);
-            $event->sheet->setCellValue("Z" . $row, $data["frozen_food_price"]);
-            $event->sheet->setCellValue("AA" . $row, $data["other_weight"]);
-            $event->sheet->setCellValue("AB" . $row, $data["other_price"]);
-            $event->sheet->setCellValue("AC" . $row, $data["cosmetic_weight"]);
-            $event->sheet->setCellValue("AD" . $row, $data["cosmetic_price"]);
-            $event->sheet->setCellValue("AE" . $row, $data["email"]);
-            $event->sheet->setCellValue("AF" . $row, $data["addational_instruction"]);
-            $event->sheet->setCellValue("AG" . $row, $data["storage_type"]);
-            $event->sheet->setCellValue("AH" . $row, $data["how_in_ygn"]);
-            $event->sheet->setCellValue("AI" . $row, $data["sg_home_pickup"]);
-            $event->sheet->setCellValue("AJ" . $row, $data["total_price"]);
-            $event->sheet->setCellValue("AK" . $row, $data["total_weight"]);
-            $event->sheet->setCellValue("AL" . $row, $data["no_of_package"]);
-            $event->sheet->setCellValue("AM" . $row, $data["received"]);
+            $event->sheet->setCellValue("A" . $row, $data["receipt_no"]);
+            $event->sheet->setCellValue("B" . $row, $data["date"]);
+            $event->sheet->setCellValue("C" . $row, $data["collection_status"]);
+            $event->sheet->setCellValue("D" . $row, $data["location"]);
+            $event->sheet->setCellValue("E" . $row, $data["box"]);;
+            $event->sheet->setCellValue("F" . $row, $data["sender_name"]);
+            $event->sheet->setCellValue("G" . $row, $data["sender_address"]);
+            $event->sheet->setCellValue("H" . $row, $data["sender_contact_no"]);
+            $event->sheet->setCellValue("I" . $row, $data["sea_or_air"]);
+            $event->sheet->setCellValue("J" . $row, $data["details_of_cargo"]);
+            $event->sheet->setCellValue("K" . $row, $data["weight"]);
+            $event->sheet->setCellValue("L" . $row, $data["ygn_home_pickup"]);
+            $event->sheet->setCellValue("M" . $row, $data["what_sending"]);
+            $event->sheet->setCellValue("N" . $row, $data["how_in_sg"]);
+            $event->sheet->setCellValue("O" . $row, $data["payment_type"]);
+            $event->sheet->setCellValue("P" . $row, $data["receiver_name"]);
+            $event->sheet->setCellValue("Q" . $row, $data["receiver_address"]);
+            $event->sheet->setCellValue("R" . $row, $data["receiver_postalcode"]);
+            $event->sheet->setCellValue("S" . $row, $data["receiver_contact_no"]);
+            $event->sheet->setCellValue("T" . $row, $data["food_weight"]);
+            $event->sheet->setCellValue("U" . $row, $data["food_price"]);
+            $event->sheet->setCellValue("V" . $row, $data["clothes_weight"]);
+            $event->sheet->setCellValue("W" . $row, $data["clothes_price"]);
+            $event->sheet->setCellValue("X" . $row, $data["frozen_food_weight"]);
+            $event->sheet->setCellValue("Y" . $row, $data["frozen_food_price"]);
+            $event->sheet->setCellValue("Z" . $row, $data["other_weight"]);
+            $event->sheet->setCellValue("AA" . $row, $data["other_price"]);
+            $event->sheet->setCellValue("AB" . $row, $data["cosmetic_weight"]);
+            $event->sheet->setCellValue("AC" . $row, $data["cosmetic_price"]);
+            $event->sheet->setCellValue("AD" . $row, $data["email"]);
+            $event->sheet->setCellValue("AE" . $row, $data["addational_instruction"]);
+            $event->sheet->setCellValue("AF" . $row, $data["storage_type"]);
+            $event->sheet->setCellValue("AG" . $row, $data["how_in_ygn"]);
+            $event->sheet->setCellValue("AH" . $row, $data["sg_home_pickup"]);
+            $event->sheet->setCellValue("AI" . $row, $data["total_price"]);
+            $event->sheet->setCellValue("AJ" . $row, $data["total_weight"]);
+            $event->sheet->setCellValue("AK" . $row, $data["no_of_package"]);
+            $event->sheet->setCellValue("AL" . $row, $data["received"]);
+            $event->sheet->setCellValue("AM" . $row, $data["handling"]);
             $event->sheet->setCellValue("AN" . $row, $data["balance"]);
-            $event->sheet->setCellValue("AO" . $row, $data["handling"]);
 
-            $endTableRow = $row;
+            $event->sheet->styleCells(
+                "A$row:" . $this->endTableColumn . $row,
+                [
+                    'borders' => $styleArray['borderStyle'],
+                    'alignment' => $styleArray['verticalAlign'],
+                ]
+            );
+            // $event->sheet->styleCells(
+            //     "AN$row",
+            //     [
+            //         'fill' => $styleArray['fill']
+            //     ]
+            // );
 
             if ($lastExcelRow > $no) {
                 $row++;
@@ -182,10 +195,12 @@ class InvoiceExport implements WithHeadings, WithEvents, WithTitle
     {
         # set title style
         $event->sheet->styleCells(
-            'A1:AO1',
+            'A1:AN1',
             [
                 'font' => $styleArray['tableHeader'],
-                'alignment' => $styleArray['centerAlign']
+                'alignment' => $styleArray['centerAlign'],
+                'fill' => $styleArray['fill'],
+                'borders' => $styleArray['borderStyle']
             ]
 
         );
