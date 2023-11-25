@@ -240,8 +240,8 @@ class LogisticLogic
         }
 
         $returndData = [];
-        $SGMM = SgToMmItem::with('category')->where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
-        $MMSG = MmToSgItem::with('category')->where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
+        $SGMM = SgToMmItem::with('category', 'category.categoryName:id,name')->where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
+        $MMSG = MmToSgItem::with('category', 'category.categoryName:id,name')->where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
 
         if (!empty($MMSG) || !empty($SGMM)) {
             if (!empty($MMSG)) {
