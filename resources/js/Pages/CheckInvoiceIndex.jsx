@@ -13,6 +13,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment from "moment";
 import dayjs from "dayjs";
+import LocationModal from "./LocationModal";
 
 const CheckInvoiceIndex = (props) => {
     useEffect(() => {
@@ -37,6 +38,8 @@ const CheckInvoiceIndex = (props) => {
     const [deleteId, setDeleteId] = useState("");
     const [indexNumber, setIndexNumber] = useState("0");
     const [month, setMonth] = useState(dayjs());
+    const [locationModalShow, setLocationModalShow] = useState(false);
+    const [categories, setCategories] = useState([]);
 
     const invoiceNoChange = (e) => {
         setInvoiceNo(e.target.value);
@@ -133,6 +136,18 @@ const CheckInvoiceIndex = (props) => {
         setShow(true);
         setDeleteStatus(true);
         setDeleteId(id);
+    };
+
+    const locationClick = (id,invoiceNo) => {
+        setInvoiceNo(invoiceNo);
+        if(invoiceList.length > 0 ){
+            invoiceList.map((data,index) => {
+                if(data.id === id){
+                    setCategories(data.category)
+                }
+            })
+        }
+        setLocationModalShow(true);
     };
 
     const locationChange = (e, id) => {
@@ -284,6 +299,41 @@ const CheckInvoiceIndex = (props) => {
         setCurrentPage(pageNumber);
         searchClick(pageNumber);
     };
+
+    const locationSave = (itemsArr) => {
+        setLoading(true);
+        let url = "/set-location-shelf";
+        let params = itemsArr;
+
+        axios
+            .post(url, params)
+            .then((data) => {
+                setLoading(false);
+                toast.success("Successfully Update Location And ShelfNo!", {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            })
+            .catch((e) => {
+                setLoading(false);
+                toast.error("Fail To Update Location And ShelfNo!", {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            });
+    }
     return (
         <>
             <Modal
@@ -294,6 +344,13 @@ const CheckInvoiceIndex = (props) => {
                 saveOK={saveOK}
                 deleteOK={deleteOK}
                 deleteStatus={deleteStatus}
+            />
+            <LocationModal
+                show={locationModalShow}
+                onClose={() => setLocationModalShow(false)}
+                categories={categories}
+                invoiceNo={invoiceNo}
+                locationSave={locationSave}
             />
             <ToastContainer
                 position="top-right"
@@ -497,7 +554,12 @@ const CheckInvoiceIndex = (props) => {
                                                             </div>
                                                         </td>
                                                         <td width={75}>
-                                                            <button className="bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600">
+                                                            <button
+                                                                onClick={
+                                                                    ()=>locationClick(data.id,data.invoice_no)
+                                                                }
+                                                                className="bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600"
+                                                            >
                                                                 Location
                                                             </button>
                                                         </td>
