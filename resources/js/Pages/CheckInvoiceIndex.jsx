@@ -303,7 +303,7 @@ const CheckInvoiceIndex = (props) => {
     const locationSave = (itemsArr) => {
         setLoading(true);
         let url = "/set-location-shelf";
-        let params = {items:itemsArr};
+        let params = {invoice_no:invoiceNo,items:itemsArr};
 
         axios
             .post(url, params)

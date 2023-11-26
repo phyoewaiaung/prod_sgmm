@@ -52,7 +52,7 @@ export default function LocationModal(props) {
         let itemsArr = [];
 
         cargoData.map(d => {
-            itemsArr.push({invoice_no:props.invoiceNo,category_id:d.id,item_category_id:d.item_category_id,location:allCheck?allLocation:d.category_name.location?? "",shelf_no:allCheck? allShelfNo: d.category_name.shelfNo??""})
+            itemsArr.push({category_id:d.id,item_category_id:d.item_category_id,location:allCheck?allLocation:d.category_name.location?? "",shelf_no:allCheck? allShelfNo: d.category_name.shelfNo??""})
         })
 
         props.locationSave(itemsArr);
