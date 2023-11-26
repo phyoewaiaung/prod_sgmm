@@ -18,7 +18,7 @@ const Modal = (props) => {
                                             Invoice No <span className='ms-3 bg-blue-200 text-indigo-900'>{props.invoiceNo}</span>
                                         </h6> :
                                         <h6 className="text-2xl font-semibold text-red-800">
-                                            Delete Confirmation
+                                            Cancel Confirmation
                                         </h6>
                                     }
                                 </div>
@@ -26,9 +26,9 @@ const Modal = (props) => {
                                 <div className="relative pl-6 pr-6 pt-2 pb-2 flex-auto">
                                     <p className="my-4 leading-relaxed">
                                         {!props.deleteStatus ?
-                                        props.type == "1" ? "Are you sure want to update LOCATION?" : "Are you sure want to update SHELF NO?"
+                                        props.type == "1" ? "Are you sure want to update Arrival Status?" : "Are you sure want to update SHELF NO?"
                                         :
-                                        "Are you sure you want to delete this invoice!"
+                                        "Are you sure you want to cancel this invoice!"
                                     }
                                     </p>
                                 </div>
