@@ -138,11 +138,11 @@ const CheckInvoiceIndex = (props) => {
         setDeleteId(id);
     };
 
-    const locationClick = (id,invoiceNo) => {
-        setInvoiceNo(invoiceNo);
+    const locationClick = (invoice) => {
+        setInvoiceNo(invoice);
         if(invoiceList.length > 0 ){
             invoiceList.map((data,index) => {
-                if(data.id === id){
+                if(data.invoice_no === invoice){
                     setCategories(data.category)
                 }
             })
@@ -556,7 +556,7 @@ const CheckInvoiceIndex = (props) => {
                                                         <td width={75}>
                                                             <button
                                                                 onClick={
-                                                                    ()=>locationClick(data.id,data.invoice_no)
+                                                                    ()=>locationClick(data.invoice_no)
                                                                 }
                                                                 className="bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600"
                                                             >
