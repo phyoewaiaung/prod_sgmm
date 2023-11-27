@@ -26,7 +26,7 @@ class LogisticController extends Controller
             "sender_name" => "required",
             "sender_phone" => "required",
             "sg_home_pickup" => "required",
-            "sg_address" => "required",
+            // "sg_address" => "required",
             "shipment_method" => "required",
             "how_in_ygn" => "required|in:1,2,3,4",
             "payment_type" => "required|in:1,2",

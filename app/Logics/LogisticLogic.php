@@ -246,12 +246,24 @@ class LogisticLogic
 
         if (!empty($MMSG) || !empty($SGMM)) {
             if (!empty($MMSG)) {
+                $MMSG = json_decode($MMSG, true);
                 foreach ($MMSG as $data) {
+                    foreach ($data['category'] as $key => $modify) {
+                        $modify['category_name']['location'] = $modify['location'];
+                        $modify['category_name']['shelf_no'] = $modify['shelf_no'];
+                        $data['category'][$key]['category_name'] = $modify['category_name'];
+                    }
                     array_push($returndData, $data);
                 }
             }
             if (!empty($SGMM)) {
+                $SGMM = json_decode($SGMM, true);
                 foreach ($SGMM as $data) {
+                    foreach ($data['category'] as $key => $modify) {
+                        $modify['category_name']['location'] = $modify['location'];
+                        $modify['category_name']['shelf_no'] = $modify['shelf_no'];
+                        $data['category'][$key]['category_name'] = $modify['category_name'];
+                    }
                     array_push($returndData, $data);
                 }
             };
@@ -298,7 +310,6 @@ class LogisticLogic
                 $returndData["handling_fee"]    = $MMSG['handling_fee'];
                 $returndData["form"]            = $MMSG['form'];
                 $returndData["estimated_arrival"] = $MMSG['estimated_arrival'];
-                $returndData["shelf_no"]        = $MMSG['shelf_no'];
                 $returndData["payment_status"]  = $MMSG['payment_status'];
                 $returndData["additional_instruction"] = $MMSG['additional_instruction'];
                 $returndData["created_at"]      = $MMSG['created_at'];
@@ -331,7 +342,6 @@ class LogisticLogic
                 $returndData["receiver_phone"]  = $SGMM['receiver_phone'];
                 $returndData["form"]            = $SGMM['form'];
                 $returndData["estimated_arrival"] = $SGMM['estimated_arrival'];
-                $returndData["shelf_no"]        = $SGMM['shelf_no'];
                 $returndData["handling_fee"]    = $SGMM['handling_fee'];
                 $returndData["payment_status"]  = $SGMM['payment_status'];
                 $returndData["note"]            = $SGMM['note'];
@@ -562,8 +572,8 @@ class LogisticLogic
             $ready[$key]['date'] = Carbon::parse($exportData['created_at'])->format('m/d/Y H:m:s');
             $ready[$key]['collection_status'] = $exportData['payment_status'] == 1 ? 'Pending' : 'Collected';;
             $ready[$key]['receipt_no'] = $exportData['invoice_no'];
-            $ready[$key]['location'] = 'ma ti tay';
-            $ready[$key]['box'] = 'ma ti tay';
+            $ready[$key]['location'] = collect($exportData['category'])->pluck('location')->filter()->implode(', ');
+            $ready[$key]['box'] = collect($exportData['category'])->pluck('shelf_no')->filter()->implode(', ');
             $ready[$key]['sender_name'] = $exportData['sender_name'];
             $ready[$key]['sender_address'] = $exportData['sender_address'];
             $ready[$key]['sender_contact_no'] = $exportData['sender_phone'];
@@ -613,8 +623,8 @@ class LogisticLogic
             $ready[$key]['total_weight'] = collect($exportData['category'])->pluck('weight')->sum();
             $ready[$key]['no_of_package'] = count($exportData['category']);
             $ready[$key]['received'] = $exportData['payment_status'] == 1 ? 'Pending' : 'Received';
-            $ready[$key]['balance'] = 1000;
-            $ready[$key]['handling'] = $exportData['handling_fee'];
+            $ready[$key]['balance'] = $exportData['total_price'];
+            $ready[$key]['handling'] = $exportData['handling_fee'] == 1 ? 'Yes' : 'No';
 
             if ($exportData['form'] === 1) {
                 $ready[$key]['sea_or_air'] = '';
