@@ -40,7 +40,7 @@ trait CommonTrait
 
         if ($data['name'] === 'SGMM') {
             $default = "SM";
-            $lastNo = SgToMmItem::where('invoice_no', 'like', "%$default$year-$month" . "W" . "$weekOfMonth%")->orderBy('created_at', 'desc')->first();
+            $lastNo = SgToMmItem::where('invoice_no', 'like', "%$default$year-$month" . "W" . "$weekOfMonth%")->orderBy('created_at', 'desc')->withTrashed()->first();
 
             if (!empty($lastNo)) {
                 $dbNo = $lastNo->invoice_no;
@@ -54,10 +54,10 @@ trait CommonTrait
         } else if ($data['name'] === 'MMSG') {
             if ($data['form'] == 2) {
                 $default = "MS";
-                $lastNo = MmToSgItem::where('invoice_no', 'like', "%$default$year-$month" . "W" . "$weekOfMonth%")->orderBy('created_at', 'desc')->first();
+                $lastNo = MmToSgItem::where('invoice_no', 'like', "%$default$year-$month" . "W" . "$weekOfMonth%")->orderBy('created_at', 'desc')->withTrashed()->first();
             } else if ($data['form'] == 3) {
                 $default = "AS";
-                $lastNo = MmToSgItem::where('invoice_no', 'like', "%$default$year-$month" . "W" . "$weekOfMonth%")->orderBy('created_at', 'desc')->first();
+                $lastNo = MmToSgItem::where('invoice_no', 'like', "%$default$year-$month" . "W" . "$weekOfMonth%")->orderBy('created_at', 'desc')->withTrashed()->first();
                 $no = '502';
             }
             if (!empty($lastNo)) {
