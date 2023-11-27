@@ -11,9 +11,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Pagination\LengthAwarePaginator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 trait CommonTrait
 {
@@ -109,6 +110,10 @@ trait CommonTrait
     public function createPdf($data)
     // public function createPdf()
     {
+        if (!file_exists(storage_path('app/public/parcel-tag-file'))) {
+            Storage::makeDirectory('public/parcel-tag-file');
+            Artisan::call('storage:link');
+        }
         // $data = SgToMmItem::orderBy('id', 'desc')->first();
         // $data = MmToSgItem::orderBy('id', 'desc')->first();
         $flag = $data->form;
@@ -151,6 +156,16 @@ trait CommonTrait
         // $generateData = MmToSgItem::where('invoice_no', $request->invoice_no)
         //     ->with('category:*', 'category.categoryName')
         //     ->first();
+
+        if (!file_exists(storage_path('app/public/qr_code'))) {
+            Storage::makeDirectory('public/qr_code');
+            Artisan::call('storage:link');
+        }
+
+        if (!file_exists(storage_path('app/public/invoice-issue'))) {
+            Storage::makeDirectory('public/invoice-issue');
+            Artisan::call('storage:link');
+        }
 
         $invoiceNo = $generateData['invoice_no'];
         $form = $generateData['form'];
