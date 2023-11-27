@@ -127,31 +127,37 @@ const InvoiceIssueIndex = (props) => {
         props.data.category.map((d) => {
             if (d.id == "1" && d.weight != null) {
                 setFoodWeight(d.weight);
-                setTotalFood(parseFloat(d.weight * foodUnit).toFixed(2));
+                setFoodUnitCustom(d.unit_price);
+                setTotalFood(parseFloat(d.weight * (d.unit_price? d.unit_price : foodUnit)).toFixed(2));
             }
             if (d.id == "2" && d.weight != null) {
                 setClothWeight(d.weight);
-                setTotalCloth(parseFloat(d.weight * foodUnit).toFixed(2));
+                setClothUnitCustom(d.unit_price);
+                setTotalCloth(parseFloat(d.weight * (d.unit_price ? d.unit_price : clothUnit)).toFixed(2));
             }
             if (d.id == "3" && d.weight != null) {
                 setCosmeticWeight(d.weight);
+                setCosmeticUnitCustom(d.unit_price);
                 setTotalCosmetic(
-                    parseFloat(d.weight * cosmeticUnit).toFixed(2)
+                    parseFloat(d.weight * (d.unit_price ? d.unit_price : cosmeticUnit)).toFixed(2)
                 );
             }
             if (d.id == "4" && d.weight != null) {
                 setShoeWeight(d.weight);
-                setTotalShoe(parseFloat(d.weight * shoeUnit).toFixed(2));
+                setShoeUnitCustom(d.unit_price);
+                setTotalShoe(parseFloat(d.weight * (d.unit_price ? d.unit_price : shoeUnit)).toFixed(2));
             }
             if (d.id == "5" && d.weight != null) {
                 setElectronicWeight(d.weight);
+                setElectronicUnitCustom(d.unit_price);
                 setTotalElectronic(
-                    parseFloat(d.weight * electronicUnit).toFixed(2)
+                    parseFloat(d.weight * (d.unit_price ? d.unit_price : electronicUnit)).toFixed(2)
                 );
             }
             if (d.id == "6" && d.weight != null) {
                 setFrozenWeight(d.weight);
-                setTotalFrozen(parseFloat(d.weight * frozenUnit).toFixed(2));
+                setFrozenUnitCustom(d.unit_price);
+                setTotalFrozen(parseFloat(d.weight * (d.unit_price ? d.unit_price : frozenUnit)).toFixed(2));
             }
             if (d.id == "7" && d.weight != null) {
                 setOthersWeight(d.weight);
@@ -275,31 +281,39 @@ const InvoiceIssueIndex = (props) => {
         let data = categories.map((d) => {
             if (d.id == "1") {
                 d.weight = foodWeight;
-                d.unit_price = foodUnit;
+                d.unit_price = foodUnitCustom ? foodUnitCustom : foodUnit;
+                d.total_price = totalFood;
             }
             if (d.id == "2") {
                 d.weight = clothWeight;
-                d.unit_price = foodUnit;
+                d.unit_price = clothUnitCustom ? clothUnitCustom : clothUnit;
+                d.total_price = totalCloth;
             }
             if (d.id == "3") {
                 d.weight = cosmeticWeight;
-                d.unit_price = cosmeticUnit;
+                d.unit_price = cosmeticUnitCustom ? cosmeticUnitCustom : cosmeticUnit;
+                d.total_price = totalCosmetic;
             }
+
             if (d.id == "4") {
                 d.weight = shoeWeight;
-                d.unit_price = shoeUnit;
+                d.unit_price = shoeUnitCustom ? shoeUnitCustom : shoeUnit;
+                d.total_price = totalShoe
             }
             if (d.id == "5") {
                 d.weight = electronicWeight;
-                d.unit_price = electronicUnit;
+                d.unit_price = electronicUnitCustom ? electronicUnitCustom : electronicUnit;
+                d.total_price = totalElectronic;
             }
             if (d.id == "6") {
                 d.weight = frozenWeight;
-                d.unit_price = frozenUnit;
+                d.unit_price = frozenUnitCustom ? frozenUnitCustom : frozenUnit;
+                d.total_price = totalFrozen;
             }
             if (d.id == "7") {
                 d.weight = othersWeight;
                 d.unit_price = othersUnit;
+                d.total_price = totalOther
             }
             return d;
         });

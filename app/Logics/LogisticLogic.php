@@ -310,6 +310,7 @@ class LogisticLogic
                 $returndData["handling_fee"]    = $MMSG['handling_fee'];
                 $returndData["form"]            = $MMSG['form'];
                 $returndData["estimated_arrival"] = $MMSG['estimated_arrival'];
+                // $returndData["shelf_no"]        = $MMSG['shelf_no'];
                 $returndData["payment_status"]  = $MMSG['payment_status'];
                 $returndData["additional_instruction"] = $MMSG['additional_instruction'];
                 $returndData["created_at"]      = $MMSG['created_at'];
@@ -342,6 +343,7 @@ class LogisticLogic
                 $returndData["receiver_phone"]  = $SGMM['receiver_phone'];
                 $returndData["form"]            = $SGMM['form'];
                 $returndData["estimated_arrival"] = $SGMM['estimated_arrival'];
+                // $returndData["shelf_no"]        = $SGMM['shelf_no'];
                 $returndData["handling_fee"]    = $SGMM['handling_fee'];
                 $returndData["payment_status"]  = $SGMM['payment_status'];
                 $returndData["note"]            = $SGMM['note'];

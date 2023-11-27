@@ -140,12 +140,12 @@ const CheckInvoiceIndex = (props) => {
 
     const locationClick = (invoice) => {
         setInvoiceNo(invoice);
-        if(invoiceList.length > 0 ){
-            invoiceList.map((data,index) => {
-                if(data.invoice_no === invoice){
-                    setCategories(data.category)
+        if (invoiceList.length > 0) {
+            invoiceList.map((data, index) => {
+                if (data.invoice_no === invoice) {
+                    setCategories(data.category);
                 }
-            })
+            });
         }
         setLocationModalShow(true);
     };
@@ -184,18 +184,23 @@ const CheckInvoiceIndex = (props) => {
             .post(url, params, { responseType: "blob" })
             .then((data) => {
                 setLoading(false);
-                console.log(data)
 
                 const href = URL.createObjectURL(data.data);
                 const link = document.createElement("a");
                 link.href = href;
-                link.setAttribute("download", "file.xlsx"); //or any other extension
+                link.setAttribute(
+                    "download",
+                    data.headers["content-disposition"]
+                        .split("; ")
+                        .find((part) => part.startsWith("filename="))
+                        .split("=")[1]
+                ); //or any other extension
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(href);
 
-                toast.success("Successfully Downloaded !", {
+                toast.success("Successfully Downloaded!", {
                     position: "top-right",
                     autoClose: 2000,
                     hideProgressBar: false,
@@ -208,7 +213,7 @@ const CheckInvoiceIndex = (props) => {
             })
             .catch((e) => {
                 setLoading(false);
-                toast.error("Fail To Download " + text + "!", {
+                toast.error("Data is not found!", {
                     position: "top-right",
                     autoClose: 2000,
                     hideProgressBar: false,
@@ -303,8 +308,8 @@ const CheckInvoiceIndex = (props) => {
 
     const locationSave = (itemsArr) => {
         setLoading(true);
-        let url = "/set-location-shelf";
-        let params = {invoice_no:invoiceNo,items:itemsArr};
+        let url = "/update-shelf";
+        let params = { invoice_no: invoiceNo, items: itemsArr };
 
         axios
             .post(url, params)
@@ -334,7 +339,7 @@ const CheckInvoiceIndex = (props) => {
                     theme: "dark",
                 });
             });
-    }
+    };
     return (
         <>
             <Modal
@@ -556,8 +561,10 @@ const CheckInvoiceIndex = (props) => {
                                                         </td>
                                                         <td width={75}>
                                                             <button
-                                                                onClick={
-                                                                    ()=>locationClick(data.invoice_no)
+                                                                onClick={() =>
+                                                                    locationClick(
+                                                                        data.invoice_no
+                                                                    )
                                                                 }
                                                                 className="bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600"
                                                             >
