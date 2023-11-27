@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('sg_category_items', function (Blueprint $table) {
             $table->id();
-            $table->integer('sg_to_mm_id');
-            $table->integer('item_category_id');
+            $table->foreignId('sg_to_mm_id')->references('id')->on('sg_to_mm_items')->constrained()->onDelete('cascade');
+            $table->integer('item_category_id')->references('id')->on('item_categories')->constrained()->onDelete('cascade');
             $table->string('name')->nullable();
             $table->string('weight')->nullable();
             $table->string('unit_price')->nullable();
