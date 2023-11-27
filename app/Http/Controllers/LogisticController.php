@@ -53,7 +53,7 @@ class LogisticController extends Controller
             // "sender_email" => "required|email",
             "sender_name" => "required",
             "sender_phone" => "required",
-            "sender_address" => "required",
+            // "sender_address" => "required",
             "transport" => "required",
             "storage_type" => "required",
             "mm_home_pickup" => "required",
@@ -61,7 +61,7 @@ class LogisticController extends Controller
             "payment_type" => "required|in:1,2",
             "receiver_postal_code" => "",
             "receiver_name" => "required",
-            "receiver_address" => "required",
+            // "receiver_address" => "required",
             "receiver_phone" => "required",
             "additional_instruction" => "",
             "items"  => "required|Array"
@@ -120,7 +120,7 @@ class LogisticController extends Controller
     {
         $validator = Validator::make($request->all(), [
             "invoice_no"    => "required",
-            "shelf_no"      => "required",
+            "items"      => "required|array",
         ]);
 
         if ($validator->fails()) {
@@ -130,13 +130,14 @@ class LogisticController extends Controller
             ], 422);
         }
         $data = $this->logisticLogic->getInvoiceData($request);
-
+        // return $data;
         if (empty($data)) {
             return response()->json(['status' => 404, 'message' => 'Data is Not Found !'], 404);
         }
-
-        $data->shelf_no = $request->shelf_no;
-        $data->update();
+        $updateData =  $this->logisticLogic->updateLocationAndShelf($data, $request);
+        if (!$updateData) {
+            return response()->json(['status' => 500, 'message' => 'Something Was Wrong'], 500);
+        }
 
         return response()->json(['status' => 200, 'message' => 'Update Successfully', 'data' => $data], 200);
     }

@@ -13,6 +13,7 @@ use App\Models\SgCategoryItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpParser\Node\Stmt\TryCatch;
 
 class LogisticLogic
 {
@@ -188,7 +189,7 @@ class LogisticLogic
 
                 $getParcelTagFile = $this->createPdf($logistic, 2);
 
-                if ($getParcelTagFile['status'] == "OK" && $logistic->email != null) {
+                if ($getParcelTagFile['status'] == "OK" && $logistic->sender_email != null) {
 
                     $sender = [
                         "email" => $logistic->sender_email,
@@ -240,8 +241,8 @@ class LogisticLogic
         }
 
         $returndData = [];
-        $SGMM = SgToMmItem::with('category', 'category.categoryName:id,name')->where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
-        $MMSG = MmToSgItem::with('category', 'category.categoryName:id,name')->where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'shelf_no', 'total_price', 'created_at')->get();
+        $SGMM = SgToMmItem::with('category', 'category.categoryName:id,name')->where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'total_price', 'created_at', 'deleted_at')->withTrashed()->get();
+        $MMSG = MmToSgItem::with('category', 'category.categoryName:id,name')->where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status', 'estimated_arrival', 'total_price', 'created_at', 'deleted_at')->withTrashed()->get();
 
         if (!empty($MMSG) || !empty($SGMM)) {
             if (!empty($MMSG)) {
@@ -525,7 +526,6 @@ class LogisticLogic
 
 
         if (count($MMSG) || count($SGMM)) {
-            Log::info('shi');
             if (!empty($MMSG)) {
                 foreach ($MMSG as $data) {
                     array_push($exportDatas, $data);
@@ -642,5 +642,24 @@ class LogisticLogic
         }
 
         return $ready;
+    }
+
+    public function updateLocationAndShelf($data, $request)
+    {
+        try {
+            foreach ($request->items as $updateData) {
+                foreach ($data['category'] as $dbData) {
+                    if ($dbData['item_category_id'] === $updateData['item_category_id'] && $dbData['id'] === $updateData['category_id']) {
+                        $dbData['location'] = $updateData['location'];
+                        $dbData['shelf_no'] = $updateData['shelf_no'];
+                        $dbData->save();
+                    }
+                }
+            }
+            return true;
+        } catch (\Throwable $th) {
+            Log::info($th);
+            return false;
+        }
     }
 }
