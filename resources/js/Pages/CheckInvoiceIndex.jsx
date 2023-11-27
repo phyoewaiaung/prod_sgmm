@@ -184,6 +184,7 @@ const CheckInvoiceIndex = (props) => {
             .post(url, params, { responseType: "blob" })
             .then((data) => {
                 setLoading(false);
+                console.log(data)
 
                 const href = URL.createObjectURL(data.data);
                 const link = document.createElement("a");

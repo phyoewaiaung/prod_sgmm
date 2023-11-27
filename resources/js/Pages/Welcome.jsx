@@ -2,7 +2,6 @@ import { Link } from "@inertiajs/react";
 import EventEmitter from "@/utils/EventEmitter";
 import { useEffect } from "react";
 export default function Welcome(props) {
-    console.log(props)
     useEffect(()=> {
         EventEmitter.emit("auth",{
             auth:props.auth.user?true:false
