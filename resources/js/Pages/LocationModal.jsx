@@ -10,8 +10,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 import { useEffect } from "react";
 import Loading from "@/Common/Loading";
-import { ToastContainer,toast } from "react-toastify";
-
+import { ToastContainer, toast } from "react-toastify";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     "& .MuiDialogContent-root": {
@@ -28,14 +27,47 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 export default function LocationModal(props) {
     const [allCheck, setAllCheck] = useState(false);
-    const [cargoData, setCargoData] = useState(props.categories);
+    const [cargoData, setCargoData] = useState([]);
     const [allLocation, setAllLocation] = useState("");
     const [allShelfNo, setAllShelfNo] = useState("");
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        setCargoData(props.categories);
+        let cargoArr = JSON.parse(JSON.stringify(props.categories));
+        if (cargoArr.length > 0) {
+            const sameLocation = getAllLocationStatus(cargoArr); // check all location is same
+            const sameShelfNo = getAllShelfNoStatus(cargoArr); // check all shelf no is same
+            if (sameLocation && sameShelfNo) {
+                setAllCheck(true);
+                setAllLocation(cargoArr[0].category_name.location);
+                setAllShelfNo(cargoArr[0].category_name.shelf_no);
+                setCargoData(cargoArr);
+            } else {
+                setCargoData(
+                    cargoArr.map((d) => {
+                        if (d.category_name.location || d.shelf_no) {
+                            d.isChecked = true;
+                        }
+                        return d;
+                    })
+                );
+            }
+        }
     }, [props.categories]);
+
+    function getAllLocationStatus(dataArray) {
+        const firstCategoryLocation = dataArray[0].category_name.location;
+        return dataArray.every(
+            (item) => item.category_name.location === firstCategoryLocation
+        );
+    }
+
+    function getAllShelfNoStatus(dataArray) {
+        const firstCategoryShelfNo = dataArray[0].category_name.shelf_no;
+        return dataArray.every(
+            (item) => item.category_name.shelf_no === firstCategoryShelfNo
+        );
+    }
 
     const cargoOnChage = (id) => {
         let data = cargoData.map((data) => {
@@ -51,9 +83,18 @@ export default function LocationModal(props) {
         props.onClose();
         let itemsArr = [];
 
-        cargoData.map(d => {
-            itemsArr.push({category_id:d.id,item_category_id:d.item_category_id,location:allCheck?allLocation:d.category_name.location?? "",shelf_no:allCheck? allShelfNo: d.category_name.shelfNo??""})
-        })
+        cargoData.map((d) => {
+            itemsArr.push({
+                category_id: d.id,
+                item_category_id: d.item_category_id,
+                location: allCheck
+                    ? allLocation
+                    : d.category_name.location ?? "",
+                shelf_no: allCheck
+                    ? allShelfNo
+                    : d.category_name.shelf_no ?? "",
+            });
+        });
 
         props.locationSave(itemsArr);
     };
@@ -73,7 +114,7 @@ export default function LocationModal(props) {
         setCargoData(
             cargoData.map((d) => {
                 if (d.category_name.id === id) {
-                    d.category_name.shelfNo = event.target.value;
+                    d.category_name.shelf_no = event.target.value;
                 }
                 return d;
             })
@@ -82,11 +123,11 @@ export default function LocationModal(props) {
 
     const allLocationChange = (e) => {
         setAllLocation(e.target.value);
-    }
+    };
 
     const allShelfNoChange = (e) => {
         setAllShelfNo(e.target.value);
-    }
+    };
 
     return (
         <React.Fragment>
@@ -116,7 +157,20 @@ export default function LocationModal(props) {
                         className=" dark:bg-gray-400 focus:ring cursor-pointer focus:ring-blue-100 focus:ring-opacity-50 focus:outline-none"
                         type="checkbox"
                         id="all-items"
-                        onChange={() => setAllCheck(!allCheck)}
+                        onChange={() => {
+                            setAllCheck(!allCheck);
+                            setCargoData(
+                                cargoData.map((d) => {
+                                    if (
+                                        d.category_name.location ||
+                                        d.shelf_no
+                                    ) {
+                                        d.isChecked = true;
+                                    }
+                                    return d;
+                                })
+                            );
+                        }}
                         checked={allCheck}
                     />
                     <label htmlFor="all-items" className="ms-2 cursor-pointer">
@@ -133,7 +187,7 @@ export default function LocationModal(props) {
                             cargoData.map((data, index) => {
                                 return (
                                     <div
-                                    key={data.id}
+                                        key={data.id}
                                         className={
                                             !data.isChecked
                                                 ? "ml-6 mt-3 p-3 rounded"
@@ -157,7 +211,7 @@ export default function LocationModal(props) {
                                             checked={
                                                 allCheck === true
                                                     ? true
-                                                    : data.isChecked?? false
+                                                    : data.isChecked ?? false
                                             }
                                             disabled={allCheck ? true : false}
                                         />
@@ -213,7 +267,7 @@ export default function LocationModal(props) {
                                                         id=""
                                                         value={
                                                             data.category_name
-                                                                .shelfNo
+                                                                .shelf_no
                                                         }
                                                         onChange={(e) =>
                                                             subShelfNoChange(

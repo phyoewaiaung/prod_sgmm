@@ -325,6 +325,7 @@ const CheckInvoiceIndex = (props) => {
                     progress: undefined,
                     theme: "dark",
                 });
+                searchClick(currentPage);
             })
             .catch((e) => {
                 setLoading(false);
@@ -351,13 +352,15 @@ const CheckInvoiceIndex = (props) => {
                 deleteOK={deleteOK}
                 deleteStatus={deleteStatus}
             />
-            <LocationModal
-                show={locationModalShow}
-                onClose={() => setLocationModalShow(false)}
-                categories={categories}
-                invoiceNo={invoiceNo}
-                locationSave={locationSave}
-            />
+            {locationModalShow && (
+                <LocationModal
+                    show={locationModalShow}
+                    onClose={() => setLocationModalShow(false)}
+                    categories={categories}
+                    invoiceNo={invoiceNo}
+                    locationSave={locationSave}
+                />
+            )}
             <ToastContainer
                 position="top-right"
                 autoClose={2000}
