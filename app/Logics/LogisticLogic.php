@@ -486,8 +486,8 @@ class LogisticLogic
             $searchData[] = ['invoice_no', $request->invoice_no];
         }
 
-        $SGMM = SgToMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status as collection_status', 'estimated_arrival', 'shelf_no', 'total_price', 'how_in_ygn as collection_type', 'pay_with', 'updated_at')->first();
-        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status as collection_status', 'estimated_arrival', 'shelf_no', 'total_price', 'how_in_sg as collection_type', 'pay_with', 'updated_at')->first();
+        $SGMM = SgToMmItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status as collection_status', 'estimated_arrival',  'total_price', 'how_in_ygn as collection_type', 'pay_with', 'updated_at')->first();
+        $MMSG = MmToSgItem::where($searchData)->select('id', 'invoice_no', 'sender_name', 'receiver_name', 'payment_type', 'payment_status as collection_status', 'estimated_arrival',  'total_price', 'how_in_sg as collection_type', 'pay_with', 'updated_at')->first();
 
         if (!empty($SGMM) || !empty($MMSG)) {
             if (!empty($MMSG)) {

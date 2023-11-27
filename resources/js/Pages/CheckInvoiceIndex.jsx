@@ -14,6 +14,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment from "moment";
 import dayjs from "dayjs";
 import LocationModal from "./LocationModal";
+import { Stack } from "@mui/material";
 
 const CheckInvoiceIndex = (props) => {
     useEffect(() => {
@@ -139,7 +140,7 @@ const CheckInvoiceIndex = (props) => {
     };
 
     const locationClick = (invoice) => {
-        setInvoiceNo(invoice);
+        // setInvoiceNo(invoice);
         if (invoiceList.length > 0) {
             invoiceList.map((data, index) => {
                 if (data.invoice_no === invoice) {
@@ -392,21 +393,21 @@ const CheckInvoiceIndex = (props) => {
                     </h2>
                     <div className="mb-[50px] mt-5">
                         <div className="flex items-center gap-4">
-                            <div className="dark:text-gray-400">
-                                <LocalizationProvider
-                                    dateAdapter={AdapterDayjs}
-                                >
-                                    <DemoContainer components={["DatePicker"]}>
-                                        <DatePicker
-                                            value={month}
-                                            onChange={(date) =>
-                                                handleDateChange(date)
-                                            }
-                                            views={["month", "year"]}
-                                            format={"YYYY-MM"}
-                                        />
-                                    </DemoContainer>
-                                </LocalizationProvider>
+                            <div className="dark:text-gray-400 dark:bg-gray-400">
+                                <Stack>
+                                    <LocalizationProvider
+                                        dateAdapter={AdapterDayjs}
+                                    >
+                                            <DatePicker
+                                                value={month}
+                                                onChange={(date) =>
+                                                    handleDateChange(date)
+                                                }
+                                                views={["month", "year"]}
+                                                format={"YYYY-MM"}
+                                            />
+                                    </LocalizationProvider>
+                                </Stack>
                             </div>
                             <div className="pt-[8px]">
                                 <button
@@ -491,7 +492,15 @@ const CheckInvoiceIndex = (props) => {
                                         {invoiceList.length > 0 &&
                                             invoiceList.map((data, index) => {
                                                 return (
-                                                    <tr key={index}>
+                                                    <tr
+                                                        key={index}
+                                                        className={
+                                                            data.deleted_at !==
+                                                            null
+                                                                ? "bg-gray-200"
+                                                                : ""
+                                                        }
+                                                    >
                                                         <td
                                                             className="dark:text-black"
                                                             width={50}
@@ -521,90 +530,110 @@ const CheckInvoiceIndex = (props) => {
                                                             {data.receiver_name}
                                                         </td>
                                                         <td
-                                                            className="dark:text-black"
+                                                            className={
+                                                                data.deleted_at ===
+                                                                null
+                                                                    ? "dark:text-black"
+                                                                    : "text-red-600"
+                                                            }
                                                             width={100}
                                                         >
-                                                            {data.payment_status ==
-                                                            "1"
+                                                            {data.deleted_at !==
+                                                            null
+                                                                ? "canceled"
+                                                                : data.payment_status ==
+                                                                  "1"
                                                                 ? "Not Collected"
                                                                 : "Collected"}
                                                         </td>
                                                         <td width={150}>
-                                                            <div className="flex justify-center">
-                                                                <input
-                                                                    className="dark:text-black w-[120px]"
-                                                                    type="text"
-                                                                    value={
-                                                                        data.estimated_arrival ==
-                                                                        null
-                                                                            ? ""
-                                                                            : data.estimated_arrival
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        locationChange(
-                                                                            e,
+                                                            {data.deleted_at ===
+                                                                null && (
+                                                                <div className="flex justify-center">
+                                                                    <input
+                                                                        className="dark:text-black w-[120px]"
+                                                                        type="text"
+                                                                        value={
+                                                                            data.estimated_arrival ==
+                                                                            null
+                                                                                ? ""
+                                                                                : data.estimated_arrival
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            locationChange(
+                                                                                e,
+                                                                                data.invoice_no
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            setClick(
+                                                                                1,
+                                                                                data
+                                                                            )
+                                                                        }
+                                                                        className="set-btn"
+                                                                    >
+                                                                        Set
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                        <td width={75}>
+                                                            {data.deleted_at ===
+                                                                null && (
+                                                                <button
+                                                                    onClick={() =>
+                                                                        locationClick(
                                                                             data.invoice_no
                                                                         )
                                                                     }
-                                                                />
-                                                                <button
-                                                                    onClick={() =>
-                                                                        setClick(
-                                                                            1,
-                                                                            data
-                                                                        )
-                                                                    }
-                                                                    className="set-btn"
+                                                                    className="bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600"
                                                                 >
-                                                                    Set
+                                                                    Location
                                                                 </button>
-                                                            </div>
-                                                        </td>
-                                                        <td width={75}>
-                                                            <button
-                                                                onClick={() =>
-                                                                    locationClick(
-                                                                        data.invoice_no
-                                                                    )
-                                                                }
-                                                                className="bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600"
-                                                            >
-                                                                Location
-                                                            </button>
+                                                            )}
                                                         </td>
                                                         <td width={100}>
-                                                            <Link
-                                                                href={route(
-                                                                    "invoice-issue"
-                                                                )}
-                                                                method="get"
-                                                                data={{
-                                                                    invoice_no:
-                                                                        data.invoice_no,
-                                                                }}
-                                                                preserveState={
-                                                                    true
-                                                                }
-                                                            >
-                                                                <button className="bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600">
-                                                                    Invoice
-                                                                    issue
-                                                                </button>
-                                                            </Link>
+                                                            {data.deleted_at ===
+                                                                null && (
+                                                                <Link
+                                                                    href={route(
+                                                                        "invoice-issue"
+                                                                    )}
+                                                                    method="get"
+                                                                    data={{
+                                                                        invoice_no:
+                                                                            data.invoice_no,
+                                                                    }}
+                                                                    preserveState={
+                                                                        true
+                                                                    }
+                                                                >
+                                                                    <button className="bg-gradient-to-r from-green-400 to-green-500 text-white p-2 rounded hover:from-green-500 hover:to-green-600">
+                                                                        Invoice
+                                                                        issue
+                                                                    </button>
+                                                                </Link>
+                                                            )}
                                                         </td>
                                                         <td width={75}>
-                                                            <button
-                                                                onClick={() =>
-                                                                    cancelClick(
-                                                                        data.invoice_no
-                                                                    )
-                                                                }
-                                                                className="bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600"
-                                                            >
-                                                                Cancel
-                                                            </button>
+                                                            {data.deleted_at ===
+                                                                null && (
+                                                                <button
+                                                                    onClick={() =>
+                                                                        cancelClick(
+                                                                            data.invoice_no
+                                                                        )
+                                                                    }
+                                                                    className="bg-gradient-to-r from-red-400 to-red-500 text-white p-2 rounded hover:from-red-500 hover:to-red-600"
+                                                                >
+                                                                    Cancel
+                                                                </button>
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 );
