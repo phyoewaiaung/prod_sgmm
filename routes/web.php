@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/set-arrival', [LogisticController::class, 'setEstimatedArrival'])->name('set-arrival');
     Route::post('/delete', [LogisticController::class, 'deleteData'])->name('delete');
     Route::post('/payment', [LogisticController::class, 'paymetUpdate'])->name('payment');
+    Route::post('/mothly-invoice', [LogisticController::class, 'monthlyInvoice']);
 });
 
 # Track Parcel

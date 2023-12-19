@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('sender_name');
             $table->string('sender_phone');
             $table->tinyInteger('sg_home_pickup')->comment('1: true 2: false');
-            $table->string('sg_address');
+            $table->string('sg_address')->nullable();
             $table->tinyInteger('shipment_method')->comment('1:Land(2week) 2:Land Express(7-10 days) 3:Sea Cargo(3-4 week) 4:Air Cargo(3-5 days)');
             $table->string('invoice_no');
             $table->tinyInteger('how_in_ygn')->comment('1: Yangon Home Delivery($3.5) 2:Yangon Home Deliver Outside ($5.0) 3: Bus Gate ($3.5) 4: Self Collection');

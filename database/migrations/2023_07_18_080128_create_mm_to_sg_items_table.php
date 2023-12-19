@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('sender_email')->nullable();
             $table->string('sender_name');
             $table->string('sender_phone');
-            $table->string('sender_address');
+            $table->string('sender_address')->nullable();
             $table->tinyInteger('transport')->comment('1: Sea Cargo 2: Air Cargo');
             $table->tinyInteger('storage_type')->comment('1: Room Temperature 2: In Normal Fridge 3: In Freezer');
             $table->tinyInteger('mm_home_pickup')->comment('1: yes 2: no');
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('pay_with')->nullable();
             $table->string('receiver_name');
             $table->string('receiver_phone');
-            $table->string('receiver_address');
+            $table->string('receiver_address')->nullable();
             $table->string('receiver_postal_code')->nullable();
             $table->integer('handling_fee')->default(2);
             $table->integer('form');
