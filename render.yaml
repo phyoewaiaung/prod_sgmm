@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: sg-mm-app
+    env: php
+    plan: free
+    buildCommand: composer install --no-dev && npm install && npm run build
+    startCommand: php -S 0.0.0.0:10000 -t public
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        fromEnv: APP_KEY
