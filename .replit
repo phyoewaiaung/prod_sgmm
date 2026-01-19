@@ -20,7 +20,7 @@ APP_KEY = "base64:1Y9Gt2PbVv+AmO+gyj6nka+sFWL/lzVny8g9HqRQgCY="
 channel = "stable-25_05"
 
 [[ports]]
-localPort = 5000
+localPort = 8080
 externalPort = 80
 
 [workflows]
@@ -37,7 +37,7 @@ args = "bash build.sh"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "bash start.sh"
-waitForPort = 5000
+waitForPort = 8080
 
 [workflows.workflow.metadata]
 outputType = "webview"
