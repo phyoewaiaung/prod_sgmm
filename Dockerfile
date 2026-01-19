@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install -j$(nproc) gd && \
+RUN docker-php-ext-install -j$(nproc) gd zip && \
     docker-php-ext-configure sodium && \
     docker-php-ext-install -j$(nproc) sodium
 
