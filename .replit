@@ -32,6 +32,10 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
+args = "bash build.sh"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
 args = "bash start.sh"
 waitForPort = 5000
 
