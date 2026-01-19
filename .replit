@@ -1,0 +1,39 @@
+modules = ["nodejs-20", "php-8.2", "web"]
+
+[env]
+APP_NAME = "Laravel"
+APP_ENV = "production"
+APP_DEBUG = "false"
+APP_URL = "https://prodsgmm--phyoaiaugpxyo.repl.co"
+LOG_CHANNEL = "stack"
+LOG_LEVEL = "debug"
+DB_CONNECTION = "sqlite"
+DB_DATABASE = "database.sqlite"
+BROADCAST_DRIVER = "log"
+CACHE_DRIVER = "file"
+QUEUE_CONNECTION = "sync"
+SESSION_DRIVER = "file"
+MAIL_MAILER = "log"
+APP_KEY = "base64:1Y9Gt2PbVv+AmO+gyj6nka+sFWL/lzVny8g9HqRQgCY="
+
+[nix]
+channel = "stable-25_05"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "bash start.sh"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
