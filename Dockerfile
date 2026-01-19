@@ -11,19 +11,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     npm \
     nodejs \
-    build-essential \
-    libssl-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libsodium-dev \
     && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install -j$(nproc) gd zip opcache && \
-    docker-php-ext-configure sodium && \
-    docker-php-ext-install -j$(nproc) sodium
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -34,8 +22,8 @@ WORKDIR /var/www/html
 # Copy project files
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install PHP dependencies (ignore platform requirements)
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd --ignore-platform-req=ext-sodium --ignore-platform-req=ext-zip
 
 # Install Node dependencies and build frontend
 RUN npm install && npm run build
