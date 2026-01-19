@@ -11,13 +11,17 @@ RUN apt-get update && apt-get install -y \
     unzip \
     npm \
     nodejs \
+    build-essential \
     libssl-dev \
     libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     libsodium-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install -j$(nproc) gd zip && \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j$(nproc) gd zip opcache && \
     docker-php-ext-configure sodium && \
     docker-php-ext-install -j$(nproc) sodium
 
