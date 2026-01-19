@@ -16,8 +16,9 @@ mkdir -p database
 touch database/database.sqlite
 
 echo "Preparing database..."
-php artisan migrate:fresh --seed --force || true
-php artisan cache:clear || true
-php artisan config:clear || true
+php artisan migrate:fresh --force
+php artisan db:seed --force
+php artisan cache:clear
+php artisan config:clear
 
 echo "Build complete! Starting server..."
