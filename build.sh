@@ -11,8 +11,12 @@ npm install
 echo "Building frontend assets..."
 npm run build
 
+echo "Creating database file..."
+mkdir -p database
+touch database/database.sqlite
+
 echo "Preparing database..."
-php artisan migrate --force || true
+php artisan migrate:fresh --seed --force || true
 php artisan cache:clear || true
 php artisan config:clear || true
 
