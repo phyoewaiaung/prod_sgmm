@@ -2,6 +2,9 @@
 set -e
 
 echo "Building application..."
+echo "Setting up environment..."
+cp .env.replit .env
+
 echo "Installing PHP dependencies..."
 composer install --no-dev --optimize-autoloader
 
